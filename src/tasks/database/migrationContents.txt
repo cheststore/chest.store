@@ -1,0 +1,18 @@
+export default [
+  async function create{Table}(postgres) {
+    await postgres.query(`
+      CREATE TABLE IF NOT EXISTS {table} (
+        id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+        credential_id uuid REFERENCES cloud_credentials,
+        -- col1 varchar(255),
+        -- ...
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      );
+    `)
+  },
+
+  async function create{Table}Indexes(postgres) {
+    await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS {table}_credential_id_idx on {table} (credential_id)`)
+  }
+]

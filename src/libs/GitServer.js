@@ -1,12 +1,18 @@
+import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs'
 import path from 'path'
+import tar from 'tar'
 import Server from 'node-git-server'
+import Aws from '../libs/Aws'
 import BackgroundWorker from '../libs/BackgroundWorker'
+import CloudBuckets from '../libs/models/CloudBuckets'
+import CloudCredentials from '../libs/models/CloudCredentials'
 import AuditLog from '../libs/models/AuditLog'
 import Users from '../libs/models/Users'
 import config from '../config'
 
 export default function GitServer({
-  log,
+  // log,
   postgres,
   redis,
   rootDir=path.join(config.app.rootDir, 'tmp')
@@ -57,13 +63,19 @@ export default function GitServer({
     },
 
     async onPush(push) {
-      await Promise.all([
-        // TODO: background worker to tar git repo, push to S3
-        // and save metadata in DB about git repo
-        // BackgroundWorker({ redis }).enqueue('gitSavePushedRepo', {
-        //   userId: this.user.id,
-        //   repo: push.repo
-        // }),
+      const repoTarFilename = `${push.repo}_${uuidv4()}.tar.gz`
+      const fullRepoTarPath = path.join(rootDir, this.user.username, repoTarFilename)
+      const [ bucket, cred ] = await Promise.all([
+        CloudBuckets(postgres).find(this.user.current_bucket_id),
+        CloudCredentials(postgres).find(this.user.current_credential_id),
+        tar.c(
+          {
+            gzip: true,
+            file: fullRepoTarPath,
+            cwd: path.join(rootDir, this.user.username)
+          },
+          [ `${push.repo}.git` ]
+        ),
         AuditLog(postgres).log({
           credential_id: this.user.current_credential_id,
           user_id: this.user.id,
@@ -73,6 +85,24 @@ export default function GitServer({
             commit: push.commit,
             branch: push.branch
           }
+        })
+      ])
+
+      const s3 = Aws({
+        accessKeyId: cred.key,
+        secretAccessKey: cred.secret
+      }).S3
+
+      await Promise.all([
+        s3.writeFile({
+          bucket: bucket.bucket_uid,
+          data: fs.createReadStream(fullRepoTarPath),
+          filename: repoTarFilename
+        }),
+        BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+          bucketId: bucket.id,
+          credentialId: this.user.current_credential_id,
+          userId: this.user.id
         })
       ])
 

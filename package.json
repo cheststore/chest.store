@@ -50,6 +50,7 @@
     "ioredis": "^4.14.1",
     "minimist": "^1.2.5",
     "moment": "^2.25.1",
+    "node-git-server": "^0.6.1",
     "node-resque": "^7.0.4",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",

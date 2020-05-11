@@ -12,6 +12,7 @@ import passport from 'passport'
 import socketIo from 'socket.io'
 import bunyan from 'bunyan'
 import WebSocket from '../websocket/index'
+import GitServer from '../libs/GitServer'
 import PostgresClient from '../libs/PostgresClient'
 import RedisHelper from '../libs/RedisHelper'
 import SessionHandler from '../libs/SessionHandler'
@@ -100,6 +101,21 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
               return next(err)
             res.redirect(redirectTo)
           })
+        })
+
+        // git server
+        const gitServer = GitServer({ log, postgres, redis })
+        let userGitServers = {}
+        app.use('/git/:username', async function gitRoute(...args) {
+          try {
+            const [ req ] = args
+            const username = req.params.username
+            userGitServers[username] = userGitServers[username] || await gitServer.create(username)
+            userGitServers[username].handle(...args)
+          } catch(err) {
+            const [ _, res ] = args
+            res.status(401).send(err.message)
+          }
         })
 
         //static files

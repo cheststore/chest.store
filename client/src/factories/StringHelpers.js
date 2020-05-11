@@ -36,9 +36,10 @@ export default {
     if (Math.abs(bytes) < thresh)
       return `${bytes} B`
     
-    const units = si
-      ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-      : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB']
+    const units = ['kB','MB','GB','TB','PB','EB','ZB','YB']
+    // const units = si
+    //   ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+    //   : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB']
     
     let u = -1
     do {

@@ -93,6 +93,19 @@ export default function({ log, postgres, redis }) {
       const buckId  = session.getLoggedInBucketId()
       const userId  = session.getLoggedInUserId()
 
+      // We don't have trigger happy users from queueing up
+      // a ton of manual syncs back to back. This will enforce
+      // a minumum 10 minute delay between manual syncs per bucket.
+      const canManualSync = await redis.client.set(
+        `manual_sync_${buckId}`,
+        'true',
+        'NX',
+        'EX',
+        60 + 10)  // 10 min
+
+      if (!canManualSync)
+        return res.status(400).json({ error: `This bucket was recently synced. Please wait up to 10 minutes before trying to manually sync again.` })
+
       await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
         bucketId: buckId,
         credentialId: credId,

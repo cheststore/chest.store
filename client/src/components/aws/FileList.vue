@@ -2,42 +2,30 @@
   div
     div.row.mb-4
       div.col-lg-12.d-flex.align-items-center
-        div.text-gray
-          | #[strong {{ objectInfo.totalCount }}] objects
-          | in #[strong {{ currentBucket.name }}]
-        button.ml-auto.btn.btn-vsm.btn-primary(@click="syncBucket()") Sync Bucket
+        button.ml-auto.btn.btn-vsm.btn-primary(@click="syncBucket()") Sync Bucket Manually
 
-    pagination.mb-3(
-      :info="objectInfo",
-      @changePage="changePage",
-      @changePerPage="changePerPage")
-    div.row.small-gutters
-      div.col-md-6.col-lg-3.mb-2(v-for="obj in objectInfo.data")
-        div.card.card-small.no-shadow.border.rounded-0
-          div.card-body.py-2.px-3
-            div.small.text-soft.d-flex.align-items-center.text-gray
-              div.overflow-ellipses.no-hover.small {{ obj.full_path }}
-              div.ml-auto.nowrap.small
-                div.ml-2.small.text-right
-                  strong {{ getFormattedDate(obj.last_modified) }}
-            div.mt-2.d-flex.align-items-center
-              div.overflow-ellipses.no-hover(:id="`object-${obj.id}`")
-                a(@click="downloadObject(obj.id)") {{ obj.name }}
-                b-tooltip(:target="`object-${obj.id}`") {{ obj.name }}
-              div.ml-auto.nowrap
-                div.ml-2.small.text-gray {{ humanFileSize(obj.size_bytes) }}
-    pagination.mt-1(
-      :info="objectInfo",
-      @changePage="changePage",
-      @changePerPage="changePerPage")
+    ul.list-unstyled.object-list
+      li.px-3.py-2(v-if="objectInfo.totalCount === 0")
+        i No objects in bucket #[strong {{ currentBucket.name }}] yet
+      li.px-3.py-2.border-bottom(v-else,v-for="(obj, index) in objectInfo.data")
+        file-list-row(:file="obj",:ind="index")
+
+    div.row
+      div.d-none.col-md-6.d-md-flex.align-items-center
+        div.text-gray
+          | page #[strong {{ objectInfo.currentPage }}] of #[strong {{ objectInfo.numberPages }}]
+          | (#[strong {{ objectInfo.totalCount }}] objects in #[strong {{ currentBucket.name }}])
+      div.col-md-6
+        pagination.mt-1(
+          :info="objectInfo",
+          @changePage="changePage",
+          @changePerPage="changePerPage")
 </template>
 
 <script>
   import { mapState } from 'vuex'
+  import FileListRow from './FileListRow'
   import ApiAws from '../../factories/ApiAws'
-  import DomHelpers from '../../factories/DomHelpers'
-  import StringHelpers from '../../factories/StringHelpers'
-  import TimeHelpers from '../../factories/TimeHelpers'
 
   export default {
     computed: {
@@ -48,13 +36,6 @@
     },
 
     methods: {
-      getFormattedDate: TimeHelpers.getFormattedDate,
-      humanFileSize: StringHelpers.humanFileSize,
-
-      downloadObject(objId) {
-        DomHelpers.downloadUri(`/file/download/${objId}`)
-      },
-
       async changePage(newPage) {
         this.$store.commit('SET_OBJECT_LIST_PAGE', newPage)
         await this.getObjectList()
@@ -73,6 +54,7 @@
       async syncBucket() {
         try {
           await ApiAws.syncCurrentBucket()
+          window.toastr.success(`Began syncing bucket! Any new objects should show up shortly.`)
         } catch(err) {
           window.toastr.error(err.message)
         }
@@ -81,6 +63,10 @@
 
     async created() {
       await this.getObjectList()
+    },
+
+    components: {
+      FileListRow
     }
   }
 </script>

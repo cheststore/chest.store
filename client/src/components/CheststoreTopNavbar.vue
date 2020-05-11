@@ -1,7 +1,7 @@
 <template lang="pug">
-  nav.py-2.navbar.navbar-expand-lg.navbar-light.bg-light
+  nav.col-12.navbar.navbar-expand-lg.navbar-light
     router-link.navbar-brand(to='/') #[i.fa.fa-treasure-chest] chest.store
-    button.navbar-toggler(
+    button.navbar-toggler.mr-2(
       type='button',
       data-toggle='collapse',
       data-target='#navbar-supported-content',
@@ -44,6 +44,7 @@
 
 <style lang="scss" scoped>
   .navbar {
+    box-shadow: 0 0 10px rgba(10, 10, 10, .2);
     padding: 0rem;
 
     .navbar-brand {

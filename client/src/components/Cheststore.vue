@@ -5,7 +5,7 @@
       div.w-100.alert.alert-danger.text-center.rounded-0.mb-0(
         v-if="mainNotification",
         v-html="mainNotification")
-    div.container-fluid.mt-4
+    div.container.mt-4
       loader(v-if="isLoading")
       router-view#main-content.mb-4(v-else)
 

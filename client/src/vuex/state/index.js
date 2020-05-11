@@ -9,5 +9,9 @@ export default {
   mainNotification: null,
   pageSizes: [ 10, 15, 20, 25, 50, 100 ],
   
-  session: {}
+  session: {},
+
+  getRowNumber(index, currentPage=1, perPage=20) {
+    return (perPage * (currentPage - 1)) + (index + 1)
+  },
 }

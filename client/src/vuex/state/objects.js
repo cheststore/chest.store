@@ -1,5 +1,7 @@
 export default {
   objects: {
+    currentObject: {},
+
     currentList: {
       currentPage: 1,
       data: [],

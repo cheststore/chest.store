@@ -245,3 +245,11 @@ table {
     overflow: visible;
   }
 }
+
+.object-list {
+  > li {
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+}

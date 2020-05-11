@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 const AuthError = () => import('@/components/auth/AuthError')
 const InitAws = () => import('@/components/aws/InitAws')
+const FileDetail = () => import('@/components/aws/FileDetail')
 const FileList = () => import('@/components/aws/FileList')
 const Login = () => import('@/components/auth/Login')
 
@@ -19,6 +20,13 @@ export default new VueRouter({
 
 export function getRoutes() {
   return [
+    {
+      path: '/object/:id',
+      component: FileDetail,
+      props: true,
+      title: 'File/Object Detail',
+      subTitle: 'chest.store'
+    },
     {
       path: '/aws/init',
       component: InitAws,

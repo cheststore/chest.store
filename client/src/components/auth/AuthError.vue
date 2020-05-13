@@ -1,7 +1,7 @@
 <template lang="pug">
   div
     div.row.text-center
-      div.col-lg-8.offset-lg-2
+      div.col-lg-6.offset-lg-3
         div.alert.alert-danger.text-center.mb-0.mb-4(v-if="!!errorMessage") {{ errorMessage }}
     component(:is="subComponent")
 </template>

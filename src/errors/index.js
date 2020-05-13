@@ -1,4 +1,5 @@
 import AccountDisabled from './AccountDisabled'
+import Generic from './Generic'
 import IncorrectPassword from './IncorrectPassword'
 import IncorrectPasswordTooManyTries from './IncorrectPasswordTooManyTries'
 import InvalidEmailAddress from './InvalidEmailAddress'
@@ -12,6 +13,7 @@ import UsernameAlreadyExists from './UsernameAlreadyExists'
 
 export default {
   AccountDisabled,
+  Generic,
   IncorrectPassword,
   IncorrectPasswordTooManyTries,
   InvalidEmailAddress,

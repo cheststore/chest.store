@@ -1,4 +1,8 @@
 export default {
+  generic: `
+    There was an error authenticating you. Please make sure
+    you enter a valie username and password and try again.`,
+
   disabled: `
     Your account has been disabled. If you think this is a mistake
     contact customer support to re-enable your account.

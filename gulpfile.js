@@ -2,12 +2,21 @@ const gulp = require('gulp')
 const babel = require('gulp-babel')
 const nodemon = require('gulp-nodemon')
 const plumber = require('gulp-plumber')
+const ts = require('gulp-typescript')
+
+const tsProject = ts.createProject('tsconfig.json')
 
 gulp.task('src', function() {
   return gulp.src("./src/**/*.js")
     .pipe(plumber())
     .pipe(babel())
     .pipe(gulp.dest("./dist"))
+})
+
+gulp.task('ts-src', function () {
+  return tsProject.src()
+    .pipe(tsProject())
+    .js.pipe(gulp.dest('./dist'));
 })
 
 gulp.task('txt', function() {
@@ -32,4 +41,4 @@ gulp.task('start', function(done) {
   return stream
 })
 
-gulp.task('build', gulp.parallel('src', 'txt'))
+gulp.task('build', gulp.parallel('src', 'ts-src', 'txt'))

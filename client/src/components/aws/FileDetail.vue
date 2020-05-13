@@ -43,7 +43,7 @@
       async getObject(id=this.id) {
         try {
           this.isLoadingLocal = true
-          this.$store.commit('SET_OBJECT', { id })
+          this.$store.commit('SET_BUCKET_OBJECT', { id })
           await this.$store.dispatch('getCurrentObject')
         } catch(err) {
           window.toastr.error(err.message)

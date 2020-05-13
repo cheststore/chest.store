@@ -11,7 +11,7 @@
             | #[strong {{ getFormattedDate(file.last_modified) }}]
       div.d-flex.align-items-center
         div.overflow-ellipses.no-hover(:id="`object-${file.id}`")
-          router-link(:to="`object/${file.id}`") {{ file.name }}
+          router-link(:to="`/object/${file.id}`") {{ file.name }}
           b-tooltip(:target="`object-${file.id}`") {{ file.name }}
         div.ml-auto.nowrap.d-flex.align-items-center
           div.ml-2.small.text-gray {{ humanFileSize(file.size_bytes) }}

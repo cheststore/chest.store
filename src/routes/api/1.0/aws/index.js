@@ -17,14 +17,14 @@ export default function({ log, postgres, redis }) {
       const creds    = CloudCredentials(postgres)
       const credMap  = CloudCredentialUserMap(postgres)
       const users    = Users(postgres)
-      const bucket   = session.getLoggedInBucketId(true)
       const user     = session.getLoggedInUserId(true)
       const {
+        providerType,
         awsKey,
         awsSecret
       } = req.body
 
-      const provider = Providers(bucket.type, { apiKey: awsKey, apiSecret: awsSecret })
+      const provider = Providers(providerType, { apiKey: awsKey, apiSecret: awsSecret })
       
       try {
         // will provide an error if key/secret combo are invalid
@@ -60,6 +60,7 @@ export default function({ log, postgres, redis }) {
       const login   = LoginHandler(postgres, req)
       const session = SessionHandler(req.session)
       const buckets = CloudBuckets(postgres)
+      const users   = Users(postgres)
       const credId  = session.getLoggedInCredentialId()
       const user    = session.getLoggedInUserId(true)
       const bucket  = req.body.bucket
@@ -76,8 +77,12 @@ export default function({ log, postgres, redis }) {
         CloudBucketUserMap(postgres).findOrCreateBy({ user_id: user.id, bucket_id: buckets.record.id })
       ])
 
-      await login.standardLogin(user, true)
+      if (!user.current_bucket_id) {
+        users.setRecord({ id: user.id, current_bucket_id: buckets.record.id })
+        await users.save()
+      }
 
+      await login.standardLogin({ ...user, ...users.record }, true)
       res.json(true)
     },
 
@@ -91,11 +96,11 @@ export default function({ log, postgres, redis }) {
       // a ton of manual syncs back to back. This will enforce
       // a minumum 10 minute delay between manual syncs per bucket.
       const canManualSync = await redis.client.set(
-        `manual_sync_${buckId}`,
+        `chest.store_manual_sync_${buckId}`,
         'true',
         'NX',
         'EX',
-        60 + 10)  // 10 min
+        60 * 10)  // 10 min
 
       if (!canManualSync)
         return res.status(400).json({ error: `This bucket was recently synced. Please wait up to 10 minutes before trying to manually sync again.` })

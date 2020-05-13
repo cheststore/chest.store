@@ -47,6 +47,13 @@ export function getRoutes() {
       subTitle: 'chest.store'
     },
     {
+      path: '/directory/:directoryId',
+      component: FileList,
+      props: true,
+      title: 'chest.store',
+      subTitle: 'chest.store'
+    },
+    {
       path: '/*',
       component: FileList,
       title: 'chest.store',

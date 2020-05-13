@@ -5,6 +5,7 @@ export default [
         id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         bucket_id uuid REFERENCES cloud_buckets,
         full_path varchar(1000),
+        directory_id uuid REFERENCES cloud_directories, -- null means top level of bucket
         name varchar(255),
         last_modified timestamptz,
         etag varchar(255),

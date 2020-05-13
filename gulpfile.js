@@ -27,9 +27,9 @@ gulp.task('txt', function() {
 gulp.task('start', function(done) {
   const stream = nodemon({
     exec: 'npm start',
-    ext: 'js',
+    ext: 'js ts',
     tasks: ['build'],
-    watch: ['src/**/*.js'],
+    watch: ['src/**/*.{js,ts}'],
     done: done
   })
 

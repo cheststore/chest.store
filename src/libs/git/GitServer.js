@@ -2,11 +2,12 @@ import fs from 'fs'
 import path from 'path'
 import Server from 'node-git-server'
 import GitHelpers from './GitHelpers'
-import Aws from '../Aws'
+import Providers from '../cloud/Providers'
 import FileManagement from '../FileManagement'
 import AuditLog from '../models/AuditLog'
 import CloudBuckets from '../models/CloudBuckets'
 import CloudCredentials from '../models/CloudCredentials'
+import CloudDirectories from '../models/CloudDirectories'
 import CloudObjects from '../models/CloudObjects'
 import GitRepos from '../models/GitRepos'
 import Users from '../models/Users'
@@ -106,7 +107,7 @@ export default function GitServer({
     },
 
     async handlePush(push) {
-      const objects = CloudObjects(postgres)
+      const directories = CloudDirectories(postgres)
       const gitRepos = GitRepos(postgres)
 
       const [
@@ -129,24 +130,18 @@ export default function GitServer({
         })
       ])
 
-      const s3 = Aws({
-        accessKeyId: cred.key,
-        secretAccessKey: cred.secret
-      }).S3
+      const fullTarPath = `git/${tarInfo.name}`
 
-      const { filename } = await s3.writeFile({
-        bucket: bucket.bucket_uid,
-        data: fs.createReadStream(tarInfo.path),
-        filename: tarInfo.name
-      })
+      const provider = Providers(bucket.type, { apiKey: cred.key, apiSecret: cred.secret })
+      await provider.writeObject(bucket.bucket_uid, fullTarPath, fs.createReadStream(tarInfo.path))
 
-      await Promise.all([
-        objects.findOrCreateBy({ bucket_id: bucket.id, full_path: filename }),
+      const [ newRecInfo ] = await Promise.all([
+        directories.createDirsAndObjectFromFullPath(bucket.id, fullTarPath),
         gitRepos.findOrCreateBy({ bucket_id: bucket.id, repo: push.repo })
       ])
       gitRepos.setRecord({
         credential_id: this.user.current_credential_id,
-        object_id: objects.record.id,
+        object_id: newRecInfo[newRecInfo.length - 1].id,
         user_id: this.user.id
       })
       await gitRepos.save()

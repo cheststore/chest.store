@@ -1,4 +1,5 @@
 import SessionHandler from '../../../../libs/SessionHandler'
+import CloudDirectories from '../../../../libs/models/CloudDirectories'
 import CloudObjects from '../../../../libs/models/CloudObjects'
 import config from '../../../../config'
 
@@ -6,15 +7,29 @@ export default function({ postgres }) {
   return {
     async ['list'](req, res) {
       const session = SessionHandler(req.session)
+      const dir     = CloudDirectories(postgres)
       const objects = CloudObjects(postgres)
       const buckId  = session.getLoggedInBucketId()
       const {
+        directoryId,
         page,
         perPage
       } = req.query
 
-      const info = await objects.getObjectsInBucket(buckId, page, perPage)
-      res.json(info)
+      const [ info, directory, directories ] = await Promise.all([
+        objects.getObjectsInBucket(buckId, directoryId, page, perPage),
+        (async function getDir() {
+          if (directoryId)
+            return await dir.findBy({ bucket_id: buckId, id: directoryId })
+        })(),
+        dir.getDirectChildren(buckId, directoryId)
+      ])
+
+      res.json({
+        objectInfo: info,
+        directory,
+        directories
+      })
     },
 
     async ['get'](req, res) {

@@ -247,7 +247,7 @@ table {
 }
 
 .object-list {
-  > li {
+  > li.object {
     &:hover {
       background: #f0f0f0;
     }

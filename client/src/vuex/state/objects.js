@@ -1,5 +1,7 @@
 export default {
   objects: {
+    directories: [],
+    currentDirectory: {},
     currentObject: {},
 
     currentList: {

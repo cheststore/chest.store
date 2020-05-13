@@ -7,11 +7,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  async checkAndSaveKey(awsKey, awsSecret) {
+  async checkAndSaveKey(providerType, awsKey, awsSecret) {
     const response = await CheststoreFetch(`/api/1.0/aws/key/check/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ awsKey, awsSecret })
+      body: JSON.stringify({ providerType, awsKey, awsSecret })
     })
     return await handleFetchResponse(response)
   },

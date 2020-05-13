@@ -10,6 +10,7 @@ export default function CloudObjects(postgres) {
       accessibleColumns: [
         'bucket_id',
         'full_path',
+        'directory_id', // null means top level of bucket
         'name',
         'last_modified',
         'etag',
@@ -23,15 +24,25 @@ export default function CloudObjects(postgres) {
 
       async getObjectsInBucket(
         bucketId,
+        directoryId=null,
         page=1,
         perPage=30
       ) {
+        let filters = [ `bucket_id = $1` ]
+        let params = [ bucketId ]
+        if (directoryId) {
+          filters.push(`directory_id = $2`)
+          params.push(directoryId)
+        } else {
+          filters.push(`directory_id is null`)
+        }
+
         return await PostgresSqlParser().runPaginationQuery(postgres, `
           select o.*
           from cloud_objects as o
-          where bucket_id = $1
+          where ${filters.join(' and ')}
           order by o.last_modified desc
-        `, [ bucketId ], page, perPage)
+        `, params, page, perPage)
       }
     }
   )

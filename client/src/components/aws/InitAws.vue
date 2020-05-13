@@ -67,7 +67,7 @@
             return window.toastr.error(`Please enter both and access key and secret to add.`)
 
           this.isCheckingKey = true
-          await ApiAws.checkAndSaveKey(this.computedKey, this.awsSecret)
+          await ApiAws.checkAndSaveKey('aws', this.computedKey, this.awsSecret)
           await Promise.all([
             this.$store.dispatch('getUserSession', true),
             this.listBuckets()

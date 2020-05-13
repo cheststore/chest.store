@@ -54,6 +54,7 @@
     "ioredis": "^4.14.1",
     "minimist": "^1.2.5",
     "moment": "^2.25.1",
+    "node-git-server": "^0.6.1",
     "node-resque": "^7.0.4",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
@@ -65,8 +66,10 @@
     "pug": "^2.0.4",
     "require-all": "^3.0.0",
     "sanitize-html": "^1.20.1",
+    "simple-git": "^2.4.0",
     "socket.io": "^2.3.0",
     "sticky-cluster": "^0.3.5",
+    "tar": "^6.0.2",
     "uuid": "^8.0.0"
   },
   "license": "UNLICENSED"

@@ -54,7 +54,7 @@ export default function({ log, postgres, redis }) {
             credential_id: cred.id,
             user_id: userId,
             action: `Download Object`,
-            additional_info: objId
+            additional_info: { objectId: objId }
           })
         ])
 

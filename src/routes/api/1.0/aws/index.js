@@ -1,4 +1,4 @@
-import Aws from '../../../../libs/Aws'
+import Providers from '../../../../libs/cloud/Providers'
 import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import LoginHandler from '../../../../libs/LoginHandler'
 import SessionHandler from '../../../../libs/SessionHandler'
@@ -17,20 +17,18 @@ export default function({ log, postgres, redis }) {
       const creds    = CloudCredentials(postgres)
       const credMap  = CloudCredentialUserMap(postgres)
       const users    = Users(postgres)
+      const bucket   = session.getLoggedInBucketId(true)
       const user     = session.getLoggedInUserId(true)
       const {
         awsKey,
         awsSecret
       } = req.body
 
-      const sts = Aws({
-        accessKeyId: awsKey,
-        secretAccessKey: awsSecret
-      }).STS
+      const provider = Providers(bucket.type, { apiKey: awsKey, apiSecret: awsSecret })
       
       try {
-        // will provide an AWS error if key/secret combo are invalid
-        await sts.getCallerIdentity()
+        // will provide an error if key/secret combo are invalid
+        await provider.areValidCredentials()
 
         await creds.findOrCreateBy({ type: 'aws', key: awsKey })
         creds.setRecord({ secret: awsSecret })
@@ -53,12 +51,8 @@ export default function({ log, postgres, redis }) {
       const session = SessionHandler(req.session)
       const cred    = session.getLoggedInCredentialId(true)
 
-      const s3 = Aws({
-        accessKeyId: cred.key,
-        secretAccessKey: cred.secret
-      }).S3
-
-      const buckets = await s3.listBuckets()
+      const provider = Providers(cred.type, { apiKey: cred.key, apiSecret: cred.secret })
+      const buckets = await provider.listBuckets()
       res.json(buckets)
     },
 

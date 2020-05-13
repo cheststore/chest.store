@@ -1,4 +1,5 @@
 import passport from 'passport'
+import Errors from '../errors'
 // import SessionHandler from '../libs/SessionHandler'
 
 export default function() {
@@ -7,6 +8,16 @@ export default function() {
     verb: 'POST',
     route: '/auth/local',
     handler: [
+      (req, res, next) => {
+        const {
+          username,
+          password
+        } = req.body
+        if (!(username && password))
+          throw new Errors.Generic(`Bad username or password`)
+
+        next()
+      },
       passport.authenticate("local"),
       (req, res) => {
         // const session = SessionHandler(req.session)

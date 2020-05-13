@@ -2,7 +2,7 @@
   "name": "chest.store",
   "version": "0.0.1",
   "author": "Lance Whatley <whatl3y@gmail.com>",
-  "description": "Easy AWS S3 object explorer and cloud storage.",
+  "description": "Easy AWS S3 object explorer, cloud storage, and git HTTP server.",
   "engines": {
     "node": "14.0.0"
   },

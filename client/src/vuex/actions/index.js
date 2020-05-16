@@ -18,7 +18,10 @@ export default {
 
       await dispatch('getUserSession')
 
-      const fullPath = state.router.currentRoute.fullPath
+      // Seeing a weird bug where the currentRoute.fullPath shows
+      // as the root route, then populates as the correct route.
+      const fullPath = window.location.pathname // state.router.currentRoute.fullPath
+
       const isLoggedIn = !!(state.session.user)
       commit('CHECK_LOGGED_IN', isLoggedIn)
       if (isLoggedIn) {
@@ -28,12 +31,12 @@ export default {
             return state.router.push(path)
         }
         
-        if (/^\/login/.test(fullPath)) {
+        if (/^\/account/.test(fullPath)) {
           return window.location.href = '/' // return commit('SET_ROUTE', '/')
         }
       } else {
-        if (!(/^\/login/.test(fullPath) || /^\/autherror/.test(fullPath) || /^\/mfa/.test(fullPath))) {
-          commit('SET_ROUTE', '/login')
+        if (!(/^\/account/.test(fullPath) || /^\/autherror/.test(fullPath) || /^\/mfa/.test(fullPath))) {
+          return commit('SET_ROUTE', '/account/login')
         }
       }
 

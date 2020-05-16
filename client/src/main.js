@@ -7,12 +7,12 @@ import toastr from 'toastr'
 import * as FastClick from 'fastclick'
 import VueSocketIO from 'vue-socket.io'
 import store from './vuex/store'
-import Cheststore from './components/Cheststore'
+import Cheststore from './Cheststore'
+import Dashboard from './plugins/dashboard'
 import CheststoreSocket from './factories/CheststoreSocket'
 import router from './router'
 
-// external libraries and components
-import './components/reusable'
+// import './registerServiceWorker'
 
 // css
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -29,6 +29,7 @@ Vue.use(
     }
   })
 )
+Vue.use(Dashboard)
 
 // Initiate FastClick for mobile devices to remove the built-in 300ms
 // delay. Read more in https://github.com/ftlabs/fastclick

@@ -24,14 +24,14 @@ interface ICloudObjects {
 }
 
 interface ICloudProvider {
-  async areValidCredentials: () => boolean
-  async doesObjectExist: (bucket: string, name: string, options?: object) => boolean
-  async listObjectsRecursive: (bucket: string, setCallback: (set: Array<object>) => void, nextPageToken: any) => ICloudObjects
-  async getObject: (bucket: string, name: string, options?: object) => Buffer
-  async getObjectStreamWithBackoff: (stream: WritableStream, bucket: string, name: string, backoffAttempt?: number) => void
-  async writeObject: (bucket: string, name: string, data: (Buffer | ReadableStream | string), options?: object) => object
-  async listBuckets: () => ICloudBuckets,
-  async createBucket: (name: string) => any
+  async areValidCredentials: () => Promise<boolean>
+  async doesObjectExist: (bucket: string, name: string, options?: object) => Promise<boolean>
+  async listObjectsRecursive: (bucket: string, setCallback: (set: Array<object>) => void, nextPageToken: any) => Promise<ICloudObjects>
+  async getObject: (bucket: string, name: string, options?: object) => Promise<Buffer>
+  async getObjectStreamWithBackoff: (stream: WritableStream, bucket: string, name: string, backoffAttempt?: number) => Promise<void>
+  async writeObject: (bucket: string, name: string, data: (Buffer | ReadableStream | string), options?: object) => Promise<object>
+  async listBuckets: () => Promise<ICloudBuckets>,
+  async createBucket: (name: string) => Promise<any>
 }
 
 export interface IFactoryOptions {

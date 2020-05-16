@@ -9,7 +9,7 @@ export default function() {
     handler: async function Index(req, res) {
       await Users(null, req.session).logout()
       req.logout()
-      res.redirect("/login")
+      res.redirect('/account/login')
     }
   }
 }

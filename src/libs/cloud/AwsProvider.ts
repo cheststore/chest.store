@@ -1,4 +1,4 @@
-import { IFactoryOptions } from './ProviderTypes'
+import { ICloudProvider, IFactoryOptions } from './ProviderTypes'
 // import Aws from '../Aws'
 const Aws = require('../Aws').default
 
@@ -6,7 +6,7 @@ export default function AwsProvider({
   apiKey,
   apiSecret,
   region
-}: IFactoryOptions) {
+}: IFactoryOptions): ICloudProvider {
   const aws = Aws({
     accessKeyId: apiKey,
     secretAccessKey: apiSecret,

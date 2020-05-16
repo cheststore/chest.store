@@ -1,255 +1,70 @@
-$primary: #000080;
-$accent-color: $primary;
+/*!
 
-@import './overrides';
-@import '../../node_modules/bootstrap/scss/bootstrap.scss';
-@import './borders';
-@import 'toastr';
+=========================================================
+* Vue Argon Dashboard - v1.0.0
+=========================================================
 
-a {
-  &:not([href]):not([tabindex]) {
-    color: $primary;
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+* Copyright 2019 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md)
 
-    &.color-inherit {
-      color: inherit;
-    }
-  }
+* Coded by Creative Tim
 
-  &.color-inherit {
-    color: inherit;
-  }
+=========================================================
 
-  cursor: pointer;
-}
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-label {
-  margin-bottom: 0px;
-}
+*/
 
-.text {
-  &-light-gray {
-    color: $gray-400 !important;
-  }
+// Core
 
-  &-gray {
-    color: $gray-500 !important;
-  }
-}
+@import "custom/functions";
+@import "custom/variables";
+@import "custom/mixins";
 
-.nowrap {
-  white-space: nowrap;
-}
+// Bootstrap (4.1.3) components
 
-.clickable {
-  cursor: pointer;
-}
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/code";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/tables";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/button-group";
+@import "~bootstrap/scss/input-group";
+@import "~bootstrap/scss/custom-forms";
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/jumbotron";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/progress";
+@import "~bootstrap/scss/media";
+@import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/close";
+@import "~bootstrap/scss/modal";
+@import "~bootstrap/scss/tooltip";
+@import "~bootstrap/scss/popover";
+@import "~bootstrap/scss/carousel";
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/print";
 
-.text-large {
-  font-size: 1.4rem;
-}
+// Argon utilities and components
 
-.text-small {
-  font-size: 0.7rem;
-}
+@import "custom/reboot";
+@import "custom/utilities";
+@import "custom/components";
 
-.small-gutters {
-  margin-right: -5px;
-  margin-left: -5px;
+// Vendor (Plugins)
 
-  > .col,
-  > [class*="col-"] {
-    padding-right: 5px;
-    padding-left: 5px;
-  }
-}
+@import "custom/vendors";
 
-.card {
-  background-color: #fff;
-  border: none;
-  border-radius: .625rem;
-  -webkit-box-shadow: 0 0.46875rem 2.1875rem rgba(90,97,105,.1), 0 0.9375rem 1.40625rem rgba(90,97,105,.1), 0 0.25rem 0.53125rem rgba(90,97,105,.12), 0 0.125rem 0.1875rem rgba(90,97,105,.1);
-  box-shadow: 0 0.46875rem 2.1875rem rgba(90,97,105,.1), 0 0.9375rem 1.40625rem rgba(90,97,105,.1), 0 0.25rem 0.53125rem rgba(90,97,105,.12), 0 0.125rem 0.1875rem rgba(90,97,105,.1);
 
-  &.no-shadow {
-    box-shadow: inherit;
-    -webkit-box-shadow: inherit;
-  }
-
-  &.small-shadow {
-    -webkit-box-shadow: 0 0.16875rem 1.1875rem rgba(90, 97, 105, 0.1), 0 0.4375rem 0.80625rem rgba(90, 97, 105, 0.1), 0 0.12rem 0.13125rem rgba(90, 97, 105, 0.12), 0 0.025rem 0.0875rem rgba(90, 97, 105, 0.1);
-    box-shadow: 0 0.16875rem 1.1875rem rgba(90, 97, 105, 0.1), 0 0.4375rem 0.80625rem rgba(90, 97, 105, 0.1), 0 0.12rem 0.13125rem rgba(90, 97, 105, 0.12), 0 0.025rem 0.0875rem rgba(90, 97, 105, 0.1);
-  }
-
-  &.card-dark {
-    background: $accent-color;
-    color: #ffffff;
-  }
-
-  &.card-light-gray {
-    background: $light;
-  }
-
-  .card-header {
-    background-color: #fff;
-
-    &.header-tabs {
-      background-color: rgba(90, 97, 105, .06);
-    }
-  }
-
-  .card-header,
-  .card-body {
-    &:first-child {
-      border-radius: .625rem .625rem 0 0;
-    }
-  }
-}
-
-.form-control {
-  &.danger, &.danger:hover {
-    border-color: $danger;
-  }
-
-  &.warning, &.warning:hover {
-    border-color: $warning;
-  }
-
-  &.info, &.info:hover {
-    border-color: $info;
-  }
-
-  &.success, &.success:hover {
-    border-color: $success;
-  }
-
-  &.form-control-vsm:not([size]):not([multiple]) {
-    height: calc(1.38845rem + 2px);
-  }
-}
-
-.btn {
-  &.btn-vsm {
-    padding: .3286rem .675rem;
-    font-size: .5875rem;
-    line-height: 1.25;
-    border-radius: .25rem;
-  }
-}
-
-table {
-  &.table {
-    th,
-    td {
-      vertical-align: middle;
-    }
-  
-    &.top {
-      th,
-      td {
-        vertical-align: top;
-      }
-    }
-  }
-
-  &.small-padding {
-    th,
-    td {
-      padding: 0.2rem;
-    }
-
-    tr {
-      th:first-child,
-      td:first-child {
-        padding-left: 0.75rem;
-      }
-
-      th:last-child,
-      td:last-child {
-        padding-right: 0.75rem;
-      }
-    }
-  }
-
-  &.vsmall-padding {
-    th,
-    td {
-      padding: 1px;
-    }
-
-    tr {
-      th:first-child,
-      td:first-child {
-        padding-left: 1px;
-      }
-
-      th:last-child,
-      td:last-child {
-        padding-right: 1px;
-      }
-    }
-  }
-
-  &.no-padding {
-    th,
-    td {
-      padding: 0px;
-    }
-
-    tr {
-      th:first-child,
-      td:first-child {
-        padding-left: 0px;
-      }
-
-      th:last-child,
-      td:last-child {
-        padding-right: 0px;
-      }
-    }
-  }
-
-  thead {
-    &.secondary-header {
-      background: #03b0f0;
-      color: #ffffff;
-    }
-  }
-
-  .th-xl {
-    min-width: 16rem;
-  }
-
-  .th-lg {
-    min-width: 9rem;
-  }
-
-  .th-sm {
-    min-width: 6rem;
-  }
-}
-
-.overflow-ellipses {
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &.wrap-always {
-    white-space: normal;
-    word-break: break-all;
-  }
-
-  &:hover:not(.no-hover) {
-    word-break: break-all;
-    white-space: normal;
-    overflow: visible;
-  }
-}
-
-.object-list {
-  > li.object {
-    &:hover {
-      background: #f0f0f0;
-    }
-  }
-}

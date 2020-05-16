@@ -130,15 +130,18 @@ export default function GitServer({
         })
       ])
 
-      const fullTarPath = `git/${tarInfo.name}`
+      await gitRepos.findOrCreateBy({ bucket_id: bucket.id, repo: push.repo })
+      let fullTarPath = `chest.store.git/${this.user.username}/${tarInfo.name}`
+      if (!gitRepos.isNewRecord) {
+        const repoObj = await CloudObjects(postgres).findBy({ bucket_id: bucket.id, id: gitRepos.record.object_id })
+        fullTarPath = repoObj.full_path
+      }
 
       const provider = Providers(bucket.type, { apiKey: cred.key, apiSecret: cred.secret })
       await provider.writeObject(bucket.bucket_uid, fullTarPath, fs.createReadStream(tarInfo.path))
 
-      const [ newRecInfo ] = await Promise.all([
-        directories.createDirsAndObjectFromFullPath(bucket.id, fullTarPath),
-        gitRepos.findOrCreateBy({ bucket_id: bucket.id, repo: push.repo })
-      ])
+      const newRecInfo = await directories.createDirsAndObjectFromFullPath(bucket.id, fullTarPath)
+      
       gitRepos.setRecord({
         credential_id: this.user.current_credential_id,
         object_id: newRecInfo[newRecInfo.length - 1].id,

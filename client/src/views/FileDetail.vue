@@ -46,7 +46,7 @@
           this.$store.commit('SET_BUCKET_OBJECT', { id })
           await this.$store.dispatch('getCurrentObject')
         } catch(err) {
-          window.toastr.error(err.message)
+          this.$notify({ type: 'danger', message: err.message })
         } finally {
           this.isLoadingLocal = false
         }

@@ -28,10 +28,11 @@ interface ICloudProvider {
   async doesObjectExist: (bucket: string, name: string, options?: object) => Promise<boolean>
   async listObjectsRecursive: (bucket: string, setCallback: (set: Array<object>) => void, nextPageToken: any) => Promise<ICloudObjects>
   async getObject: (bucket: string, name: string, options?: object) => Promise<Buffer>
-  async getObjectStreamWithBackoff: (stream: WritableStream, bucket: string, name: string, backoffAttempt?: number) => Promise<void>
-  async writeObject: (bucket: string, name: string, data: (Buffer | ReadableStream | string), options?: object) => Promise<object>
+  async getObjectStreamWithBackoff: (stream: WriteStream, bucket: string, name: string, backoffAttempt?: number) => Promise<void>
+  async writeObject: (bucket: string, name: string, data: (Buffer | ReadStream | string), options?: object) => Promise<object>
   async listBuckets: () => Promise<ICloudBuckets>,
   async createBucket: (name: string) => Promise<any>
+  async createPresignedUrl: (options: any) => Promise<any>
 }
 
 export interface IFactoryOptions {

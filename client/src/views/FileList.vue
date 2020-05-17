@@ -4,7 +4,14 @@
       div.row
         div.col-lg-12.d-flex.align-items-center
           h2.text-white.mb-0 #[strong {{ objectInfo.totalCount }}] objects in #[strong {{ dirOrBucket }}]
-          base-button.ml-auto(type="warning",@click="syncBucket()") Sync Bucket Manually
+          div.ml-auto.d-flex.align-items-center
+            base-button(type="info",@click="syncBucket()") Sync Bucket Manually
+            file-uploader(
+              :remove-after-upload="true"
+              :btn-only="true"
+              :btn-text="`Add File to ${dirOrBucket}`"
+              btn-variant="warning"
+              @added="fileUploaded")
 
     div.container.mt--7
       div.row
@@ -40,7 +47,11 @@
                   th
                 template(slot-scope="{row}")
                   th(scope="row")
-                    router-link(:to="`/object/${row.id}`") {{ row.full_path }}
+                    router-link(:to="`/object/${row.id}`")
+                      div.d-flex.align-items-center
+                        span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
+                          img(:src="`/file/download/${row.id}`")
+                        div {{ row.full_path }}
                   td {{ humanFileSize(row.size_bytes) }}
                   td {{ getFormattedDate(row.last_modified) }}
                   td
@@ -63,6 +74,7 @@
   import StringHelpers from '../factories/StringHelpers'
   import TimeHelpers from '../factories/TimeHelpers'
   import ApiAws from '../factories/ApiAws'
+  import { isImage } from '../factories/Utilities'
 
   export default {
     props: {
@@ -84,22 +96,31 @@
 
         directories(state) {
           return this.directoryId != null
-            ? [{ full_path: '..', id: this.currentParentDirId || '' }].concat(state.objects.directories)
+            ? [{ full_path: '<<< back', id: this.currentParentDirId || '' }].concat(state.objects.directories)
             : state.objects.directories
         },
       }),
 
       dirOrBucket() {
         return this.currentDir ? `/${this.currentDir.full_path}` : '/'
+      },
+
+      maxShowSize() {
+        return 1024 * 250
       }
     },
 
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
       humanFileSize: StringHelpers.humanFileSize,
+      isImage,
 
       downloadObject(objId) {
         DomHelpers.downloadUri(`/file/download/${objId}`)
+      },
+
+      fileUploaded() {
+        console.log("FILE", arguments)
       },
 
       async changePage(newPage) {
@@ -120,9 +141,9 @@
       async syncBucket() {
         try {
           await ApiAws.syncCurrentBucket()
-          window.toastr.success(`Began syncing bucket! Any new objects should show up shortly.`)
+          this.$notify(`Began syncing bucket! Any new objects should show up shortly.`)
         } catch(err) {
-          window.toastr.error(err.message)
+          this.$notify({ type: 'danger', message: err.message })
         }
       }
     },

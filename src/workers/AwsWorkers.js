@@ -16,10 +16,21 @@ export default function AwsWorkers({ log, postgres }) {
         }
       },
       perform: async options => {
-        const { bucketId, credentialId/*, userId */ } = options
-        const [ bucket, credential ] = await Promise.all([
+        const {
+          bucketId,
+          credentialId,
+          userId,
+          objectId
+        } = options
+
+        const [ bucket, credential, object ] = await Promise.all([
           CloudBuckets(postgres).find(bucketId),
-          CloudCredentials(postgres).find(credentialId)
+          CloudCredentials(postgres).find(credentialId),
+          (async function getObjects() {
+            if (objectId) {
+              return await CloudObjects(postgres).findBy({ bucket_id: bucketId, id: objectId })
+            }
+          })()
         ])
 
         const s3 = Aws({
@@ -27,7 +38,7 @@ export default function AwsWorkers({ log, postgres }) {
           secretAccessKey: credential.secret
         }).S3
 
-        await s3.listFilesRecursive(bucket.bucket_uid, async objects => {
+        const processObjects = async function processObjects(objects) {
           for (let i = 0; i < objects.length; i++) {
             const obj = objects[i]
             const directories = CloudDirectories(postgres)
@@ -50,7 +61,18 @@ export default function AwsWorkers({ log, postgres }) {
             })
             await objInst.save()
           }
-        })
+        }
+
+        if (object) {
+          const obj = await s3.getFile({ bucket: bucket.bucket_uid, filename: object.full_path })
+          await processObjects([{
+            Key: object.full_path,
+            Size: obj.ContentLength,
+            ...obj
+          }])
+        } else {
+          await s3.listFilesRecursive(bucket.bucket_uid, processObjects)
+        }
 
         log.info(`Successfully processed all objects for bucket ${bucket.type} - ${bucket.bucket_uid}`)
       }

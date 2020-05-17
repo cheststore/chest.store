@@ -13,6 +13,7 @@ import BaseSwitch from "../components/BaseSwitch";
 import BaseTable from "../components/BaseTable";
 import BaseHeader from "../components/BaseHeader";
 import Card from "../components/Card";
+import FileUploader from "../components/FileUploader";
 import Loader from "../components/Loader";
 import LoaderInline from "../components/LoaderInline";
 import StatsCard from "../components/StatsCard";
@@ -37,6 +38,7 @@ export default {
     Vue.component(BaseTable.name, BaseTable);
     Vue.component(BaseHeader.name, BaseHeader);
     Vue.component(Card.name, Card);
+    Vue.component(FileUploader.name, FileUploader);
     Vue.component(Loader.name, Loader);
     Vue.component(LoaderInline.name, LoaderInline);
     Vue.component(StatsCard.name, StatsCard);

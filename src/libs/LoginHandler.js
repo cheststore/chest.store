@@ -38,6 +38,8 @@ export default function LoginHandler(postgres, request, options=null) {
       //   await AuditLog(postgres).log({
       //     team_id: currentActiveTeam.id,
       //     user_id: userRecord.id,
+      //     entity_table: 'users',
+      //     entity_id: userRecord.id,
       //     action: 'Login',
       //     // additional_info: {}
       //   })

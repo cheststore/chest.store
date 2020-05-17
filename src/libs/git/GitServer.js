@@ -94,6 +94,8 @@ export default function GitServer({
           await AuditLog(postgres).log({
             credential_id: this.user.current_credential_id,
             user_id: this.user.id,
+            entity_table: 'git_repos',
+            entity_id: await GitRepos(postgres).findBy({ bucket_id: this.user.current_bucket_id, repo: fetch.repo }).id,
             action: `git - Fetch Repo`,
             additional_info: {
               repo: fetch.repo,
@@ -121,6 +123,8 @@ export default function GitServer({
         AuditLog(postgres).log({
           credential_id: this.user.current_credential_id,
           user_id: this.user.id,
+          entity_table: 'git_repos',
+          entity_id: await GitRepos(postgres).findBy({ bucket_id: this.user.current_bucket_id, repo: push.repo }).id,
           action: `git - Push Repo`,
           additional_info: {
             repo: push.repo,

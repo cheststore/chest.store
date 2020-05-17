@@ -5,7 +5,7 @@
         div.card.bg-secondary.shadow.border-0
           div.card-header.border-0
             h3.m-0 Enter AWS Access Key
-          div.card-body
+          div.card-body.py-lg-3.px-lg-5
             div.small.mb-3
               | In order to integrate with your AWS account and S3 bucket(s),
               | you need to enter a valid AWS Access Key and Secret we will
@@ -66,7 +66,7 @@
           evt.preventDefault()
 
           if (!(this.computedKey && this.awsSecret))
-            return window.toastr.error(`Please enter both and access key and secret to add.`)
+            return this.$notify({ type: 'danger', message: `Please enter both and access key and secret to add.` })
 
           this.isCheckingKey = true
           await ApiAws.checkAndSaveKey('aws', this.computedKey, this.awsSecret)
@@ -76,7 +76,7 @@
           ])
 
         } catch(err) {
-          window.toastr.error(err.message)
+          this.$notify({ type: 'danger', message: err.message })
         } finally {
           this.isCheckingKey = false
         }
@@ -85,14 +85,14 @@
       async selectBucket() {
         try {
           if (!this.selectedBucketName)
-            return window.toastr.error(`Please enter a valid bucket to integrate with.`)
+            return this.$notify({ type: 'danger', message: `Please enter a valid bucket to integrate with.` })
 
           await ApiAws.saveBucket(this.selectedBucketName)
           await this.$store.dispatch('getUserSession', true)
           this.$router.push('/')
 
         } catch(err) {
-          window.toastr.error(err.message)
+          this.$notify({ type: 'danger', message: err.message })
         }
       },
 
@@ -102,7 +102,7 @@
           this.buckets = Buckets
 
         } catch(err) {
-          window.toastr.error(err.message)
+          this.$notify({ type: 'danger', message: err.message })
         }
       }
     },

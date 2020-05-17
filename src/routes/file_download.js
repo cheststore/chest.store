@@ -53,6 +53,8 @@ export default function({ log, postgres, redis }) {
           AuditLog(postgres).log({
             credential_id: cred.id,
             user_id: userId,
+            entity_table: 'cloud_objects',
+            entity_id: object.id,
             action: `Download Object`,
             additional_info: { objectId: objId }
           })

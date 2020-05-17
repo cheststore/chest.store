@@ -66,6 +66,10 @@ export default function AwsProvider({
 
     async createBucket(name: string) {
       return await aws.S3.createBucket(name)
+    },
+
+    async createPresignedUrl(options: any) {
+      return await aws.S3.createPresignedPost(options)
     }
   }
 }

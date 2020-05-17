@@ -51,8 +51,6 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         app.use(compression())
         app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }))
         app.use(bodyParser.json({ limit: '100mb' }))
-
-        app.use(formidable.parse())
         app.use(cookieParser(config.session.sessionSecret))
 
         const RedisStore = ConnectRedis(session)
@@ -121,10 +119,13 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         //static files
         app.use('/public', express.static(path.join(config.app.rootDir, '/public')))
 
+        const formidableMiddleware = formidable({ multiples: true })
+
         //setup route handlers in the express app
         routes.forEach(route => {
           try {
-            app[route.verb.toLowerCase()](route.path, route.handler)
+            const handlerArgs = route.formidable ? [ formidableMiddleware, route.handler ] : [ route.handler ]
+            app[route.verb.toLowerCase()](route.path, ...handlerArgs)
             log.debug(`Successfully bound route to express; method: ${route.verb}; path: ${route.path}`)
           } catch(err) {
             log.error(err, `Error binding route to express; method: ${route.verb}; path: ${route.path}`)

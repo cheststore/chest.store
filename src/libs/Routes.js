@@ -15,11 +15,10 @@ export default function Routes(options) {
       const routes = routeFiles.map(file => {
         const routeInfo = require(path.join(this._path, file)).default(options)
         return {
-          verb: routeInfo.verb,
+          ...routeInfo,
           path: routeInfo.route,
           order: routeInfo.priority,
-          file: file,
-          handler: routeInfo.handler
+          file
         }
       })
 

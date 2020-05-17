@@ -10,14 +10,32 @@ export default function AuditLog(postgres) {
       accessibleColumns: [
         'credential_id',
         'user_id',
+        'entity_table',
+        'entity_id',
         'action',
         'ip_address',
         'additional_info'
       ],
 
-      async log({ credential_id, user_id, action, ip_address, additional_info }={}) {
+      async log({
+        credential_id,
+        user_id,
+        entity_table,
+        entity_id,
+        action,
+        ip_address, 
+        additional_info
+      }) {
         this.resetRecord()
-        this.setRecord({ credential_id, user_id, action, ip_address, additional_info })
+        this.setRecord({
+          credential_id,
+          user_id,
+          entity_table,
+          entity_id,
+          action,
+          ip_address, 
+          additional_info
+        })
         return await this.save()
       },
 

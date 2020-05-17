@@ -9,7 +9,7 @@ export default [
         name varchar(255),
         last_modified timestamptz,
         etag varchar(255),
-        size_bytes integer,
+        size_bytes bigint,
         storage_class varchar(100),
         owner_id varchar(255),
         owner_display_name varchar(255),

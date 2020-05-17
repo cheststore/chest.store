@@ -15,6 +15,7 @@ module.exports = {
       ['/file/']: { target: 'http://dev.chest.store:8000' },
       ['/git/']: { target: 'http://dev.chest.store:8000' },
       ['/logout']: { target: 'http://dev.chest.store:8000' },
+      ['/object']: { target: 'http://dev.chest.store:8000' },
       // ['/public']: { target: 'http://dev.chest.store:8000' },
       ['/socket.io']: {
         target: 'http://dev.chest.store:8000',

@@ -1,39 +1,32 @@
 import path from 'path'
 import fs from 'fs'
-import rimraf from 'rimraf'
 
 const fsStatPromise     = fs.promises.stat
 const fsWriteFile       = fs.promises.writeFile
 const mkdirPromise      = fs.promises.mkdir
+const rmdirPromise      = fs.promises.rmdir
 const readFilePromise   = fs.promises.readFile
 const readdirPromise    = fs.promises.readdir
 
 export default function FileManagement() {
   return {
-    getLocalFileStream(filePath) {
-      return fs.createReadStream(filePath)
-    },
-
-    async getLocalFile(filePath, encoding=null) {
+    async getLocalFile(filePath: string, encoding: null | undefined=null): Promise<Buffer> {
       return await readFilePromise(filePath, { encoding })
     },
 
-    async readDir(dirPath) {
+    async readDir(dirPath: string): Promise<string[]> {
       return await readdirPromise(dirPath)
     },
 
-    async deleteDir(dirPath) {
-      return await new Promise((resolve, reject) => {
-        rimraf(dirPath, err => {
-          if (err)
-            return reject(err)
-
-          resolve()
-        })
-      })
+    async deleteDir(dirPath: string): Promise<void> {
+      return await rmdirPromise(dirPath, { recursive: true })
     },
 
-    async checkAndCreateDirectoryOrFile(filepath, isFile=false, fileContents=JSON.stringify([])) {
+    async checkAndCreateDirectoryOrFile(
+      filepath: string,
+      isFile: boolean=false,
+      fileContents: any=JSON.stringify([])
+    ): Promise<boolean> {
       try {
         if (isFile && !(await this.doesFileExist(filepath))) {
           // Since all files should hold JSON that will be large arrays,
@@ -53,24 +46,25 @@ export default function FileManagement() {
       }
     },
 
-    async doesDirectoryExist(filePath) {
+    async doesDirectoryExist(filePath: string): Promise<boolean> {
       return await this.doesDirOrFileExist(filePath, 'isDirectory')
     },
 
-    async doesFileExist(filePath) {
+    async doesFileExist(filePath: string): Promise<boolean> {
       return await this.doesDirOrFileExist(filePath, 'isFile')
     },
 
-    async doesDirOrFileExist(filePath, method) {
+    async doesDirOrFileExist(filePath: string, method: string): Promise<boolean> {
       try {
-        const stats = await fsStatPromise(filePath)
-        return stats[method]()
+        const stats: fs.Stats = await fsStatPromise(filePath)
+        const statMethod: Function = method === 'isFile' ? stats.isFile : stats.isFile
+        return statMethod()
       } catch(e) {
         return false
       }
     },
 
-    getFileName(fileName, extraText=Date.now()) {
+    getFileName(fileName: string, extraText: number | string=Date.now()): string {
       fileName = encodeURIComponent(fileName)
       return `${fileName.split('.').slice(0, -1).join('.')}_${extraText}${path.extname(fileName)}`
     }

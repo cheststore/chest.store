@@ -17,7 +17,7 @@ export default function GitServer({
   log,
   postgres,
   redis,
-  rootDir=path.join(config.app.rootDir, 'tmp', 'git')
+  rootDir = path.join(config.app.rootDir, 'tmp', 'git'),
 }) {
   const fileMgmt = FileManagement()
   const helpers = GitHelpers({ log, postgres, redis, rootDir })
@@ -26,20 +26,16 @@ export default function GitServer({
   return {
     user: null,
 
-    async create(
-      username,
-      autoCreate=true
-    ) {
+    async create(username, autoCreate = true) {
       const userRecord = await users.findBy({ username })
-      if (!userRecord)
-        throw new Error(`No user with the username provided.`)
+      if (!userRecord) throw new Error(`No user with the username provided.`)
 
       this.user = userRecord
 
       const filePath = path.join(rootDir, username)
       const repos = new Server(filePath, {
         autoCreate,
-        authenticate: this.handleAuth.bind(this)
+        authenticate: this.handleAuth.bind(this),
       })
       repos.on('push', this.onPush.bind(this))
       repos.on('fetch', this.onFetch.bind(this))
@@ -52,24 +48,40 @@ export default function GitServer({
         user(async (username, password) => {
           try {
             if (username.toLowerCase() !== this.user.username.toLowerCase())
-              throw new Error(`Please make sure your git remote URL has the correct username (i.e. https://URL/git/:username/REPO)`)
+              throw new Error(
+                `Please make sure your git remote URL has the correct username (i.e. https://URL/git/:username/REPO)`
+              )
 
-            const isValidPassword = await users.validateUserPassword(username, password, this.user.password_hash)
-            if (!isValidPassword)
-              throw new Error(`Your password is invalid.`)
+            if (config.git.clientKey && password === config.git.clientKey) {
+              log.debug(
+                `git client key used to authenticate with repo`,
+                type,
+                repo
+              )
+            } else {
+              const isValidPassword = await users.validateUserPassword(
+                username,
+                password,
+                this.user.password_hash
+              )
+              if (!isValidPassword) throw new Error(`Your password is invalid.`)
+            }
 
             if (type === 'fetch') {
-              const repoDirExists = await fileMgmt.doesDirectoryExist(path.join(rootDir, username, `${repo}.git`))
+              const repoDirExists = await fileMgmt.doesDirectoryExist(
+                path.join(rootDir, username, `${repo}.git`)
+              )
               if (!repoDirExists) {
-                await helpers.untarRepoFromS3(
+                await helpers.untarRepo(
                   this.user.username,
                   this.user.current_bucket_id,
-                  repo)
+                  repo
+                )
               }
             }
 
-            resolve() 
-          } catch(err) {
+            resolve()
+          } catch (err) {
             reject(err)
           }
         })
@@ -81,7 +93,7 @@ export default function GitServer({
       push.res.on('finish', async () => {
         try {
           await this.handlePush(push)
-        } catch(err) {
+        } catch (err) {
           log.error(`Error handling push`, err)
         }
       })
@@ -95,14 +107,17 @@ export default function GitServer({
             credential_id: this.user.current_credential_id,
             user_id: this.user.id,
             entity_table: 'git_repos',
-            entity_id: await GitRepos(postgres).findBy({ bucket_id: this.user.current_bucket_id, repo: fetch.repo }).id,
+            entity_id: await GitRepos(postgres).findBy({
+              bucket_id: this.user.current_bucket_id,
+              repo: fetch.repo,
+            }).id,
             action: `git - Fetch Repo`,
             additional_info: {
               repo: fetch.repo,
-              commit: fetch.commit
-            }
+              commit: fetch.commit,
+            },
           })
-        } catch(err) {
+        } catch (err) {
           log.error(`Error handling fetch`, err)
         }
       })
@@ -112,11 +127,7 @@ export default function GitServer({
       const directories = CloudDirectories(postgres)
       const gitRepos = GitRepos(postgres)
 
-      const [
-        bucket,
-        cred,
-        tarInfo
-      ] = await Promise.all([
+      const [bucket, cred, tarInfo] = await Promise.all([
         CloudBuckets(postgres).find(this.user.current_bucket_id),
         CloudCredentials(postgres).find(this.user.current_credential_id),
         helpers.tarRepo(this.user.username, push.repo),
@@ -124,34 +135,50 @@ export default function GitServer({
           credential_id: this.user.current_credential_id,
           user_id: this.user.id,
           entity_table: 'git_repos',
-          entity_id: await GitRepos(postgres).findBy({ bucket_id: this.user.current_bucket_id, repo: push.repo }).id,
+          entity_id: await GitRepos(postgres).findBy({
+            bucket_id: this.user.current_bucket_id,
+            repo: push.repo,
+          }).id,
           action: `git - Push Repo`,
           additional_info: {
             repo: push.repo,
             commit: push.commit,
-            branch: push.branch
-          }
-        })
+            branch: push.branch,
+          },
+        }),
       ])
 
       await gitRepos.findOrCreateBy({ bucket_id: bucket.id, repo: push.repo })
       let fullTarPath = `chest.store.git/${this.user.username}/${tarInfo.name}`
       if (!gitRepos.isNewRecord) {
-        const repoObj = await CloudObjects(postgres).findBy({ bucket_id: bucket.id, id: gitRepos.record.object_id })
+        const repoObj = await CloudObjects(postgres).findBy({
+          bucket_id: bucket.id,
+          id: gitRepos.record.object_id,
+        })
         fullTarPath = repoObj.full_path
       }
 
-      const provider = Providers(bucket.type, { apiKey: cred.key, apiSecret: cred.secret })
-      await provider.writeObject(bucket.bucket_uid, fullTarPath, fs.createReadStream(tarInfo.path))
+      const provider = Providers(bucket.type, {
+        apiKey: cred.key,
+        apiSecret: cred.secret,
+      })
+      await provider.writeObject(
+        bucket.bucket_uid,
+        fullTarPath,
+        fs.createReadStream(tarInfo.path)
+      )
 
-      const newRecInfo = await directories.createDirsAndObjectFromFullPath(bucket.id, fullTarPath)
-      
+      const newRecInfo = await directories.createDirsAndObjectFromFullPath(
+        bucket.id,
+        fullTarPath
+      )
+
       gitRepos.setRecord({
         credential_id: this.user.current_credential_id,
         object_id: newRecInfo[newRecInfo.length - 1].id,
-        user_id: this.user.id
+        user_id: this.user.id,
       })
       await gitRepos.save()
-    }
+    },
   }
 }

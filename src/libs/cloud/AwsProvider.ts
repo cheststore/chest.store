@@ -1,28 +1,29 @@
-import { ICloudProvider, IFactoryOptions } from './ProviderTypes'
-// import Aws from '../Aws'
+import fs from 'fs'
+import { IFactoryOptions, ICloudProvider } from './Providers'
+
 const Aws = require('../Aws').default
 
 export default function AwsProvider({
   apiKey,
   apiSecret,
-  region
+  region,
 }: IFactoryOptions): ICloudProvider {
   const aws = Aws({
     accessKeyId: apiKey,
     secretAccessKey: apiSecret,
-    region
+    region,
   })
 
   return {
-    async areValidCredentials() {
+    async areValidCredentials(): Promise<boolean> {
       await aws.STS.getCallerIdentity()
       return true
     },
 
-    async doesObjectExist(bucket: string, name: string) {
+    async doesObjectExist(bucket: string, name: string): Promise<boolean> {
       return await aws.S3.doesFileExist({
         bucket,
-        filename: name
+        filename: name,
       })
     },
 
@@ -31,32 +32,42 @@ export default function AwsProvider({
       setCallback: (set: Array<object>) => void,
       nextPageToken: string
     ) {
-      return await aws.S3.listFilesRecursive(
-        bucket,
-        setCallback,
-        nextPageToken)
+      return await aws.S3.listFilesRecursive(bucket, setCallback, nextPageToken)
     },
 
     async getObject(bucket: string, name: string) {
       const { Body } = await aws.S3.getFile({
         bucket,
-        filename: name
+        filename: name,
       })
       return Body
     },
 
-    async getObjectStreamWithBackoff(stream: WritableStream, bucket: string, name: string, backoffAttempt: number=0) {
-      await aws.S3.getFileStreamWithBackoff(stream, {
-        bucket,
-        filename: name
-      }, backoffAttempt)
+    async getObjectStreamWithBackoff(
+      stream: fs.WriteStream,
+      bucket: string,
+      name: string,
+      backoffAttempt: number = 0
+    ) {
+      await aws.S3.getFileStreamWithBackoff(
+        stream,
+        {
+          bucket,
+          filename: name,
+        },
+        backoffAttempt
+      )
     },
 
-    async writeObject(bucket: string, name: string, data: (Buffer | ReadableStream | string)) {
+    async writeObject(
+      bucket: string,
+      name: string,
+      data: Buffer | fs.ReadStream | string
+    ) {
       return await aws.S3.writeFile({
         bucket,
         filename: name,
-        data
+        data,
       })
     },
 
@@ -70,6 +81,6 @@ export default function AwsProvider({
 
     async createPresignedUrl(options: any) {
       return await aws.S3.createPresignedPost(options)
-    }
+    },
   }
 }

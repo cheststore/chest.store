@@ -1,7 +1,7 @@
 import DatabaseModel from './DatabaseModel'
 
-export default function {Table}(postgres) {
-  const factoryToExtend = DatabaseModel(postgres, '{table}')
+export default function {Table}(postgres: any): IModel {
+  const factoryToExtend: IModel = DatabaseModel(postgres, '{table}')
 
   return Object.assign(
     factoryToExtend,

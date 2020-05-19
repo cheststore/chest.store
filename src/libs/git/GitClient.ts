@@ -17,7 +17,7 @@ export default function GitClient(
   const getProtocol: RegExp = /^(https?:\/\/)(.*)/
   const protocol: string = config.server.host.replace(getProtocol, '$1')
   const hostOnly: string = config.server.host.replace(getProtocol, '$2')
-  const hostWithAuth: string = `${protocol}chest.store:${config.git.clientKey}@${hostOnly}`
+  const hostWithAuth: string = `${protocol}chest.store:${config.app.masterKey}@${hostOnly}`
 
   const workingDir: string = path.join(clientRootDir, username, repoName)
   const gitClient: SimpleGit = gitP(workingDir)

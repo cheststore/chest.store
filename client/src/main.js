@@ -2,7 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 // import $ from 'jquery'
-import "bootstrap"
+import 'bootstrap'
 import toastr from 'toastr'
 import * as FastClick from 'fastclick'
 import VueSocketIO from 'vue-socket.io'
@@ -24,17 +24,22 @@ Vue.use(
     connection: CheststoreSocket,
     vuex: {
       store,
-      actionPrefix: "SOCKET_",
-      mutationPrefix: ""
-    }
+      actionPrefix: '',
+      mutationPrefix: 'SOCKET_',
+    },
   })
 )
 Vue.use(Dashboard)
 
 // Initiate FastClick for mobile devices to remove the built-in 300ms
 // delay. Read more in https://github.com/ftlabs/fastclick
-if ('addEventListener' in document)
-  document.addEventListener('DOMContentLoaded', () => FastClick.attach(document.body), false)
+if ('addEventListener' in document) {
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => FastClick.attach(document.body),
+    false
+  )
+}
 
 window.toastr = toastr
 window.toastr.options.positionClass = 'toast-bottom-right'
@@ -47,5 +52,5 @@ new Vue({
   el: '#cheststore',
   router,
   template: '<Cheststore/>',
-  components: { Cheststore }
+  components: { Cheststore },
 })

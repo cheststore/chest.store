@@ -8,9 +8,22 @@ const hostName: string = process.env.HOSTNAME || 'http://localhost:8080'
 export default {
   apiKeyHeader: 'x-cheststore-key',
 
+  apiKeySocketIoClientOptions(key: string): StringMap {
+    return {
+      transportOptions: {
+        polling: {
+          extraHeaders: {
+            [this.apiKeyHeader]: key,
+          },
+        },
+      },
+    }
+  },
+
   app: {
     name: appName,
     titleCaseName: appName,
+    masterKey: process.env.MASTER_KEY,
     rootDir: (function () {
       try {
         return path.join(
@@ -29,10 +42,6 @@ export default {
     port: process.env.PORT || 8080,
     concurrency: parseInt(process.env.WEB_CONCURRENCY || (1).toString()),
     host: hostName,
-  },
-
-  git: {
-    clientKey: process.env.GIT_CLIENT_KEY,
   },
 
   postgres: {

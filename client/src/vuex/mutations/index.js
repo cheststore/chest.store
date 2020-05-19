@@ -7,7 +7,7 @@ export default {
     state.isLoading = false
   },
 
-  SET_INIT_PROCESSING(state, isProcessing=false) {
+  SET_INIT_PROCESSING(state, isProcessing = false) {
     state.isInitProcessing = isProcessing
   },
 
@@ -19,11 +19,11 @@ export default {
     state.router.push(newPath)
   },
 
-  SET_MAIN_NOTIFICATION(state, notification) {
-    state.mainNotification = notification
-  },
-
   SET_SESSION(state, sessionObj) {
     state.session = sessionObj
-  }
+  },
+
+  SOCKET_SET_MAIN_NOTIFICATION(state, notification) {
+    state.mainNotification = notification
+  },
 }

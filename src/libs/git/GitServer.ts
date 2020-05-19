@@ -64,7 +64,7 @@ export default function GitServer(
                 `${password.slice(0, 2)}......${password.slice(-2)}`
               )
 
-              if (config.git.clientKey && password === config.git.clientKey) {
+              if (config.app.masterKey && password === config.app.masterKey) {
                 log.debug(
                   `git client key used to authenticate with repo`,
                   type,

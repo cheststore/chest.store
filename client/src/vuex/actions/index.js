@@ -10,8 +10,7 @@ export default {
     // from dispatching more than once at a time. currently init is dispatched
     // on root component create and when route changes occur which could
     // overlap.
-    if (state.isInitProcessing)
-      return
+    if (state.isInitProcessing) return
 
     try {
       commit('SET_INIT_PROCESSING', true)
@@ -22,39 +21,39 @@ export default {
       // as the root route, then populates as the correct route.
       const fullPath = window.location.pathname // state.router.currentRoute.fullPath
 
-      const isLoggedIn = !!(state.session.user)
+      const isLoggedIn = !!state.session.user
       commit('CHECK_LOGGED_IN', isLoggedIn)
       if (isLoggedIn) {
         if (!state.session.current_credential) {
           const path = '/aws/init'
-          if (fullPath !== path)
-            return state.router.push(path)
+          if (fullPath !== path) return state.router.push(path)
         }
-        
+
         if (/^\/account/.test(fullPath)) {
-          return window.location.href = '/' // return commit('SET_ROUTE', '/')
+          return (window.location.href = '/') // return commit('SET_ROUTE', '/')
         }
       } else {
-        if (!(/^\/account/.test(fullPath) || /^\/autherror/.test(fullPath) || /^\/mfa/.test(fullPath))) {
+        if (
+          !(
+            /^\/account/.test(fullPath) ||
+            /^\/autherror/.test(fullPath) ||
+            /^\/mfa/.test(fullPath)
+          )
+        ) {
           return commit('SET_ROUTE', '/account/login')
         }
       }
-
     } finally {
       commit('APP_NO_LONGER_LOADING')
       commit('SET_INIT_PROCESSING', false)
     }
   },
 
-  async getUserSession({ commit, state }, reset=false) {
+  async getUserSession({ commit, state }, reset = false) {
     if (state.session && state.session.user && !reset)
       return { session: state.session }
 
     const { session } = await ApiAuth.getSession()
     commit('SET_SESSION', session)
   },
-
-  SOCKET_mainNotification({ commit }, notification) {
-    commit('SET_MAIN_NOTIFICATION', notification)
-  }
 }

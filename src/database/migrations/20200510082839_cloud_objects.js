@@ -15,6 +15,7 @@ export default [
         owner_display_name varchar(255),
         sha256_contents varchar(32),
         metadata jsonb,
+        is_deleted BOOLEAN NOT NULL DEFAULT false,
         created_at timestamptz NOT NULL DEFAULT now(),
         updated_at timestamptz NOT NULL DEFAULT now(),
         UNIQUE(bucket_id, full_path)
@@ -23,6 +24,11 @@ export default [
   },
 
   async function createCloudObjectsIndexes(postgres) {
-    await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS cloud_objects_bucket_id_idx on cloud_objects (bucket_id)`)
-  }
+    await postgres.query(
+      `CREATE INDEX CONCURRENTLY IF NOT EXISTS cloud_objects_bucket_id_idx on cloud_objects (bucket_id)`
+    )
+    await postgres.query(
+      `CREATE INDEX CONCURRENTLY IF NOT EXISTS cloud_objects_is_deleted_idx on cloud_objects (is_deleted)`
+    )
+  },
 ]

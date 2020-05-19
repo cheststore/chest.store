@@ -55,6 +55,7 @@ export interface ICloudProvider {
     data: Buffer | fs.ReadStream | string,
     options?: object
   ) => Promise<object>
+  deleteObject: (bucket: string, name: string) => Promise<void>
   listBuckets: () => Promise<ICloudBucket[]>
   createBucket: (name: string) => Promise<any>
   createPresignedUrl: (options: any) => Promise<any>

@@ -2,7 +2,7 @@ import DatabaseModel from './DatabaseModel'
 
 const PostgresSqlParser = require('../PostgresSqlParser').default
 
-export default function AuditLog(postgres: any): IModel {
+export default function AuditLog(postgres: any) {
   const factoryToExtend: IModel = DatabaseModel(postgres, 'audit_log')
 
   return Object.assign(factoryToExtend, {

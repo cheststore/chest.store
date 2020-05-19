@@ -1,6 +1,6 @@
 import DatabaseModel from './DatabaseModel'
 
-export default function CloudBuckets(postgres: any): IModel {
+export default function CloudBuckets(postgres: any) {
   const factoryToExtend: IModel = DatabaseModel(postgres, 'cloud_buckets')
 
   return Object.assign(factoryToExtend, {

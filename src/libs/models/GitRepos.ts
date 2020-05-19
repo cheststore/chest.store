@@ -10,6 +10,8 @@ export default function GitRepos(postgres: any): IModel {
       'object_id',
       'user_id',
       'repo',
+      'is_object_version_repo',
+      'version_source_object_id',
     ],
   })
 }

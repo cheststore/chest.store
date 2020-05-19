@@ -5,7 +5,9 @@
       :ref="`file-uploader-${_uid}`"
       :class="uploaderClasses"
       :options="finalOptions"
-      @vdropzone-processing="fileProcessing")
+      @vdropzone-processing="fileProcessing"
+      @vdropzone-error="errorAddingFile"
+      @vdropzone-success="successAddingFile")
 
     base-button(
       v-if="btnOnly",
@@ -27,7 +29,7 @@
 
       btnOnly: { type: Boolean, default: false }, // if true, only show a button to click to upload files
       btnText: { type: String, default: null },
-      btnVariant: { type: String, default: 'primary' }
+      btnVariant: { type: String, default: 'primary' },
     },
 
     data() {
@@ -38,20 +40,17 @@
           parallelUploads: 4,
           thumbnailHeight: 80,
           thumbnailWidth: 80,
-          timeout: 600000     // 600s, 10min
-        }
+          timeout: 600000, // 600s, 10min
+        },
       }
     },
 
     computed: {
       uploaderClasses() {
-        if (this.btnOnly)
-          return 'd-none'
+        if (this.btnOnly) return 'd-none'
 
-        return ['sm', 'small'].includes(this.size)
-          ? 'small-dropzone'
-          : ''
-      }
+        return ['sm', 'small'].includes(this.size) ? 'small-dropzone' : ''
+      },
     },
 
     methods: {
@@ -62,7 +61,7 @@
       errorAddingFile(...args) {
         this.$emit('error', args)
       },
-      
+
       successAddingFile(...args) {
         this.$emit('added', args)
 
@@ -70,21 +69,23 @@
           if (this.$refs[`file-uploader`])
             this.$refs[`file-uploader`].dropzone.removeAllFiles()
         }
-      }
+      },
     },
 
     created() {
-      let btnOptions = this.btnOnly ? { clickable: `#uploader-btn-${this._uid}` } : null
+      let btnOptions = this.btnOnly
+        ? { clickable: `#uploader-btn-${this._uid}` }
+        : null
       this.finalOptions = {
         ...this.finalOptions,
         ...this.options,
-        ...btnOptions
+        ...btnOptions,
       }
     },
 
     components: {
-      Dropzone
-    }
+      Dropzone,
+    },
   }
 </script>
 
@@ -120,7 +121,7 @@
 
         .dz-error-mark,
         .dz-success-mark {
-           top: 0%;
+          top: 0%;
         }
 
         .dz-progress {

@@ -1,7 +1,7 @@
 <template lang="pug">
   modal(:show.sync='showModal' @close="$emit('close')")
     template(slot='header')
-      h5#exampleModalLabel.modal-title Forgot Password
+      h5.modal-title Forgot Password
     div
       base-alert(v-if="!!forgot.error && !forgot.success",type="danger") {{ forgot.error }}
       base-alert(v-if="!!forgot.success",type="success") {{ forgot.success }}
@@ -21,15 +21,15 @@
 
   export default {
     props: {
-      show: { type: Boolean }
+      show: { type: Boolean },
     },
 
     watch: {
       show(newVal) {
         this.showModal = newVal
-      }
+      },
     },
-    
+
     data() {
       return {
         showModal: false,
@@ -37,8 +37,8 @@
         forgot: {
           email: null,
           error: null,
-          success: null
-        }
+          success: null,
+        },
       }
     },
 
@@ -48,20 +48,20 @@
           evt.preventDefault()
 
           if (!ApiAuth.isValidEmail(this.forgot.email))
-            return this.forgot.error = `Please enter a valid e-mail address to send a temporary password to.`
+            return (this.forgot.error = `Please enter a valid e-mail address to send a temporary password to.`)
 
           this.forgot.success = null
           this.forgot.error = null
           await ApiAuth.forgotPassword(this.forgot.email)
           this.forgot.success = `Success! Check your email shortly for your temporary password to login.`
-          
+
           await sleep(1500)
           this.showModal = false
           this.forgot.error = this.forgot.success = null
-        } catch(err) {
+        } catch (err) {
           this.forgot.error = err.message
         }
-      }
-    }
+      },
+    },
   }
 </script>

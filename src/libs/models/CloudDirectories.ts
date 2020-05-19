@@ -46,6 +46,7 @@ export default function CloudDirectories(postgres: object) {
         .split('/')
         .filter((str: string) => str !== '')
       let info: object[] = []
+
       for (let ind: number = 0; ind < splitInfo.length; ind++) {
         const dirOrObj: string = splitInfo[ind]
         const parentDirId: number | string = (
@@ -59,7 +60,11 @@ export default function CloudDirectories(postgres: object) {
             bucket_id: bucketId,
             full_path: fullObjectPath,
           })
-          obj.setRecord({ name: dirOrObj, directory_id: parentDirId })
+          obj.setRecord({
+            name: dirOrObj,
+            directory_id: parentDirId,
+            is_deleted: false,
+          })
           await obj.save()
           info.push({ type: 'object', id: obj.record.id })
           continue

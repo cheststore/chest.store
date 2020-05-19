@@ -1,21 +1,25 @@
-// import tar from 'tar'
 import fs from 'fs'
 import path from 'path'
 import gitP, { SimpleGit } from 'simple-git/promise'
+import config from '../../config'
 
-const config = require('../../config').default
+export const clientRootDir: string = path.join(
+  config.app.rootDir,
+  'tmp',
+  'git',
+  '_cheststore_repos'
+)
 
 export default function GitClient(
   repoName: string,
-  username: string,
-  rootDir = path.join(config.app.rootDir, 'tmp', 'git', '_cheststore_repos')
-) {
-  const getProtocol = /^(https?:\/\/)(.*)/
-  const protocol = config.server.host.replace(getProtocol, '$1')
-  const hostOnly = config.server.host.replace(getProtocol, '$2')
-  const hostWithAuth = `${protocol}chest.store:${config.git.clientKey}@${hostOnly}`
+  username: string
+): StringMap {
+  const getProtocol: RegExp = /^(https?:\/\/)(.*)/
+  const protocol: string = config.server.host.replace(getProtocol, '$1')
+  const hostOnly: string = config.server.host.replace(getProtocol, '$2')
+  const hostWithAuth: string = `${protocol}chest.store:${config.git.clientKey}@${hostOnly}`
 
-  const workingDir: string = path.join(rootDir, username, repoName)
+  const workingDir: string = path.join(clientRootDir, username, repoName)
   const gitClient: SimpleGit = gitP(workingDir)
 
   return {
@@ -23,35 +27,47 @@ export default function GitClient(
     repoName,
     username,
 
-    async newRepo(commitMessage: string = 'init'): Promise<void> {
+    async initAndPushLocalRepo(commitMessage: string = 'init'): Promise<void> {
       await gitClient.init()
       await gitClient.add('./*')
       await gitClient.commit(commitMessage)
-      await gitClient.addRemote(
-        'origin',
-        `${hostWithAuth}/git/${username}/${repoName}.git`
-      )
+      if (!(await this.hasLocalRemote())) {
+        await gitClient.addRemote(
+          'origin',
+          `${hostWithAuth}/git/${username}/${repoName}`
+        )
+      }
       await gitClient.push('origin', 'master')
+    },
+
+    async hasLocalRemote(): Promise<boolean> {
+      const remotes = await gitClient.getRemotes(true)
+      return !!remotes.find((r) => r.name === 'origin')
     },
 
     async overrideFileAndPush(
       filePathInRepo: string,
-      fileData: string | Uint8Array,
+      fileDataReadStream: fs.ReadStream,
       commitMessage: string = `chest.store - update file version ${filePathInRepo}`
     ): Promise<void> {
-      await this.overrideFile(filePathInRepo, fileData)
-      await gitClient.add('./*')
-      await gitClient.commit(commitMessage)
-      await gitClient.push('origin', 'master')
+      await this.overrideFile(filePathInRepo, fileDataReadStream)
+      await this.initAndPushLocalRepo(commitMessage)
     },
 
     async overrideFile(
       filePathInRepo: string,
-      fileData: string | Uint8Array
+      fileDataReadStream: fs.ReadStream
     ): Promise<void> {
-      await fs.promises.writeFile(
-        path.join(workingDir, filePathInRepo),
-        fileData
+      return await new Promise(
+        (resolve: (data: any) => void, reject: (err: any) => void) => {
+          const writeStream: fs.WriteStream = fs.createWriteStream(
+            path.join(workingDir, filePathInRepo)
+          )
+          fileDataReadStream
+            .on('error', reject)
+            .on('end', resolve)
+            .pipe(writeStream)
+        }
       )
     },
   }

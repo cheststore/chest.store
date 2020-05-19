@@ -198,6 +198,18 @@ export default function Aws({
         })
       },
 
+      async deleteFile({ bucket, filename }) {
+        return await new Promise((resolve, reject) => {
+          const params = { Bucket: bucket, Key: filename }
+          this._s3.deleteObject(params, (err, data) => {
+            if (err) return reject(err)
+            // if (!data.DeleteMarker)
+            //   return reject(new Error(`object not deleted`))
+            resolve()
+          })
+        })
+      },
+
       // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#listBuckets-property
       async listBuckets() {
         return await new Promise((resolve, reject) => {

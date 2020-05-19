@@ -71,6 +71,13 @@ export default function AwsProvider({
       })
     },
 
+    async deleteObject(bucket: string, name: string): Promise<void> {
+      return await aws.S3.deleteFile({
+        bucket,
+        filename: name,
+      })
+    },
+
     async listBuckets() {
       return await aws.S3.listBuckets()
     },

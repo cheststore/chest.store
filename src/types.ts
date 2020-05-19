@@ -2,6 +2,12 @@ interface StringMap {
   [key: string]: any
 }
 
+interface IFactoryOptions {
+  log: StringMap
+  postgres: StringMap
+  redis: StringMap
+}
+
 interface IModelCallbacks {
   beforeSave: () => Promise<void>
   afterSave: () => Promise<void>

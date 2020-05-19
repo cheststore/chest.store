@@ -10,15 +10,18 @@ export default function Routes(options) {
     _path: path.join(__dirname, '..', 'routes'),
 
     async get() {
-      const files       = await readDir(this._path)
-      const routeFiles  = files.filter(file => fs.lstatSync(path.join(this._path, file)).isFile()).filter(file => !/\.spec\.js$/.test(file))
-      const routes = routeFiles.map(file => {
+      const files = await readDir(this._path)
+      const routeFiles = files
+        .filter((file) => fs.lstatSync(path.join(this._path, file)).isFile())
+        .filter((file) => /\.js$/.test(file))
+        .filter((file) => !/\.spec\.js$/.test(file))
+      const routes = routeFiles.map((file) => {
         const routeInfo = require(path.join(this._path, file)).default(options)
         return {
           ...routeInfo,
           path: routeInfo.route,
           order: routeInfo.priority,
-          file
+          file,
         }
       })
 
@@ -26,23 +29,24 @@ export default function Routes(options) {
     },
 
     apiKeyMiddleware() {
-      return function(req, res, next) {
+      return function (req, res, next) {
         try {
           let code = req.headers[config.apiKeyHeader]
           if (!code) {
             if (req.method.toLowerCase() === 'post') {
-              code = req.body[config.apiKeyHeader] || req.query[config.apiKeyHeader]
+              code =
+                req.body[config.apiKeyHeader] || req.query[config.apiKeyHeader]
             } else {
-              code = req.query[config.apiKeyHeader] || req.body[config.apiKeyHeader]
+              code =
+                req.query[config.apiKeyHeader] || req.body[config.apiKeyHeader]
             }
           }
           req.cheststoreAuth = code
           next()
-
-        } catch(err) {
+        } catch (err) {
           next(err)
         }
       }
-    }
+    },
   }
 }

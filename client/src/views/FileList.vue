@@ -60,12 +60,21 @@
                         i.fa.fa-ellipsis-h
                       template
                         a.dropdown-item(@click="downloadObject(row.id)") Download Object
+                        a.dropdown-item(@click="promptDeleteObject(row)") Delete Object
             div.card-footer.d-flex.justify-content-end
               base-pagination.mb-0(
                 :total="objectInfo.totalCount"
                 :value="objectInfo.currentPage"
                 :perPage="objectInfo.perPage"
                 @input="changePage")
+
+    confirmation-modal(
+      :show="showDeleteObjectModal"
+      header="Are you sure?",
+      :text="`Are you sure you want to delete <strong>${objectToDelete.full_path}</strong>? This is an irreversible action.`"
+      variant="danger"
+      @close="showDeleteObjectModal = false",
+      @confirm="deleteObject(objectToDelete.id)")
 </template>
 
 <script>
@@ -74,29 +83,41 @@
   import StringHelpers from '../factories/StringHelpers'
   import TimeHelpers from '../factories/TimeHelpers'
   import ApiAws from '../factories/ApiAws'
+  import ApiCloudObjects from '../factories/ApiCloudObjects'
   import { isImage } from '../factories/Utilities'
 
   export default {
     props: {
-      directoryId: { type: String, default: null }
+      directoryId: { type: String, default: null },
     },
 
     watch: {
       async directoryId() {
         await this.changePage(1)
+      },
+    },
+
+    data() {
+      return {
+        showDeleteObjectModal: false,
+        objectToDelete: {},
       }
     },
 
     computed: {
       ...mapState({
-        currentDir: state => state.objects.currentDirectory,
-        currentParentDirId: state => state.objects.currentDirectory && state.objects.currentDirectory.parent_directory_id,
-        currentBucket: state => state.session.current_bucket,
-        objectInfo: state => state.objects.currentList,
+        currentDir: (state) => state.objects.currentDirectory,
+        currentParentDirId: (state) =>
+          state.objects.currentDirectory &&
+          state.objects.currentDirectory.parent_directory_id,
+        currentBucket: (state) => state.session.current_bucket,
+        objectInfo: (state) => state.objects.currentList,
 
         directories(state) {
           return this.directoryId != null
-            ? [{ full_path: '<<< back', id: this.currentParentDirId || '' }].concat(state.objects.directories)
+            ? [
+                { full_path: '<<< back', id: this.currentParentDirId || '' },
+              ].concat(state.objects.directories)
             : state.objects.directories
         },
       }),
@@ -107,7 +128,7 @@
 
       maxShowSize() {
         return 1024 * 250
-      }
+      },
     },
 
     methods: {
@@ -119,8 +140,25 @@
         DomHelpers.downloadUri(`/file/download/${objId}`)
       },
 
-      fileUploaded() {
-        console.log("FILE", arguments)
+      promptDeleteObject(obj) {
+        this.objectToDelete = obj
+        this.showDeleteObjectModal = true
+      },
+
+      async fileUploaded(/* [, {objectIds}] */) {
+        // console.log('FILE', arguments)
+        await this.getObjectList()
+      },
+
+      async deleteObject(objId) {
+        try {
+          await ApiCloudObjects.deleteObject(objId)
+          this.showDeleteObjectModal = false
+
+          await this.getObjectList()
+        } catch (err) {
+          this.$notify({ type: 'danger', message: err.message })
+        }
       },
 
       async changePage(newPage) {
@@ -137,19 +175,21 @@
       async getObjectList() {
         await this.$store.dispatch('getObjectsList', this.directoryId)
       },
-      
+
       async syncBucket() {
         try {
           await ApiAws.syncCurrentBucket()
-          this.$notify(`Began syncing bucket! Any new objects should show up shortly.`)
-        } catch(err) {
+          this.$notify(
+            `Began syncing bucket! Any new objects should show up shortly.`
+          )
+        } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
-      }
+      },
     },
 
     async created() {
       await this.getObjectList()
-    }
+    },
   }
 </script>

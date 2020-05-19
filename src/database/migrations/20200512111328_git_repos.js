@@ -8,6 +8,8 @@ export default [
         object_id uuid REFERENCES cloud_objects,
         user_id uuid REFERENCES users,
         repo varchar(255),
+        is_object_version_repo BOOLEAN NOT NULL DEFAULT false,
+        version_source_object_id uuid REFERENCES cloud_objects,
         created_at timestamptz NOT NULL DEFAULT now(),
         updated_at timestamptz NOT NULL DEFAULT now(),
         UNIQUE(bucket_id, repo)
@@ -16,6 +18,8 @@ export default [
   },
 
   async function createGitReposIndexes(postgres) {
-    await postgres.query(`CREATE INDEX CONCURRENTLY IF NOT EXISTS git_repos_credential_id_idx on git_repos (credential_id)`)
-  }
+    await postgres.query(
+      `CREATE INDEX CONCURRENTLY IF NOT EXISTS git_repos_credential_id_idx on git_repos (credential_id)`
+    )
+  },
 ]

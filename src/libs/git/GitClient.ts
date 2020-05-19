@@ -45,6 +45,17 @@ export default function GitClient(
       return !!remotes.find((r) => r.name === 'origin')
     },
 
+    async pullRepo(): Promise<void> {
+      await gitClient.init()
+      if (!(await this.hasLocalRemote())) {
+        await gitClient.addRemote(
+          'origin',
+          `${hostWithAuth}/git/${username}/${repoName}`
+        )
+      }
+      await gitClient.pull('origin', 'master')
+    },
+
     async overrideFileAndPush(
       filePathInRepo: string,
       fileDataReadStream: fs.ReadStream,

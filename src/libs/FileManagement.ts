@@ -1,16 +1,19 @@
 import path from 'path'
 import fs from 'fs'
 
-const fsStatPromise     = fs.promises.stat
-const fsWriteFile       = fs.promises.writeFile
-const mkdirPromise      = fs.promises.mkdir
-const rmdirPromise      = fs.promises.rmdir
-const readFilePromise   = fs.promises.readFile
-const readdirPromise    = fs.promises.readdir
+const fsStatPromise = fs.promises.stat
+const fsWriteFile = fs.promises.writeFile
+const mkdirPromise = fs.promises.mkdir
+const rmdirPromise = fs.promises.rmdir
+const readFilePromise = fs.promises.readFile
+const readdirPromise = fs.promises.readdir
 
 export default function FileManagement() {
   return {
-    async getLocalFile(filePath: string, encoding: null | undefined=null): Promise<Buffer> {
+    async getLocalFile(
+      filePath: string,
+      encoding: null | undefined = null
+    ): Promise<Buffer> {
       return await readFilePromise(filePath, { encoding })
     },
 
@@ -24,8 +27,8 @@ export default function FileManagement() {
 
     async checkAndCreateDirectoryOrFile(
       filepath: string,
-      isFile: boolean=false,
-      fileContents: any=JSON.stringify([])
+      isFile: boolean = false,
+      fileContents: any = JSON.stringify([])
     ): Promise<boolean> {
       try {
         if (isFile && !(await this.doesFileExist(filepath))) {
@@ -37,10 +40,8 @@ export default function FileManagement() {
         }
 
         return true
-
-      } catch(err) {
-        if (err.code == 'EEXIST')
-          return true
+      } catch (err) {
+        if (err.code == 'EEXIST') return true
 
         throw err
       }
@@ -54,19 +55,27 @@ export default function FileManagement() {
       return await this.doesDirOrFileExist(filePath, 'isFile')
     },
 
-    async doesDirOrFileExist(filePath: string, method: string): Promise<boolean> {
+    async doesDirOrFileExist(
+      filePath: string,
+      method: string
+    ): Promise<boolean> {
       try {
-        const stats: fs.Stats = await fsStatPromise(filePath)
-        const statMethod: Function = method === 'isFile' ? stats.isFile : stats.isFile
-        return statMethod()
-      } catch(e) {
+        const stats = await fsStatPromise(filePath)
+        return method === 'isFile' ? stats.isFile() : stats.isDirectory()
+      } catch (e) {
         return false
       }
     },
 
-    getFileName(fileName: string, extraText: number | string=Date.now()): string {
+    getFileName(
+      fileName: string,
+      extraText: number | string = Date.now()
+    ): string {
       fileName = encodeURIComponent(fileName)
-      return `${fileName.split('.').slice(0, -1).join('.')}_${extraText}${path.extname(fileName)}`
-    }
+      return `${fileName
+        .split('.')
+        .slice(0, -1)
+        .join('.')}_${extraText}${path.extname(fileName)}`
+    },
   }
 }

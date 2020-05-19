@@ -57,6 +57,16 @@ export default function GitHelpers(
     ): Promise<void> {
       if (await this.doesLocalRepoExist(username, objectId)) return
 
+      // pull existing repo to client dir
+      const repo = await GitRepos(postgres).findBy({ repo: objectId })
+      if (repo) {
+        await fileMgmt.checkAndCreateDirectoryOrFile(
+          path.join(clientRootDir, username, objectId.toString())
+        )
+        await GitClient(objectId.toString(), username).pullRepo()
+        return
+      }
+
       await this.createLocalRepoDir(username, objectId)
     },
 
@@ -88,7 +98,7 @@ export default function GitHelpers(
       username: string,
       bucketId: number | string,
       repoName: string
-    ) {
+    ): Promise<void> {
       const userGitDir = path.join(rootDir, username)
 
       const [bucket, repo] = await Promise.all([

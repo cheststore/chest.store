@@ -3,7 +3,7 @@ const DatabaseModel = require('./DatabaseModel').default
 const CloudObjects = require('./CloudObjects').default
 
 export default function CloudDirectories(postgres: object) {
-  const factoryToExtend = DatabaseModel(postgres, 'cloud_directories')
+  const factoryToExtend: IModel = DatabaseModel(postgres, 'cloud_directories')
 
   return Object.assign(factoryToExtend, {
     accessibleColumns: [
@@ -41,11 +41,11 @@ export default function CloudDirectories(postgres: object) {
     async createDirsAndObjectFromFullPath(
       bucketId: number | string,
       fullObjectPath: string
-    ): Promise<object[]> {
+    ): Promise<StringMap[]> {
       const splitInfo: string[] = fullObjectPath
         .split('/')
         .filter((str: string) => str !== '')
-      let info: object[] = []
+      let info: StringMap[] = []
 
       for (let ind: number = 0; ind < splitInfo.length; ind++) {
         const dirOrObj: string = splitInfo[ind]
@@ -56,11 +56,14 @@ export default function CloudDirectories(postgres: object) {
         // object name
         if (ind === splitInfo.length - 1) {
           const obj = CloudObjects(postgres)
-          await obj.findOrCreateBy({
+          const existingObj = await obj.findBy({
             bucket_id: bucketId,
-            full_path: fullObjectPath,
+            full_path: (this as any)._getSanitizedValue(fullObjectPath),
           })
           obj.setRecord({
+            ...existingObj,
+            bucket_id: bucketId,
+            full_path: fullObjectPath,
             name: dirOrObj,
             directory_id: parentDirId,
             is_deleted: false,

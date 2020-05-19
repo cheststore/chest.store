@@ -23,6 +23,7 @@
 
     props: {
       url: { type: String },
+      dir: { type: String, default: '' },
       options: { type: Object, default: null },
       removeAfterUpload: { type: Boolean, default: false },
       size: { type: String, default: null },
@@ -32,20 +33,24 @@
       btnVariant: { type: String, default: 'primary' },
     },
 
-    data() {
-      return {
-        finalOptions: {
-          url: '/object/upload',
+    computed: {
+      finalOptions() {
+        let btnOptions = this.btnOnly
+          ? { clickable: `#uploader-btn-${this._uid}` }
+          : null
+
+        return {
+          url: () => `/object/upload?dir=${encodeURIComponent(this.dir || '')}`,
           maxFilesize: 20480, // 20GB
           parallelUploads: 4,
           thumbnailHeight: 80,
           thumbnailWidth: 80,
           timeout: 600000, // 600s, 10min
-        },
-      }
-    },
+          ...this.options,
+          ...btnOptions,
+        }
+      },
 
-    computed: {
       uploaderClasses() {
         if (this.btnOnly) return 'd-none'
 
@@ -70,17 +75,6 @@
             this.$refs[`file-uploader`].dropzone.removeAllFiles()
         }
       },
-    },
-
-    created() {
-      let btnOptions = this.btnOnly
-        ? { clickable: `#uploader-btn-${this._uid}` }
-        : null
-      this.finalOptions = {
-        ...this.finalOptions,
-        ...this.options,
-        ...btnOptions,
-      }
     },
 
     components: {

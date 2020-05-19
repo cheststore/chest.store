@@ -1,5 +1,5 @@
 <template lang="pug">
-  i.fal.fa-spinner.fa-spin(:class="getSizeClass()")
+  i.fa.fa-spinner.fa-spin(:class="getSizeClass()")
 </template>
 
 <script>
@@ -7,13 +7,13 @@
     name: 'loader-inline',
 
     props: {
-      size: { type: [ Number, String ], default: null }
+      size: { type: [Number, String], default: null },
     },
 
     methods: {
       getSizeClass() {
-        return (this.size) ? `fa-${this.size}x` : ''
-      }
-    }
+        return this.size ? `fa-${this.size}x` : ''
+      },
+    },
   }
 </script>

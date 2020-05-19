@@ -7,6 +7,7 @@
           div.ml-auto.d-flex.align-items-center
             base-button(type="info",@click="syncBucket()") Sync Bucket Manually
             file-uploader(
+              :dir="currentDirPath"
               :remove-after-upload="true"
               :btn-only="true"
               :btn-text="`Add File to ${dirOrBucket}`"
@@ -52,7 +53,7 @@
                         span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
                           img(:src="`/file/download/${row.id}`")
                         div {{ row.full_path }}
-                  td {{ humanFileSize(row.size_bytes) }}
+                  td {{ humanFileSize(row.size_bytes || 0) }}
                   td {{ getFormattedDate(row.last_modified) }}
                   td
                     base-dropdown.dropdown(position="right")
@@ -107,6 +108,9 @@
     computed: {
       ...mapState({
         currentDir: (state) => state.objects.currentDirectory,
+        currentDirPath: (state) =>
+          state.objects.currentDirectory &&
+          state.objects.currentDirectory.full_path,
         currentParentDirId: (state) =>
           state.objects.currentDirectory &&
           state.objects.currentDirectory.parent_directory_id,

@@ -17,9 +17,10 @@ export default new Router({
           path: ':type',
           name: 'account',
           props: true,
-          component: () => import(/* webpackChunkName: "demo" */ './views/Login.vue')
-        }
-      ]
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+        },
+      ],
     },
     {
       path: '/aws/init',
@@ -28,9 +29,10 @@ export default new Router({
         {
           path: '',
           name: 'AWS Init',
-          component: () => import(/* webpackChunkName: "demo" */ './views/InitAws.vue')
-        }
-      ]
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/InitAws.vue'),
+        },
+      ],
     },
     {
       path: '/autherror',
@@ -40,9 +42,10 @@ export default new Router({
           path: ':error',
           name: 'autherror',
           props: true,
-          component: () => import(/* webpackChunkName: "demo" */ './views/Login.vue')
-        }
-      ]
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+        },
+      ],
     },
     {
       path: '/',
@@ -51,16 +54,16 @@ export default new Router({
       children: [
         {
           path: '/directory/:directoryId',
-          name: 'Bucket Objects',
           props: true,
-          component: () => import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
         },
         {
           path: '*',
-          name: 'Bucket Objects',
-          component: () => import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
-        }
-      ]
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+        },
+      ],
     },
-  ]
+  ],
 })

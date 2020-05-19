@@ -7,7 +7,7 @@
       div.d-flex.align-items-center
         h6.m-0 {{ header }}
         div.ml-auto
-          i.fal.fa-times.clickable(@click="confirm('cancel')")
+          i.fa.fa-times.clickable(@click="confirm('cancel')")
     div {{ text }}
 
     div.mt-2.d-flex.justify-content-center

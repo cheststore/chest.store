@@ -3,8 +3,8 @@
 import Vue from 'vue'
 // import $ from 'jquery'
 import 'bootstrap'
-import toastr from 'toastr'
 import * as FastClick from 'fastclick'
+import VueHighlightJS from 'vue-highlightjs'
 import VueSocketIO from 'vue-socket.io'
 import store from './vuex/store'
 import Cheststore from './Cheststore'
@@ -18,6 +18,7 @@ import router from './router'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './css/app.scss'
 
+Vue.use(VueHighlightJS)
 Vue.use(
   new VueSocketIO({
     debug: window.webpackHotUpdate,
@@ -40,9 +41,6 @@ if ('addEventListener' in document) {
     false
   )
 }
-
-window.toastr = toastr
-window.toastr.options.positionClass = 'toast-bottom-right'
 
 Vue.config.productionTip = false
 

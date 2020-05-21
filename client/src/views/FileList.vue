@@ -52,7 +52,7 @@
                       div.d-flex.align-items-center
                         span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
                           img(:src="`/file/download/${row.id}`")
-                        div {{ row.full_path }}
+                        div {{ row.name }}
                   td {{ humanFileSize(row.size_bytes || 0) }}
                   td {{ getFormattedDate(row.last_modified) }}
                   td

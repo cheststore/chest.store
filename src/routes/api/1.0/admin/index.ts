@@ -1,9 +1,14 @@
 // import SessionHandler from '../../../../libs/SessionHandler'
 import config from '../../../../config'
 
-export default function ({ io, log, postgres, redis }) {
+export default function ({
+  io,
+  log,
+  postgres,
+  redis,
+}: IRequestOptions): StringMap {
   return {
-    async ['socket/update/clients'](req, res) {
+    async ['socket/update/clients'](req: any, res: any): Promise<void> {
       if (req.cheststoreAuth !== config.app.masterKey)
         return res.status(403).json({ error: config.errors['403'] })
 

@@ -15,39 +15,42 @@ module.exports = {
       ['/file/']: { target: 'http://dev.chest.store:8000' },
       ['/git/']: { target: 'http://dev.chest.store:8000' },
       ['/logout']: { target: 'http://dev.chest.store:8000' },
-      ['/object']: { target: 'http://dev.chest.store:8000' },
-      // ['/public']: { target: 'http://dev.chest.store:8000' },
+      ['/object/upload']: { target: 'http://dev.chest.store:8000' },
+      ['/public']: { target: 'http://dev.chest.store:8000' },
       ['/socket.io']: {
         target: 'http://dev.chest.store:8000',
-        ws: true
-      }
-    }
+        ws: true,
+      },
+    },
   },
 
   pages: {
     index: {
       entry: './src/main.js',
-      template: './index.pug'
-    }
+      template: './index.pug',
+    },
   },
 
   pluginOptions: {
     webpackBundleAnalyzer: {
       openAnalyzer: false,
-      analyzerPort: 9999
-    }
+      analyzerPort: 9999,
+    },
   },
 
   configureWebpack: {
-    externals: (process.env.NODE_ENV !== 'test') ? {
-      jquery: 'jQuery'
-    } : {},
+    externals:
+      process.env.NODE_ENV !== 'test'
+        ? {
+            jquery: 'jQuery',
+          }
+        : {},
 
     resolve: {
       alias: {
         // https://medium.com/js-dojo/how-to-reduce-your-vue-js-bundle-size-with-webpack-3145bf5019b7
-        moment: 'moment/src/moment'
-      }
-    }
-  }
+        moment: 'moment/src/moment',
+      },
+    },
+  },
 }

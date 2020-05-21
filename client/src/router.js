@@ -9,59 +9,77 @@ export default new Router({
   linkExactActiveClass: 'active',
   routes: [
     {
-      path: '/account',
-      redirect: 'account/login',
-      component: AuthLayout,
+      path: '/',
+      redirect: '/bucket',
+      component: DashboardLayout,
       children: [
         {
-          path: ':type',
-          name: 'account',
+          path: '/profile',
+          name: 'userprofile',
           props: true,
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+            import(/* webpackChunkName: "demo" */ './views/UserProfile.vue'),
         },
-      ],
-    },
-    {
-      path: '/aws/init',
-      component: AuthLayout,
-      children: [
         {
-          path: '',
-          name: 'AWS Init',
-          component: () =>
-            import(/* webpackChunkName: "demo" */ './views/InitAws.vue'),
-        },
-      ],
-    },
-    {
-      path: '/autherror',
-      component: AuthLayout,
-      children: [
-        {
-          path: ':error',
-          name: 'autherror',
+          path: '/object/:objectId',
+          name: 'object',
           props: true,
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+            import(/* webpackChunkName: "demo" */ './views/FileDetail.vue'),
+        },
+        {
+          path: '/directory',
+          name: 'directorylistroot',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+        },
+        {
+          path: '/directory/:directoryId',
+          name: 'directorylist',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+        },
+        {
+          path: '/bucket',
+          name: 'bucketlist',
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
         },
       ],
     },
     {
       path: '/',
-      redirect: 'bucket',
-      component: DashboardLayout,
+      redirect: '/account/login',
+      component: AuthLayout,
       children: [
         {
-          path: '/directory/:directoryId',
+          path: '/account/:type',
+          name: 'authenticate',
           props: true,
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+        },
+        {
+          path: '/autherror/:error',
+          name: 'autherror',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
+        },
+        {
+          path: '/aws/init',
+          name: 'AWS Init',
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/InitAws.vue'),
         },
         {
           path: '*',
+          name: 'authenticatefallback',
+          props: true,
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/FileList.vue'),
+            import(/* webpackChunkName: "demo" */ './views/Login.vue'),
         },
       ],
     },

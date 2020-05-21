@@ -61,6 +61,7 @@ export default function GitServer(
               log.debug(
                 `git auth handler`,
                 username,
+                this.user.username,
                 `${password.slice(0, 2)}......${password.slice(-2)}`
               )
 
@@ -87,7 +88,7 @@ export default function GitServer(
 
               if (type === 'fetch') {
                 const repoDirExists = await fileMgmt.doesDirectoryExist(
-                  path.join(rootDir, username, `${repo}.git`)
+                  path.join(rootDir, this.user.username, `${repo}.git`)
                 )
                 if (!repoDirExists) {
                   await helpers.untarRepo(
@@ -194,7 +195,7 @@ export default function GitServer(
         apiSecret: (cred as StringMap).secret,
       })
 
-      const [newRecInfo] = await Promise.all([
+      const [newRecInfo]: any[] = await Promise.all([
         directories.createDirsAndObjectFromFullPath(
           (bucket as StringMap).id,
           fullTarPath

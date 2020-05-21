@@ -8,6 +8,10 @@ interface IFactoryOptions {
   redis: StringMap
 }
 
+interface IRequestOptions extends IFactoryOptions {
+  io: StringMap
+}
+
 interface IModelCallbacks {
   beforeSave: () => Promise<void>
   afterSave: () => Promise<void>

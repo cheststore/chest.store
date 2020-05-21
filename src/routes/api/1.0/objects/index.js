@@ -32,12 +32,21 @@ export default function ({ log, postgres }) {
 
     async ['get'](req, res) {
       const session = SessionHandler(req.session)
+      const dirs = CloudDirectories(postgres)
       const objects = CloudObjects(postgres)
       const buckId = session.getLoggedInBucketId()
       const objId = req.query.id
 
       const object = await objects.findBy({ bucket_id: buckId, id: objId })
-      res.json({ object })
+
+      let directory = null
+      if (object.directory_id)
+        directory = await dirs.findBy({
+          bucket_id: buckId,
+          id: object.directory_id,
+        })
+
+      res.json({ object, directory })
     },
 
     async ['delete'](req, res) {

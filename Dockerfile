@@ -9,7 +9,9 @@ WORKDIR /usr/chest.store
 # Install dependencies
 COPY package.json .
 
-RUN npm install
+# why are we using --no-package-lock? see issue below
+# https://stackoverflow.com/a/53437059/7857707
+RUN npm install --no-package-lock
 
 # Copy the remainder of the source code and build
 COPY . .

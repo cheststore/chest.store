@@ -10,8 +10,10 @@
       @vdropzone-success="successAddingFile")
 
     base-button(
-      v-if="btnOnly",
+      v-if="btnOnly"
       :id="`uploader-btn-${_uid}`",
+      :class="btnClass"
+      :size="btnSize"
       :type="btnVariant") {{ btnText || 'Upload Files' }}
 </template>
 
@@ -30,6 +32,8 @@
 
       btnOnly: { type: Boolean, default: false }, // if true, only show a button to click to upload files
       btnText: { type: String, default: null },
+      btnSize: { type: String, default: null },
+      btnClass: { type: String, default: null },
       btnVariant: { type: String, default: 'primary' },
     },
 

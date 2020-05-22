@@ -1,48 +1,57 @@
 import Aws from '../libs/Aws'
+import BackgroundWorker from '../libs/BackgroundWorker'
 import CloudBuckets from '../libs/models/CloudBuckets'
 import CloudCredentials from '../libs/models/CloudCredentials'
 import CloudDirectories from '../libs/models/CloudDirectories'
 import CloudObjects from '../libs/models/CloudObjects'
 import config from '../config'
 
-export default function AwsWorkers({ log, postgres }) {
+export default function AwsWorkers({ log, postgres, redis }) {
   return {
     awsSyncObjects: {
-      plugins: [ 'Retry' ],
+      plugins: ['Retry'],
       pluginOptions: {
         retry: {
           retryLimit: 5,
           retryDelay: 1000 * 5,
-        }
+        },
       },
-      perform: async options => {
-        const {
-          bucketId,
-          credentialId,
-          userId,
-          objectId
-        } = options
+      perform: async (options) => {
+        const { bucketId, credentialId, userId, objectId } = options
 
-        const [ bucket, credential, object ] = await Promise.all([
+        const objectInst = CloudObjects(postgres)
+
+        const [
+          bucket,
+          credential,
+          [object, objectHistoryObj],
+        ] = await Promise.all([
           CloudBuckets(postgres).find(bucketId),
           CloudCredentials(postgres).find(credentialId),
           (async function getObjects() {
             if (objectId) {
-              return await CloudObjects(postgres).findBy({ bucket_id: bucketId, id: objectId })
+              return await Promise.all([
+                objectInst.findBy({ bucket_id: bucketId, id: objectId }),
+                objectInst.getHistoryObject(objectId),
+              ])
             }
-          })()
+            return []
+          })(),
         ])
 
         const s3 = Aws({
           accessKeyId: credential.key,
-          secretAccessKey: credential.secret
+          secretAccessKey: credential.secret,
         }).S3
 
         const processObjects = async function processObjects(objects) {
           for (let i = 0; i < objects.length; i++) {
             const obj = objects[i]
             const directories = CloudDirectories(postgres)
-            const info = await directories.createDirsAndObjectFromFullPath(bucketId, obj.Key)
+            const info = await directories.createDirsAndObjectFromFullPath(
+              bucketId,
+              obj.Key
+            )
             // const objInst = CloudObjects(postgres)
             // await objInst.findOrCreateBy({ bucket_id: bucketId, full_path: obj.Key })
 
@@ -64,18 +73,31 @@ export default function AwsWorkers({ log, postgres }) {
         }
 
         if (object) {
-          const obj = await s3.getFile({ bucket: bucket.bucket_uid, filename: object.full_path })
-          await processObjects([{
-            Key: object.full_path,
-            Size: obj.ContentLength,
-            ...obj
-          }])
+          const obj = await s3.getFile({
+            bucket: bucket.bucket_uid,
+            filename: object.full_path,
+          })
+          await processObjects([
+            {
+              Key: object.full_path,
+              Size: obj.ContentLength,
+              ...obj,
+            },
+          ])
+          if (objectHistoryObj) {
+            await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+              ...options,
+              objectId: objectHistoryObj.id,
+            })
+          }
         } else {
           await s3.listFilesRecursive(bucket.bucket_uid, processObjects)
         }
 
-        log.info(`Successfully processed all objects for bucket ${bucket.type} - ${bucket.bucket_uid}`)
-      }
-    }
+        log.info(
+          `Successfully processed all objects for bucket ${bucket.type} - ${bucket.bucket_uid}`
+        )
+      },
+    },
   }
 }

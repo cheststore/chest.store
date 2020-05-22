@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import SessionHandler from '../../../../libs/SessionHandler'
 import AuditLog from '../../../../libs/models/AuditLog'
 import CloudDirectories from '../../../../libs/models/CloudDirectories'
@@ -9,7 +10,7 @@ import GitClient from '../../../../libs/git/GitClient'
 import GitHelpers from '../../../../libs/git/GitHelpers'
 import config from '../../../../config'
 
-export default function ({ log, postgres }) {
+export default function ({ log, postgres, redis }) {
   return {
     async ['list'](req, res) {
       const session = SessionHandler(req.session)
@@ -98,6 +99,12 @@ export default function ({ log, postgres }) {
           object.full_path
         )
         await client.initAndPushLocalRepo()
+        await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+          bucketId: bucket.id,
+          credentialId: cred.id,
+          userId: user.id,
+          objectId: objId,
+        })
         history = {
           ...(await client.gitClient.log()),
           initialized: true,

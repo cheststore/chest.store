@@ -22,6 +22,23 @@ export default function CloudObjects(postgres: any) {
       'is_deleted',
     ],
 
+    async getHistoryObject(
+      sourceObjectId: number | string
+    ): Promise<StringMap> {
+      const { rows } = await postgres.query(
+        `
+        select o.*
+        from cloud_objects as o
+        inner join git_repos as g on g.object_id = o.id 
+        where
+          g.is_object_version_repo is true and
+          g.version_source_object_id = $1
+      `,
+        [sourceObjectId]
+      )
+      return rows[0]
+    },
+
     async getObjectAndBucket(objectId: number | string): Promise<StringMap> {
       const { rows } = await postgres.query(
         `

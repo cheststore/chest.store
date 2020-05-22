@@ -68,6 +68,13 @@ export default function Users(postgres, session = null) {
       return await sessionHandler.setSession(object, sessionObj, persistSession)
     },
 
+    isLoggedIn() {
+      if (session && session.toString() === '[object Object]') {
+        if (Object.keys(session.user || {}).length > 0) return true
+      }
+      return false
+    },
+
     async login(userObject = this.record) {
       if (session) {
         session.user = session.user || {}

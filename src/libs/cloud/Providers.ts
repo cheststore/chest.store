@@ -3,7 +3,7 @@ import AwsProvider from './AwsProvider'
 
 export default function Providers(
   type: string,
-  options: IFactoryOptions
+  options: ICloudFactoryOptions
 ): ICloudProvider {
   switch (type.toLowerCase()) {
     case 'aws':
@@ -61,12 +61,12 @@ export interface ICloudProvider {
   createPresignedUrl: (options: any) => Promise<any>
 }
 
-export interface IFactoryOptions {
+export interface ICloudFactoryOptions {
   apiKey: string
   apiSecret: string
   region?: string
 }
 
 export interface ICloudProviderFactory {
-  (options: IFactoryOptions): ICloudProvider
+  (options: ICloudFactoryOptions): ICloudProvider
 }

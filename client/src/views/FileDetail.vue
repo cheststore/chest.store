@@ -68,12 +68,12 @@
               div.card.shadow
                 div.card-header
                   h4.m-0 {{ file.name }}
-                div.card-body.py-2.small.d-flex.justify-content-center
+                div.card-body.py-2.small.d-flex.justify-content-center.bg-secondary.border.border-success
                   //- div.mb-2 Pull object and it's version history
                   pre.m-0(v-highlightjs)
                     code.sh
                       | git clone {{ cloneUrl }}
-                div.card-body.border-top
+                div.card-body
                   div.row
                     div.col
                       div.d-flex.justify-content-center(v-if="isImage(file.full_path)")

@@ -19,12 +19,12 @@ import SessionHandler from './SessionHandler'
 import Routes from './Routes'
 import config from '../config'
 
-const log         = bunyan.createLogger(config.logger.options)
-const app         = express()
-const httpServer  = http.Server(app)
-const io          = socketIo(httpServer, { pingInterval: 4000, pingTimeout: 12000 })
-const postgres    = new PostgresClient()
-const redis       = new RedisHelper()
+const log = bunyan.createLogger(config.logger.options)
+const app = express()
+const httpServer = http.Server(app)
+const io = socketIo(httpServer, { pingInterval: 4000, pingTimeout: 12000 })
+const postgres = new PostgresClient()
+const redis = new RedisHelper()
 
 app.disable('x-powered-by')
 
@@ -35,7 +35,9 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
       try {
         const routeInst = Routes({ io, log, postgres, redis })
         const routes = await routeInst.get()
-        const isActuallyProductionHost = config.server.isProduction && config.server.host.indexOf('https') === 0
+        const isActuallyProductionHost =
+          config.server.isProduction &&
+          config.server.host.indexOf('https') === 0
 
         //view engine setup
         app.set('views', path.join(config.app.rootDir, 'views'))
@@ -58,12 +60,12 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         let sessionMiddleware
         if (config.session.sessionSecret && config.session.sessionCookieKey) {
           let sessionConfig = {
-            store:              new RedisStore({ client: redis.client }),
-            secret:             config.session.sessionSecret,
-            key:                config.session.sessionCookieKey,
-            resave:             true,
-            saveUninitialized:  false,
-            cookie:             { maxAge: 60 * 60 * 1000 } // 1 hour
+            store: new RedisStore({ client: redis.client }),
+            secret: config.session.sessionSecret,
+            key: config.session.sessionCookieKey,
+            resave: true,
+            saveUninitialized: false,
+            cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
           }
 
           if (isActuallyProductionHost) {
@@ -77,7 +79,11 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
 
         app.use(passport.initialize())
         app.use(passport.session())
-        io.use((socket, next) => (sessionMiddleware) ? sessionMiddleware(socket.request, socket.request.res, next) : next())
+        io.use((socket, next) =>
+          sessionMiddleware
+            ? sessionMiddleware(socket.request, socket.request.res, next)
+            : next()
+        )
 
         app.use(function passIoToReq(req, res, next) {
           req.cheststoreIo = io
@@ -88,15 +94,13 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         app.use(routeInst.apiKeyMiddleware())
 
         app.use(function checkRedirectUrlAndFollow(req, res, next) {
-          if (!(req.session.user && req.session.redirectUrl))
-            return next()
+          if (!(req.session.user && req.session.redirectUrl)) return next()
 
           const redirectTo = req.session.redirectUrl
-          delete(req.session.redirectUrl)
+          delete req.session.redirectUrl
 
-          req.session.save(err => {
-            if (err)
-              return next(err)
+          req.session.save((err) => {
+            if (err) return next(err)
             res.redirect(redirectTo)
           })
         })
@@ -106,50 +110,78 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         let userGitServers = {}
         app.use('/git/:username', async function gitRoute(...args) {
           try {
-            const [ req ] = args
+            const [req] = args
             const username = req.params.username
-            userGitServers[username] = userGitServers[username] || await gitServer.create(username)
+            userGitServers[username] =
+              userGitServers[username] || (await gitServer.create(username))
             userGitServers[username].handle(...args)
-          } catch(err) {
-            const [ _, res ] = args
+          } catch (err) {
+            const [_, res] = args
             res.status(401).send(err.message)
           }
         })
 
         //static files
-        app.use('/public', express.static(path.join(config.app.rootDir, '/public')))
+        app.use(
+          '/public',
+          express.static(path.join(config.app.rootDir, '/public'))
+        )
 
         const formidableMiddleware = formidable({ multiples: true })
 
         //setup route handlers in the express app
-        routes.forEach(route => {
+        routes.forEach((route) => {
           try {
-            const handlerArgs = route.formidable ? [ formidableMiddleware, route.handler ] : [ route.handler ]
+            const mainRouteHandler =
+              route.handler instanceof Array ? route.handler : [route.handler]
+            const handlerArgs = route.formidable
+              ? [formidableMiddleware, ...mainRouteHandler]
+              : [...mainRouteHandler]
             app[route.verb.toLowerCase()](route.path, ...handlerArgs)
-            log.debug(`Successfully bound route to express; method: ${route.verb}; path: ${route.path}`)
-          } catch(err) {
-            log.error(err, `Error binding route to express; method: ${route.verb}; path: ${route.path}`)
+            log.debug(
+              `Successfully bound route to express; method: ${route.verb}; path: ${route.path}`
+            )
+          } catch (err) {
+            log.error(
+              err,
+              `Error binding route to express; method: ${route.verb}; path: ${route.path}`
+            )
           }
         })
 
         //passport setup
-        const strategies = fs.readdirSync(path.join(__dirname, '..', 'passport_strategies')) || []
-        strategies.forEach(stratFile => {
+        const strategies =
+          fs.readdirSync(path.join(__dirname, '..', 'passport_strategies')) ||
+          []
+        strategies.forEach((stratFile) => {
           try {
-            const oStrat = require(path.join(__dirname, '..', 'passport_strategies', stratFile)).default({ log, postgres, redis })
+            const oStrat = require(path.join(
+              __dirname,
+              '..',
+              'passport_strategies',
+              stratFile
+            )).default({ log, postgres, redis })
 
             // If bindCondition exists, make sure it's truthy before
             // proceeding in case there isn't something required to
             // bind the strategy
-            if (typeof oStrat.bindCondition !== 'function' || oStrat.bindCondition()) {
-              const stratName = path.basename(stratFile, ".js")
+            if (
+              typeof oStrat.bindCondition !== 'function' ||
+              oStrat.bindCondition()
+            ) {
+              const stratName = path.basename(stratFile, '.js')
 
               if (oStrat.options)
-                return passport.use(stratName, new oStrat.strategy(oStrat.options, oStrat.handler))
-              return passport.use(stratName, new oStrat.strategy(oStrat.handler))
+                return passport.use(
+                  stratName,
+                  new oStrat.strategy(oStrat.options, oStrat.handler)
+                )
+              return passport.use(
+                stratName,
+                new oStrat.strategy(oStrat.handler)
+              )
             }
-
-          } catch(err) {
+          } catch (err) {
             log.error(`Error binding passport strategy: ${stratFile}`, err)
           }
         })
@@ -161,8 +193,7 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
           const req = socket.request
           const session = SessionHandler(req.session, { redis })
           const userId = session.getLoggedInUserId()
-          if (!userId)
-            return next(new Error(config.errors['401']))
+          if (!userId) return next(new Error(config.errors['401']))
           next()
         })
 
@@ -173,8 +204,14 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
           log.error('Express error handling', err)
 
           const contType = req.headers['content-type']
-          if (contType && contType === 'application/json')
-            return res.status(500).json({ error: `There was an error that we're looking into now. Thanks for your patience.` })
+          const userAgent = req.headers['user-agent']
+          if (
+            (contType && contType === 'application/json') ||
+            userAgent === 'chest.store-cli'
+          )
+            return res.status(500).json({
+              error: `There was an error that we're looking into now. Thanks for your patience.`,
+            })
 
           res.redirect(err.redirectRoute || '/')
         })
@@ -182,18 +219,22 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         // Assume we'll listen in the primary app file via `sticky-cluster` module
         // if (shouldListenOnPort)
         //   httpServer.listen(portToListenOn, () => log.info(`listening on *: ${portToListenOn}`))
-
-      } catch(err) {
-        log.error("Error starting server", err)
+      } catch (err) {
+        log.error('Error starting server', err)
         process.exit()
       } finally {
-
         //handle if the process suddenly stops
-        process.on('SIGINT', () => { console.log('got SIGINT....'); process.exit() })
-        process.on('SIGTERM', () => { console.log('got SIGTERM....'); process.exit() })
+        process.on('SIGINT', () => {
+          console.log('got SIGINT....')
+          process.exit()
+        })
+        process.on('SIGTERM', () => {
+          console.log('got SIGTERM....')
+          process.exit()
+        })
 
         return app
       }
-    }
+    },
   ]
 }

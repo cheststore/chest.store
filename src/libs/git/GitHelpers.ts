@@ -40,6 +40,14 @@ export default function GitHelpers(
       return fullDirPath
     },
 
+    async deleteLocalRepoDir(
+      username: string,
+      repoName: string
+    ): Promise<void> {
+      const fullDirPath: string = path.join(clientRootDir, username, repoName)
+      await fileMgmt.deleteDir(fullDirPath)
+    },
+
     async addObjectVersion(
       username: string,
       objectId: number | string,

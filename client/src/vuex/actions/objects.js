@@ -8,6 +8,7 @@ export default {
       directories,
     } = await ApiCloudObjects.listObjects(
       directoryId,
+      state.objects.currentListFilters,
       state.objects.currentList.currentPage,
       state.objects.currentList.perPage
     )
@@ -23,5 +24,12 @@ export default {
     )
     commit('SET_BUCKET_OBJECT', object)
     commit('SET_BUCKET_CURRENT_DIRECTORY', directory)
+  },
+
+  async getCurrentObjHistory({ commit, state }) {
+    const { history } = await ApiCloudObjects.getObjectHistory(
+      state.objects.currentObject.id
+    )
+    commit('SET_BUCKET_OBJECT_HISTORY', history)
   },
 }

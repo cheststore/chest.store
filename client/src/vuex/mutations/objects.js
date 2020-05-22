@@ -11,6 +11,10 @@ export default {
     state.objects.currentList = info
   },
 
+  SET_BUCKET_OBJECT_FILTER(state, { key, value }) {
+    state.objects.currentListFilters[key] = value
+  },
+
   SET_BUCKET_CURRENT_DIRECTORY(state, dirObj) {
     state.objects.currentDirectory = dirObj
   },
@@ -22,7 +26,11 @@ export default {
   SET_BUCKET_OBJECT(state, info) {
     state.objects.currentObject = {
       ...state.objects.currentObject,
-      ...info
+      ...info,
     }
-  }
+  },
+
+  SET_BUCKET_OBJECT_HISTORY(state, history) {
+    state.objects.currentObjectHistory = history
+  },
 }

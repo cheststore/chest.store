@@ -42,16 +42,34 @@ export default function CloudObjects(postgres: any) {
     async getObjectsInBucket(
       bucketId: number | string,
       directoryId: number | string | null = null,
+      filters: null | StringMap,
       page: number = 1,
       perPage: number = 30
     ): Promise<StringMap[]> {
-      let filters: string[] = [`bucket_id = $1`]
+      let filterClauses: string[] = [`bucket_id = $1`]
       let params: (number | string)[] = [bucketId]
-      if (directoryId) {
-        filters.push(`directory_id = $2`)
-        params.push(directoryId)
+
+      // TODO: for now if there are filters present disregard the
+      // directory ID. Probably should respect directory ID at
+      // some point if it's provided.
+      const hasFilterPresent =
+        filters &&
+        Object.keys(filters).reduce(
+          (bool, val) => bool || !!filters[val],
+          false
+        )
+      if (filters && hasFilterPresent) {
+        if (filters.searchQuery) {
+          filterClauses.push(`o.name ilike '%' || $${params.length + 1} || '%'`)
+          params.push(filters.searchQuery)
+        }
       } else {
-        filters.push(`directory_id is null`)
+        if (directoryId) {
+          filterClauses.push(`directory_id = $${params.length + 1}`)
+          params.push(directoryId)
+        } else {
+          filterClauses.push(`directory_id is null`)
+        }
       }
 
       return await PostgresSqlParser().runPaginationQuery(
@@ -61,7 +79,7 @@ export default function CloudObjects(postgres: any) {
           from cloud_objects as o
           where
             o.is_deleted is not true and
-            ${filters.join(' and ')}
+            ${filterClauses.join(' and ')}
           order by o.last_modified desc
         `,
         params,

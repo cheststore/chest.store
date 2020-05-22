@@ -2,16 +2,35 @@ import CheststoreFetch from './CheststoreFetch'
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
-  async listObjects(directoryId = null, page = 1, perPage = 30) {
+  async downloadObjectBlob(objectId) {
+    const response = await CheststoreFetch(`/file/download/${objectId}`)
+    return await handleFetchResponse(response, 'blob')
+  },
+
+  async listObjects(
+    directoryId = null,
+    filters = null,
+    page = 1,
+    perPage = 30
+  ) {
     const response = await CheststoreFetch(
-      `/api/1.0/objects/list?directoryId=${directoryId || ''}&page=${page ||
-        1}&perPage=${perPage || 30}`
+      `/api/1.0/objects/list?directoryId=${directoryId ||
+        ''}&filters=${encodeURIComponent(
+        JSON.stringify(filters)
+      )}&page=${page || 1}&perPage=${perPage || 30}`
     )
     return await handleFetchResponse(response)
   },
 
   async getObjectDetail(id) {
     const response = await CheststoreFetch(`/api/1.0/objects/get?id=${id}`)
+    return await handleFetchResponse(response)
+  },
+
+  async getObjectHistory(id) {
+    const response = await CheststoreFetch(
+      `/api/1.0/objects/get/history?id=${id}`
+    )
     return await handleFetchResponse(response)
   },
 

@@ -38,18 +38,9 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
                 file.name
               }`.replace(/\/\//g, '/')
 
-              const [newObjAry] = await Promise.all([
-                CloudDirectories(postgres).createDirsAndObjectFromFullPath(
-                  bucket.id,
-                  finalFilePath
-                ),
-
-                provider.writeObject(
-                  bucket.bucket_uid,
-                  finalFilePath,
-                  fs.createReadStream(file.path)
-                ),
-              ])
+              const newObjAry: StringMap[] = await CloudDirectories(
+                postgres
+              ).createDirsAndObjectFromFullPath(bucket.id, finalFilePath)
 
               const objId = newObjAry[newObjAry.length - 1].id
               await Promise.all([
@@ -58,13 +49,6 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
                   objId,
                   fs.createReadStream(file.path)
                 ),
-
-                BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
-                  bucketId: bucket.id,
-                  credentialId: cred.id,
-                  userId: user.id,
-                  objectId: objId,
-                }),
 
                 AuditLog(postgres).log({
                   credential_id: cred.id,
@@ -75,6 +59,24 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
                   additional_info: { objectId: objId },
                 }),
               ])
+
+              // NOTE: make sure we push the object to the provider last
+              // so that all version history among other things have
+              // completed and we don't override existing object(s)
+              // before we log and store all history information first.
+              await provider.writeObject(
+                bucket.bucket_uid,
+                finalFilePath,
+                fs.createReadStream(file.path)
+              )
+
+              await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+                bucketId: bucket.id,
+                credentialId: cred.id,
+                userId: user.id,
+                objectId: objId,
+              })
+
               return objId
             }
           )

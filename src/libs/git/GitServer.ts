@@ -207,6 +207,8 @@ export default function GitServer(
           fs.createReadStream(tarInfo.path)
         ),
 
+        helpers.deleteLocalRepoDir(this.user.username, push.repo),
+
         AuditLog(postgres).log({
           credential_id: this.user.current_credential_id,
           user_id: this.user.id,

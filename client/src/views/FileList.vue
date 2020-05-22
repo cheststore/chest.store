@@ -2,17 +2,9 @@
   div
     base-header.pb-6.pb-8.pt-5.pt-md-8(type="gradient-info")
       div.row
-        div.col-lg-12.d-flex.align-items-center
-          h2.text-white.mb-0 #[strong {{ objectInfo.totalCount }}] objects in #[strong {{ dirOrBucket }}]
-          div.ml-auto.d-flex.align-items-center
-            base-button(type="info",@click="syncBucket()") Sync Bucket Manually
-            file-uploader(
-              :dir="currentDirPath"
-              :remove-after-upload="true"
-              :btn-only="true"
-              :btn-text="`Add File to ${dirOrBucket}`"
-              btn-variant="warning"
-              @added="fileUploaded")
+        div.col-lg-12
+          h2.text-white.mb-0
+            | #[strong {{ objectInfo.totalCount }}] objects in #[strong {{ dirOrBucket }}]
 
     div.container.mt--7
       div.row
@@ -33,8 +25,33 @@
                     router-link.text-primary.small(:to="`/directory/${row.id}`") {{ row.full_path }}
         div.col.mb-4
           div.card.shadow
-            div.card-header.border-0
+            div.card-header.border-0.d-flex.align-items-center
               h3.mb-0 {{ dirOrBucket == '/' ? currentBucket.name : dirOrBucket }} objects
+              div.ml-auto.d-flex.align-items-center
+                base-button(
+                  type="primary",
+                  size="sm",
+                  @click="syncBucket()") Sync Entire Bucket
+                file-uploader(
+                  :dir="currentDirPath"
+                  :remove-after-upload="true"
+                  :btn-only="true"
+                  btn-size="sm"
+                  :btn-text="`Add File to ${dirOrBucket == '/' ? currentBucket.name : dirOrBucket}`"
+                  btn-variant="warning"
+                  @added="fileUploaded")
+            div.card-header.py-2.border-top
+              base-input.m-0(
+                v-model="searchQuery"
+                :alternative="true"
+                placeholder="Search for objects..."
+                addon-left-icon="ni ni-tag")
+            div.card-body.py-2.d-flex.justify-content-end
+              base-pagination.mb-0(
+                :total="objectInfo.totalCount"
+                :value="objectInfo.currentPage"
+                :perPage="objectInfo.perPage"
+                @input="changePage")
             div.table-responsive.mb-0
               base-table.table.align-items-center.table-flush(
                 thead-classes="thead-light"
@@ -52,7 +69,9 @@
                       div.d-flex.align-items-center
                         span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
                           img(:src="`/file/download/${row.id}`")
-                        div {{ row.name }}
+                        div
+                          div {{ row.name }}
+                          div.text-light(style="font-size: 0.6rem") {{ row.full_path }}
                   td {{ humanFileSize(row.size_bytes || 0) }}
                   td {{ getFormattedDate(row.last_modified) }}
                   td
@@ -62,7 +81,7 @@
                       template
                         a.dropdown-item(@click="downloadObject(row.id)") Download Object
                         a.dropdown-item(@click="promptDeleteObject(row)") Delete Object
-            div.card-footer.d-flex.justify-content-end
+            div.card-footer.py-2.d-flex.justify-content-end
               base-pagination.mb-0(
                 :total="objectInfo.totalCount"
                 :value="objectInfo.currentPage"
@@ -85,7 +104,7 @@
   import TimeHelpers from '../factories/TimeHelpers'
   import ApiAws from '../factories/ApiAws'
   import ApiCloudObjects from '../factories/ApiCloudObjects'
-  import { isImage } from '../factories/Utilities'
+  import { debounce, isImage } from '../factories/Utilities'
 
   export default {
     props: {
@@ -102,6 +121,10 @@
       return {
         showDeleteObjectModal: false,
         objectToDelete: {},
+
+        delayRefresh: debounce(async () => {
+          await this.changePage(1)
+        }, 300),
       }
     },
 
@@ -133,6 +156,20 @@
       maxShowSize() {
         return 1024 * 250
       },
+
+      searchQuery: {
+        get() {
+          return this.$store.state.objects.currentListFilters.searchQuery
+        },
+
+        async set(value) {
+          this.$store.commit('SET_BUCKET_OBJECT_FILTER', {
+            key: 'searchQuery',
+            value,
+          })
+          this.refreshList()
+        },
+      },
     },
 
     methods: {
@@ -163,6 +200,10 @@
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
+      },
+
+      refreshList() {
+        this.delayRefresh()
       },
 
       async changePage(newPage) {

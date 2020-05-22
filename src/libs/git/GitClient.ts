@@ -12,20 +12,37 @@ export const clientRootDir: string = path.join(
 
 export default function GitClient(
   repoName: string,
-  username: string
+  username: string,
+  rootDirOverride?: string
 ): StringMap {
   const getProtocol: RegExp = /^(https?:\/\/)(.*)/
   const protocol: string = config.server.host.replace(getProtocol, '$1')
   const hostOnly: string = config.server.host.replace(getProtocol, '$2')
   const hostWithAuth: string = `${protocol}chest.store:${config.app.masterKey}@${hostOnly}`
 
-  const workingDir: string = path.join(clientRootDir, username, repoName)
+  const workingDir: string = path.join(
+    rootDirOverride || clientRootDir,
+    username,
+    repoName
+  )
   const gitClient: SimpleGit = gitP(workingDir)
 
   return {
     gitClient,
     repoName,
     username,
+    workingDir,
+
+    async getTrackedFiles(): Promise<string[]> {
+      // returns newline-delimited file paths
+      const paths = await gitClient.raw([
+        'ls-tree',
+        '-r',
+        'master',
+        '--name-only',
+      ])
+      return paths.split('\n').filter((f) => !!f)
+    },
 
     async initAndPushLocalRepo(commitMessage: string = 'init'): Promise<void> {
       await gitClient.init()

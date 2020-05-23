@@ -7,11 +7,12 @@ export default {
   isLoggedIn: false,
   isInitProcessing: false,
   mainNotification: null,
-  pageSizes: [ 10, 15, 20, 25, 50, 100 ],
-  
-  session: {},
+  pageSizes: [10, 15, 20, 25, 50, 100],
 
-  getRowNumber(index, currentPage=1, perPage=20) {
-    return (perPage * (currentPage - 1)) + (index + 1)
+  session: {},
+  providerTypes: [],
+
+  getRowNumber(index, currentPage = 1, perPage = 20) {
+    return perPage * (currentPage - 1) + (index + 1)
   },
 }

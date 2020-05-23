@@ -8,7 +8,6 @@ const log = bunyan.createLogger(config.logger.options)
 
 export default async function runMigrations(postgresUrl) {
   try {
-    console.log("URL", typeof postgresUrl, postgresUrl)
     const postgres = new PostgresClient(postgresUrl)
     const allMigrations = migrations()
 
@@ -18,17 +17,16 @@ export default async function runMigrations(postgresUrl) {
       await migrationFunction(postgres)
     }
 
-    log.info("Successfully ran DB migrations!")
-
-  } catch(err) {
-    log.error("Error running DB migrations", err)
+    log.info('Successfully ran DB migrations!')
+  } catch (err) {
+    log.error('Error running DB migrations', err)
   }
 }
 
 export function migrations() {
   const allMigrations = requireAll(path.join(__dirname, 'migrations'))
   return Object.keys(allMigrations)
-  .sort((file1, file2) => parseFloat(file1) - parseFloat(file2))
-  .map(key => allMigrations[key].default)
-  .flat(Infinity)
+    .sort((file1, file2) => parseFloat(file1) - parseFloat(file2))
+    .map((key) => allMigrations[key].default)
+    .flat(Infinity)
 }

@@ -99,7 +99,7 @@ export default function ({ log, postgres, redis }) {
           object.full_path
         )
         await client.initAndPushLocalRepo()
-        await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+        await BackgroundWorker({ redis }).enqueue('providerSyncObjects', {
           bucketId: bucket.id,
           credentialId: cred.id,
           userId: user.id,

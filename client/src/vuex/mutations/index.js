@@ -23,6 +23,10 @@ export default {
     state.session = sessionObj
   },
 
+  SET_PROVIDER_TYPES(state, types) {
+    state.providerTypes = types
+  },
+
   SOCKET_SET_MAIN_NOTIFICATION(state, notification) {
     state.mainNotification = notification
   },

@@ -3,6 +3,7 @@ import fs from 'fs'
 
 const fsStatPromise = fs.promises.stat
 const fsWriteFile = fs.promises.writeFile
+const fsRmFile = fs.promises.unlink
 const mkdirPromise = fs.promises.mkdir
 const rmdirPromise = fs.promises.rmdir
 const readFilePromise = fs.promises.readFile
@@ -12,13 +13,30 @@ export default function FileManagement() {
   return {
     async getLocalFile(
       filePath: string,
-      encoding: null | undefined = null
+      encoding?: null | undefined
     ): Promise<Buffer> {
-      return await readFilePromise(filePath, { encoding })
+      return await readFilePromise(filePath, { encoding: encoding || null })
+    },
+
+    async deleteFile(filePath: string): Promise<void> {
+      return await fsRmFile(filePath)
     },
 
     async readDir(dirPath: string): Promise<string[]> {
       return await readdirPromise(dirPath)
+    },
+
+    async readDirRecursive(dirPath: string): Promise<string[]> {
+      const dirs = await this.readDir(dirPath)
+      const files = await Promise.all(
+        dirs.map(async (dirOrFile) => {
+          const subPath: string = path.join(dirPath, dirOrFile)
+          return (await this.doesDirectoryExist(subPath))
+            ? await this.readDirRecursive(subPath)
+            : subPath
+        })
+      )
+      return files.flat(Infinity) as string[]
     },
 
     async deleteDir(dirPath: string): Promise<void> {
@@ -65,6 +83,10 @@ export default function FileManagement() {
       } catch (e) {
         return false
       }
+    },
+
+    async getFileInfo(filePath: string): Promise<fs.Stats> {
+      return await fsStatPromise(filePath)
     },
 
     getFileName(

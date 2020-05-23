@@ -73,12 +73,15 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
                   fs.createReadStream(file.path)
                 )
 
-                await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
-                  bucketId: bucket.id,
-                  credentialId: cred.id,
-                  userId: user.id,
-                  objectId: objId,
-                })
+                await BackgroundWorker({ redis }).enqueue(
+                  'providerSyncObjects',
+                  {
+                    bucketId: bucket.id,
+                    credentialId: cred.id,
+                    userId: user.id,
+                    objectId: objId,
+                  }
+                )
 
                 return objId
               }

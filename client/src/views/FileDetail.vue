@@ -48,7 +48,7 @@
                   //-   span.text-nowrap Since last month
           div.col-lg-3
             router-link.mb-2.btn.btn-sm.btn-secondary.w-100(
-              :to="currentDir ? `/directory/${currentDir.id}` : '/'") &lt; Back to bucket {{ (currentBucket || {}).bucket_uid }}
+              :to="currentDir ? `/directory/${currentDir.id}` : '/'") &lt; Back to {{ (currentBucket || {}).bucket_uid }}
             file-uploader.mb-2(
               :dir="currentDir && currentDir.full_path"
               :remove-after-upload="true"
@@ -121,7 +121,12 @@
                           div.ml-auto.text-gray
                             | {{ getFormattedDate(row.date, 'YYYY-MM-DD') }}
                         div
-                          strong {{ row.author_name }}
+                          strong(:id="`obj-version-${_uid}-${row.hash}`") {{ row.author_name }}
+                          b-tooltip(
+                            :target="`obj-version-${_uid}-${row.hash}`"
+                            placement="bottom"
+                            boundary="viewport")
+                            | {{ row.hash }}
 
 </template>
 

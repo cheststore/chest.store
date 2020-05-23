@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { ICloudFactoryOptions, ICloudProvider } from './Providers'
+import { ICloudFactoryOptions, ICloudObject, ICloudProvider } from './Providers'
 
 const Aws = require('../Aws').default
 
@@ -29,10 +29,10 @@ export default function AwsProvider({
 
     async listObjectsRecursive(
       bucket: string,
-      setCallback: (set: Array<object>) => void,
-      nextPageToken: string
-    ) {
-      return await aws.S3.listFilesRecursive(bucket, setCallback, nextPageToken)
+      setCallback: (set: ICloudObject[]) => Promise<void>,
+      nextPageToken?: string
+    ): Promise<void> {
+      await aws.S3.listFilesRecursive(bucket, setCallback, nextPageToken)
     },
 
     async getObject(bucket: string, name: string) {
@@ -41,6 +41,26 @@ export default function AwsProvider({
         filename: name,
       })
       return Body
+    },
+
+    async getObjectInfo(bucket: string, name: string): Promise<ICloudObject> {
+      const info: StringMap = await aws.S3.getFile({
+        bucket,
+        filename: name,
+      })
+
+      const owner: StringMap = info.Owner || {}
+      return {
+        bucketUid: bucket,
+        fullPath: name,
+        name: name,
+        lastModified: info.LastModified,
+        etag: info.ETag,
+        sizeBytes: info.ContentLength,
+        storageClass: info.StorageClass,
+        ownerId: owner.ID,
+        ownerDisplayName: owner.DisplayName,
+      }
     },
 
     async getObjectStreamWithBackoff(

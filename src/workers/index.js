@@ -1,5 +1,3 @@
-import AwsWorkers from './AwsWorkers'
+import ProviderWorkers from './ProviderWorkers'
 
-export default [
-  AwsWorkers
-]
+export default [ProviderWorkers]

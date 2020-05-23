@@ -19,7 +19,15 @@ export default function LoginHandler(postgres, request, options = null) {
       if (userRecord.is_disabled)
         throw new Errors.AccountDisabled(`This user account is disabled.`)
 
-      const [currentCred, currentBucket, allBuckets] = await Promise.all([
+      const [
+        allUserCreds,
+        allUserBuckets,
+        currentCred,
+        currentBucket,
+        allBuckets,
+      ] = await Promise.all([
+        creds.getAllForUser(userRecord.id),
+        buckets.getAllForUser(userRecord.id),
         creds.find(overrideCredentialId || userRecord.current_credential_id),
         buckets.find(overrideBucketId || userRecord.current_bucket_id),
         buckets.getAllForUser(userRecord.id),
@@ -34,6 +42,8 @@ export default function LoginHandler(postgres, request, options = null) {
       await users.login({ ...userRecord, password_hash: undefined })
       await users.setSession({
         last_login: new Date(),
+        buckets: allUserBuckets,
+        credentials: allUserCreds,
         current_credential: currentCred,
         current_bucket: currentBucket || allBuckets[0],
       })

@@ -30,7 +30,7 @@ export default function ({ log, postgres, redis }) {
         // will provide an error if key/secret combo are invalid
         await provider.areValidCredentials()
 
-        await creds.findOrCreateBy({ type: 'aws', key: awsKey })
+        await creds.findOrCreateBy({ type: providerType, key: awsKey })
         creds.setRecord({ secret: awsSecret })
         const credId = await creds.save()
 
@@ -139,7 +139,7 @@ export default function ({ log, postgres, redis }) {
           error: `This bucket was recently synced. Please wait up to 10 minutes before trying to manually sync again.`,
         })
 
-      await BackgroundWorker({ redis }).enqueue('awsSyncObjects', {
+      await BackgroundWorker({ redis }).enqueue('providerSyncObjects', {
         bucketId: buckId,
         credentialId: credId,
         userId: userId,

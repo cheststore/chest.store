@@ -1,14 +1,15 @@
 # chest.store
 
-Open-source, easy, lightweight, and hackable cloud object explorer,
+Open-source, lightweight, and hackable cloud object explorer,
 storage, and git HTTP server. Object versioning happens
-with git version control via new commits per uploaded version of a file.
+with git version control and any object version history repo
+can easily be cloned and/or `git pull`ed to see complete object history.
 
 ## Built-in git server
 
 chest.store has a built in HTTP git server and can be used
 like any other git remote to clone, push, pull, etc. any repository that uses git
-for its version control. Therefore, you can simply setup a new remote
+for its version control. Therefore, simply setup a new remote
 in your repository(ies) of choice to your chest.store server and
 push/pull as desired.
 
@@ -17,6 +18,23 @@ push/pull as desired.
 $ git remote add chest https://chest.store/git/YOUR_USERNAME/REPO_NAME
 $ git push chest master
 ```
+
+## Current storage support (see [TODOS](#TODOS) for upcoming integrations)
+
+#### AWS S3
+
+AWS S3 buckets can be integrated with a valid AWS access key and secret.
+For the best experience you will want AWS S3 full access IAM permissions
+from within your account, but you can get by with read access to the bucket(s)
+you'd like to manage, chest.store just won't be able to save version history or upload
+new files to the bucket.
+
+![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82731922-03de7100-9cd8-11ea-8b48-9705cd1fd06a.png)
+
+#### Local File System
+
+You can integrate a directory on your local file system to use as a
+"bucket" to manage from within chest.store.
 
 ## Install
 
@@ -104,3 +122,19 @@ following NPM script to create the minimum migration and
 model files required to create and use the new table.
 
 `$ npm run model -- your_new_table_name`
+
+## TODOS
+
+- More integrations (GCP, Wasabi, Dropbox?, more?)
+- Cloud subscription service (would anyone pay for a cloud offering of this?)
+- Hooks
+  - webhook integration when objects are downloaded, uploaded, synced, new version, etc.
+  - custom extensions on download, upload, etc.
+- Mobile app(s)
+- Blockchain integration
+  - Store SHA256 bit hash of file contents in blockchain txns for tamper-proofing
+  - Could be used by/for legal services or compliance auditors for proof object(s) haven't changed/been tampered with
+- Object editing in-app (google or O365 integrations?)
+- Collaborate tools
+  - Notes/comments, scheduling?
+- Teams/enterprise(y) features

@@ -69,10 +69,12 @@ export default new Router({
             import(/* webpackChunkName: "demo" */ './views/Login.vue'),
         },
         {
-          path: '/aws/init',
-          name: 'AWS Init',
+          path: '/cred/init',
+          name: 'initializecredential',
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/InitAws.vue'),
+            import(
+              /* webpackChunkName: "demo" */ './views/AddProvider/AddProvider.vue'
+            ),
         },
         {
           path: '*',

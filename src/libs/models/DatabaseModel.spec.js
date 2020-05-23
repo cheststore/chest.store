@@ -150,7 +150,7 @@ describe('DatabaseModel', () => {
       users.callbacks.afterSave = function () {
         assert.equal('[object Object]', this.record.toString())
 
-        // `bigint` type in DB returns from node-pg as string
+        // `uuid` type in DB returns from node-pg as string
         assert.equal('string', typeof this.record.id)
         assert.equal(true, this.record.id.length > 0)
         afterGotCalled = true

@@ -59,8 +59,8 @@ export default function Routes(options) {
           const users = Users(postgres, req.session)
           const login = LoginHandler(postgres, req)
           const session = SessionHandler(req.session, { redis })
-          // const currentPath = req.path
-          // if (isRouteNotNeedingAuth(currentPath)) return next()
+          const currentPath = req.path
+          if (isRouteNotNeedingAuth(currentPath)) return next()
 
           if (users.isLoggedIn()) return next()
 
@@ -79,12 +79,7 @@ export default function Routes(options) {
 
             const userRecord = await users.find(userApiKey.user_id)
             if (userRecord) {
-              await login.standardLogin(
-                userRecord,
-                false,
-                userApiKey.credential_id,
-                userApiKey.bucket_id
-              )
+              await login.standardLogin(userRecord)
 
               // clean up ephemeral session after the server has responded
               res.on('finish', async () => {
@@ -112,4 +107,23 @@ export default function Routes(options) {
       }
     },
   }
+}
+
+function isRouteNotNeedingAuth(currentRoute) {
+  const whitelist = routesNotNeedingAuth()
+  for (let i = 0; i < whitelist.length; i++) {
+    const testRoute = whitelist[i]
+    if (new RegExp(`^${testRoute}$`).test(currentRoute)) return true
+  }
+  return false
+}
+
+function routesNotNeedingAuth() {
+  return [
+    '/api/1.0/auth/create/user',
+    '/api/1.0/auth/password/forgot',
+    '/api/1.0/auth/password/reset',
+    '/api/1.0/auth/session',
+    '/api/1.0/providers/types',
+  ]
 }

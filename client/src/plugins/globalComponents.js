@@ -1,3 +1,9 @@
+import {
+  // BFormTimepicker,
+  BPopover,
+  BTooltip,
+} from 'bootstrap-vue'
+
 import Badge from '../components/Badge'
 import BaseAlert from '../components/BaseAlert'
 import BaseButton from '../components/BaseButton'
@@ -25,6 +31,8 @@ import Tabs from '../components/Tabs/Tabs'
 
 export default {
   install(Vue) {
+    Vue.component('b-popover', BPopover)
+    Vue.component('b-tooltip', BTooltip)
     Vue.component(Badge.name, Badge)
     Vue.component(BaseAlert.name, BaseAlert)
     Vue.component(BaseButton.name, BaseButton)

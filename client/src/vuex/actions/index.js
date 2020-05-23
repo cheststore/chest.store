@@ -1,6 +1,7 @@
 import Objects from './objects'
 
 import ApiAuth from '../../factories/ApiAuth'
+import ApiProviders from '../../factories/ApiProviders'
 
 export default {
   ...Objects,
@@ -15,7 +16,10 @@ export default {
     try {
       commit('SET_INIT_PROCESSING', true)
 
-      await dispatch('getUserSession')
+      await Promise.all([
+        dispatch('getUserSession'),
+        dispatch('getProviderTypes'),
+      ])
 
       // Seeing a weird bug where the currentRoute.fullPath shows
       // as the root route, then populates as the correct route.
@@ -25,7 +29,7 @@ export default {
       commit('CHECK_LOGGED_IN', isLoggedIn)
       if (isLoggedIn) {
         if (!state.session.current_credential) {
-          const path = '/aws/init'
+          const path = '/cred/init'
           if (fullPath !== path) return state.router.push(path)
         }
 
@@ -55,5 +59,12 @@ export default {
 
     const { session } = await ApiAuth.getSession()
     commit('SET_SESSION', session)
+  },
+
+  async getProviderTypes({ commit, state }, reset = false) {
+    if (state.providerTypes.length > 0 && !reset) return
+
+    const { types } = await ApiProviders.getTypes()
+    commit('SET_PROVIDER_TYPES', types)
   },
 }

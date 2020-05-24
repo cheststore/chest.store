@@ -63,7 +63,7 @@
       </template>
     </base-nav>
     <!-- Header -->
-    <div class="header bg-gradient-warning py-7 py-lg-8">
+    <div class="header bg-gradient-warning pt-6 p4-6 pb-lg-5">
       <div class="container">
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
@@ -92,7 +92,7 @@
       </div>
     </div>
     <!-- Page content -->
-    <div class="container mt--8 pb-5">
+    <div class="container mt--8 pb-8">
       <slide-y-up-transition mode="out-in" origin="center top">
         <router-view></router-view>
       </slide-y-up-transition>

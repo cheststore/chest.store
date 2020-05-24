@@ -51,13 +51,14 @@
               :to="currentDir ? `/directory/${currentDir.id}` : '/'") &lt; Back to {{ (currentBucket || {}).bucket_uid }}
             file-uploader.mb-2(
               :dir="currentDir && currentDir.full_path"
+              :object-id="objectId"
               :remove-after-upload="true"
               :btn-only="true"
               btn-size="sm"
               :btn-text="`Upload New Version`"
               btn-class="w-100"
               btn-variant="success"
-              @added="getObject()")
+              @added="init()")
             base-button.mb-2.w-100(type="default",size="sm",@click="downloadObject()") Download Object
     div.container.mt--7
       div.row
@@ -145,11 +146,7 @@
 
     watch: {
       async objectId(newId) {
-        this.fileAsciiCache = false
-        await Promise.all([
-          this.getObject(newId),
-          this.checkAndCacheIsFileAscii(newId),
-        ])
+        await this.init(newId)
       },
     },
 
@@ -222,10 +219,18 @@
       async getVersionHistory() {
         await this.$store.dispatch('getCurrentObjHistory')
       },
+
+      async init(id = this.objectId) {
+        this.fileAsciiCache = false
+        await Promise.all([
+          this.getObject(id),
+          this.checkAndCacheIsFileAscii(id),
+        ])
+      },
     },
 
     async created() {
-      await Promise.all([this.getObject(), this.checkAndCacheIsFileAscii()])
+      await this.init()
     },
   }
 </script>

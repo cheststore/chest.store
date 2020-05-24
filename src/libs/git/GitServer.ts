@@ -181,7 +181,7 @@ export default function GitServer(
         })
       }
 
-      let fullTarPath = `chest.store.git/${this.user.username}/${tarInfo.name}`
+      let fullTarPath = `.chest.store.git/${this.user.username}/${tarInfo.name}`
       if (!gitRepos.isNewRecord) {
         const repoObj = await CloudObjects(postgres).findBy({
           bucket_id: (bucket as StringMap).id,

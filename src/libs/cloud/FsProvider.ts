@@ -27,11 +27,12 @@ export default function FsProvider(): ICloudProvider {
         await Promise.all(
           allFilePaths.map(async (fp) => {
             const fileInfo: fs.Stats = await fileMgmt.getFileInfo(fp)
+            const pathFromBase = fp.replace(basePath, '')
             const pathSplit = fp.split('/')
             const fileName = pathSplit[pathSplit.length - 1]
             return {
               bucketUid: basePath,
-              fullPath: fileName, // cwd is base path, so this is from WITHIN the base dir
+              fullPath: pathFromBase, // cwd is base path, so this is from WITHIN the base dir
               name: fileName,
               lastModified: fileInfo.mtime,
               // etag?: string
@@ -99,6 +100,18 @@ export default function FsProvider(): ICloudProvider {
     async deleteObject(basePath: string, name: string): Promise<void> {
       const fullPath = path.join(basePath, name)
       await fileMgmt.deleteFile(fullPath)
+    },
+
+    async mvObject(
+      basePath: string,
+      sourceFile: string,
+      destinationFile: string
+    ): Promise<void> {
+      const sourcePath = path.join(basePath, sourceFile)
+      const destPath = path.join(basePath, destinationFile)
+      const sourceExists = await fileMgmt.doesFileExist(sourcePath)
+      if (!sourceExists || sourcePath == destPath) return
+      return await fileMgmt.mvFile(sourcePath, destPath)
     },
 
     async listBuckets(): Promise<ICloudBucket[]> {

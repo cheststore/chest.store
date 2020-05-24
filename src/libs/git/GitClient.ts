@@ -54,7 +54,7 @@ export default function GitClient(
           `${hostWithAuth}/git/${username}/${repoName}`
         )
       }
-      await gitClient.push('origin', 'master')
+      await gitClient.raw(['push', '-u', 'origin', 'master'])
     },
 
     async hasLocalRemote(): Promise<boolean> {

@@ -66,7 +66,9 @@ export default function ({ log, postgres, redis }) {
               .json({ error: `The requested object does not exist.` })
           }
 
-          res.set('Cache-Control', `public, max-age=86400`)
+          // TODO: Need to handle supporting clearing cache when
+          // files are updated or versions added
+          // res.set('Cache-Control', `public, max-age=86400`)
 
           if (true)
             // isAttachment)

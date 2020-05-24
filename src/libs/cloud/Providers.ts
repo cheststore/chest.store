@@ -62,6 +62,11 @@ export interface ICloudProvider {
     options?: object
   ) => Promise<void>
   deleteObject: (bucket: string, name: string) => Promise<void>
+  mvObject: (
+    bucket: string,
+    sourcePath: string,
+    destPath: string
+  ) => Promise<void>
   listBuckets: () => Promise<ICloudBucket[]>
   createBucket: (name: string) => Promise<any>
   createPresignedUrl: (options?: any) => Promise<any>

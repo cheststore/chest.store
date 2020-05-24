@@ -40,7 +40,8 @@ export default function CloudDirectories(postgres: object) {
 
     async createDirsAndObjectFromFullPath(
       bucketId: number | string,
-      fullObjectPath: string
+      fullObjectPath: string,
+      objectId?: number | string
     ): Promise<StringMap[]> {
       const splitInfo: string[] = fullObjectPath
         .split('/')
@@ -56,10 +57,15 @@ export default function CloudDirectories(postgres: object) {
         // object name
         if (ind === splitInfo.length - 1) {
           const obj = CloudObjects(postgres)
-          const existingObj = await obj.findBy({
-            bucket_id: bucketId,
-            full_path: (this as any)._getSanitizedValue(fullObjectPath),
-          })
+          let findObjFilters: StringMap = { bucket_id: bucketId }
+          if (objectId) {
+            findObjFilters.id = objectId
+          } else {
+            findObjFilters.full_path = (this as any)._getSanitizedValue(
+              fullObjectPath
+            )
+          }
+          const existingObj = await obj.findBy(findObjFilters)
           obj.setRecord({
             ...existingObj,
             bucket_id: bucketId,

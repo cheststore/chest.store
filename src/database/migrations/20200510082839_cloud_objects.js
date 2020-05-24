@@ -17,8 +17,7 @@ export default [
         metadata jsonb,
         is_deleted BOOLEAN NOT NULL DEFAULT false,
         created_at timestamptz NOT NULL DEFAULT now(),
-        updated_at timestamptz NOT NULL DEFAULT now(),
-        UNIQUE(bucket_id, full_path)
+        updated_at timestamptz NOT NULL DEFAULT now()
       );
     `)
   },

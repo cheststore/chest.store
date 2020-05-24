@@ -1,3 +1,4 @@
+import path from 'path'
 import AWS from 'aws-sdk'
 import { sleep } from './Helpers'
 
@@ -207,6 +208,32 @@ export default function Aws({
             //   return reject(new Error(`object not deleted`))
             resolve()
           })
+        })
+      },
+
+      async mvFile({ bucket, sourceFilename, destinationFilename }) {
+        return await new Promise((resolve, reject) => {
+          const params = { Bucket: bucket, Key: destinationFilename }
+          this._s3.copyObject(
+            {
+              ...params,
+
+              // NOTE: CopySource needs to include bucket, but source and
+              // destination will always be the same in our case
+              // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#copyObject-property
+              CopySource: encodeURIComponent(path.join(bucket, sourceFilename)),
+            },
+            async (err) => {
+              try {
+                if (err) return reject(err)
+
+                await this.deleteFile({ bucket, filename: sourceFilename })
+                resolve()
+              } catch (err) {
+                reject(err)
+              }
+            }
+          )
         })
       },
 

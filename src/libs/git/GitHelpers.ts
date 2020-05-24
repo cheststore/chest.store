@@ -50,18 +50,18 @@ export default function GitHelpers(
 
     async addObjectVersion(
       username: string,
-      objectId: number | string,
+      objectId: string,
       fileData: fs.ReadStream
     ): Promise<void> {
       await this.checkAndCreateNewObjectVersionRepo(username, objectId)
-      const gitClient = GitClient(objectId.toString(), username)
+      const gitClient = GitClient(objectId, username)
       const object = await objects.getObjectAndBucket(objectId)
       await gitClient.overrideFileAndPush(object.name, fileData)
     },
 
     async checkAndCreateNewObjectVersionRepo(
       username: string,
-      objectId: number | string
+      objectId: string
     ): Promise<void> {
       if (await this.doesLocalRepoExist(username, objectId)) return
 
@@ -69,9 +69,9 @@ export default function GitHelpers(
       const repo = await GitRepos(postgres).findBy({ repo: objectId })
       if (repo) {
         await fileMgmt.checkAndCreateDirectoryOrFile(
-          path.join(clientRootDir, username, objectId.toString())
+          path.join(clientRootDir, username, objectId)
         )
-        await GitClient(objectId.toString(), username).pullRepo()
+        await GitClient(objectId, username).pullRepo()
         return
       }
 

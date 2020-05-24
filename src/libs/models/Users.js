@@ -11,6 +11,8 @@ export default function Users(postgres, session = null) {
       'username',
       'password_hash',
       'email_address',
+      'first_name',
+      'last_name',
       'current_credential_id',
       'current_bucket_id',
       'last_login',

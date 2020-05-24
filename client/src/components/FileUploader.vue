@@ -26,6 +26,7 @@
     props: {
       url: { type: String },
       dir: { type: String, default: '' },
+      objectId: { type: String, default: '' },
       options: { type: Object, default: null },
       removeAfterUpload: { type: Boolean, default: false },
       size: { type: String, default: null },
@@ -44,7 +45,10 @@
           : null
 
         return {
-          url: () => `/object/upload?dir=${encodeURIComponent(this.dir || '')}`,
+          url: () =>
+            `/object/upload?dir=${encodeURIComponent(
+              this.dir || ''
+            )}&objectId=${this.objectId || ''}`,
           maxFilesize: 20480, // 20GB
           parallelUploads: 4,
           thumbnailHeight: 80,

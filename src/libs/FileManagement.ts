@@ -1,6 +1,9 @@
 import path from 'path'
 import fs from 'fs'
 
+// import rimraf from 'rimraf'
+const rimraf = require('rimraf')
+
 const fsStatPromise = fs.promises.stat
 const fsWriteFile = fs.promises.writeFile
 const fsRmFile = fs.promises.unlink
@@ -22,6 +25,10 @@ export default function FileManagement() {
       return await fsRmFile(filePath)
     },
 
+    async mvFile(sourcePath: string, destPath: string): Promise<void> {
+      return await fs.promises.rename(sourcePath, destPath)
+    },
+
     async readDir(dirPath: string): Promise<string[]> {
       return await readdirPromise(dirPath)
     },
@@ -40,7 +47,16 @@ export default function FileManagement() {
     },
 
     async deleteDir(dirPath: string): Promise<void> {
-      return await rmdirPromise(dirPath, { recursive: true })
+      // TODO: fs.rmdir does not provide `rm -rf` functionality,
+      // it errors if directory is not empty. Need to use rimraf
+      // for now, but should use std lib when it supports 'force'
+      // return await rmdirPromise(dirPath, { recursive: true })
+      return await new Promise((resolve, reject) => {
+        rimraf(dirPath, (err: null | string | Error) => {
+          if (err) return reject(err)
+          resolve()
+        })
+      })
     },
 
     async checkAndCreateDirectoryOrFile(

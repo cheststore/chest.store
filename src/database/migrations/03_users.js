@@ -6,6 +6,8 @@ export default [
         username varchar(255) NOT NULL UNIQUE,
         password_hash varchar(255),
         email_address varchar(255) UNIQUE,
+        first_name varchar(255),
+        last_name varchar(255),
         current_credential_id uuid REFERENCES cloud_credentials,
         current_bucket_id uuid REFERENCES cloud_buckets,
         last_login timestamptz,
@@ -15,5 +17,5 @@ export default [
         updated_at timestamptz NOT NULL DEFAULT now()
       );
     `)
-  }
+  },
 ]

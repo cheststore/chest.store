@@ -32,7 +32,26 @@ export default function AwsProvider({
       setCallback: (set: ICloudObject[]) => Promise<void>,
       nextPageToken?: string
     ): Promise<void> {
-      await aws.S3.listFilesRecursive(bucket, setCallback, nextPageToken)
+      await aws.S3.listFilesRecursive(
+        bucket,
+        async (info: any[]) => {
+          const cloudObjects: ICloudObject[] = info.map((obj: any) => {
+            const splitKey: string[] = obj.Key.split('/')
+            const name: string = splitKey[splitKey.length - 1]
+            return {
+              bucketUid: bucket,
+              fullPath: obj.Key,
+              name: name,
+              lastModified: obj.LastModified,
+              etag: obj.ETag,
+              sizeBytes: obj.Size,
+              storageClass: obj.StorageClass,
+            }
+          })
+          await setCallback(cloudObjects)
+        },
+        nextPageToken
+      )
     },
 
     async getObject(bucket: string, name: string) {
@@ -95,6 +114,18 @@ export default function AwsProvider({
       return await aws.S3.deleteFile({
         bucket,
         filename: name,
+      })
+    },
+
+    async mvObject(
+      bucket: string,
+      sourceObjPath: string,
+      destinationObjPath: string
+    ): Promise<void> {
+      return await aws.S3.mvFile({
+        bucket,
+        sourceFilename: sourceObjPath,
+        destinationFilename: destinationObjPath,
       })
     },
 

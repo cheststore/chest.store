@@ -57,7 +57,7 @@ export default function ({ postgres, redis }) {
         type: creds.record.type,
         bucket_uid: directory,
       })
-      buckets.setRecord({ name: directory })
+      buckets.setRecord({ name: directory, credential_id: credId })
 
       await Promise.all([
         buckets.save(),
@@ -92,6 +92,37 @@ export default function ({ postgres, redis }) {
           additional_info: req.body,
         }),
       ])
+      res.json(true)
+    },
+
+    async ['bucket/sync'](req, res) {
+      const session = SessionHandler(req.session)
+      const credId = session.getLoggedInCredentialId()
+      const buckId = session.getLoggedInBucketId()
+      const userId = session.getLoggedInUserId()
+
+      // We don't have trigger happy users from queueing up
+      // a ton of manual syncs back to back. This will enforce
+      // a minumum 10 minute delay between manual syncs per bucket.
+      const canManualSync = await redis.client.set(
+        `chest.store_manual_sync_${buckId}`,
+        'true',
+        'NX',
+        'EX',
+        60 * 10
+      ) // 10 min
+
+      if (!canManualSync)
+        return res.status(400).json({
+          error: `This bucket was recently synced. Please wait up to 10 minutes before trying to manually sync again.`,
+        })
+
+      await BackgroundWorker({ redis }).enqueue('providerSyncObjects', {
+        bucketId: buckId,
+        credentialId: credId,
+        userId: userId,
+      })
+
       res.json(true)
     },
   }

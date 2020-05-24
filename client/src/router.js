@@ -18,7 +18,7 @@ export default new Router({
           name: 'userprofile',
           props: true,
           component: () =>
-            import(/* webpackChunkName: "demo" */ './views/UserProfile.vue'),
+            import(/* webpackChunkName: "demo" */ './views/UserSettings.vue'),
         },
         {
           path: '/object/:objectId',
@@ -73,7 +73,7 @@ export default new Router({
           name: 'initializecredential',
           component: () =>
             import(
-              /* webpackChunkName: "demo" */ './views/AddProvider/AddProvider.vue'
+              /* webpackChunkName: "demo" */ './views/AddProvider/AddProviderView.vue'
             ),
         },
         {

@@ -11,8 +11,8 @@
         base-input.input-group-alternative(
           v-model="awsKey"
           placeholder="AWS Access Key"
-          :disabled="hasCred")
-        template(v-if="!hasCred")
+          :disabled="savedCredKey")
+        template(v-if="!savedCredKey")
           base-input.input-group-alternative(
             v-model="awsSecret"
             placeholder="AWS Access Secret",
@@ -33,7 +33,7 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  // import { mapState } from 'vuex'
   import ApiAws from '../../factories/ApiAws'
 
   export default {
@@ -45,17 +45,8 @@
 
         buckets: [],
         selectedBucketName: null,
+        savedCredKey: null,
       }
-    },
-
-    computed: {
-      ...mapState({
-        hasCred: (state) => state.session.current_credential,
-      }),
-
-      computedKey() {
-        return (this.hasCred && this.hasCred.key) || this.awsKey
-      },
     },
 
     methods: {
@@ -63,18 +54,24 @@
         try {
           evt.preventDefault()
 
-          if (!(this.computedKey && this.awsSecret))
+          if (!(this.awsKey && this.awsSecret))
             return this.$notify({
               type: 'danger',
               message: `Please enter both and access key and secret to add.`,
             })
 
           this.isCheckingKey = true
-          await ApiAws.checkAndSaveKey('aws', this.computedKey, this.awsSecret)
+          const { id } = await ApiAws.checkAndSaveKey(
+            'aws',
+            this.awsKey,
+            this.awsSecret
+          )
+          this.credentialId = id
           await Promise.all([
             this.$store.dispatch('getUserSession', true),
             this.listBuckets(),
           ])
+          this.savedCredKey = this.awsKey
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         } finally {
@@ -90,9 +87,9 @@
               message: `Please enter a valid bucket to integrate with.`,
             })
 
-          await ApiAws.saveBucket(this.selectedBucketName)
+          await ApiAws.saveBucket(this.selectedBucketName, this.credentialId)
           await this.$store.dispatch('getUserSession', true)
-          this.$router.push('/')
+          this.$emit('created')
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
@@ -100,16 +97,12 @@
 
       async listBuckets() {
         try {
-          const { Buckets } = await ApiAws.listBuckets()
+          const { Buckets } = await ApiAws.listBuckets(this.credentialId)
           this.buckets = Buckets
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
       },
-    },
-
-    async created() {
-      if (this.hasCred) await this.listBuckets()
     },
   }
 </script>

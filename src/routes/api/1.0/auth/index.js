@@ -1,11 +1,14 @@
 import Errors from '../../../../errors'
 // import BackgroundWorker from '../../../../libs/BackgroundWorker'
+import LoginHandler from '../../../../libs/LoginHandler'
 import SessionHandler from '../../../../libs/SessionHandler'
 import Users from '../../../../libs/models/Users'
 import LocalStrategy from '../../../../passport_strategies/local'
-import config from '../../../../config'
+import CloudCredentials from '../../../../libs/models/CloudCredentials'
+import CloudBuckets from '../../../../libs/models/CloudBuckets'
+// import config from '../../../../config'
 
-export default function({ log, postgres, redis }) {
+export default function ({ log, postgres, redis }) {
   return {
     session(req, res) {
       res.json({ session: req.session })
@@ -13,17 +16,12 @@ export default function({ log, postgres, redis }) {
 
     async ['create/user'](req, res) {
       try {
-        const session  = SessionHandler(req.session)
+        const session = SessionHandler(req.session)
         const userId = session.getLoggedInUserId()
 
-        if (userId)
-          throw new Errors.InvalidEmailAddress('Already logged in.')
+        if (userId) throw new Errors.InvalidEmailAddress('Already logged in.')
 
-        const {
-          username,
-          password,
-          cpassword
-        } = req.body
+        const { username, password, cpassword } = req.body
 
         if (!password || password !== cpassword)
           throw new Errors.PasswordNotValid('Bad password')
@@ -33,24 +31,75 @@ export default function({ log, postgres, redis }) {
           username,
           password,
           null,
-          true)
+          true
+        )
 
         res.redirect('/')
-
-      } catch(err) {
+      } catch (err) {
         log.error(`Error creating new user`, err)
         res.redirect(err.redirectRoute || '/')
       }
     },
 
+    async ['self/update'](req, res) {
+      const login = LoginHandler(postgres, req)
+      const session = SessionHandler(req.session)
+      const users = Users(postgres)
+      const user = session.getLoggedInUserId(true)
+
+      const {
+        current_credential_id,
+        current_bucket_id,
+        username,
+        email_address,
+        first_name,
+        last_name,
+      } = req.body
+
+      // make sure the user has access to the bucket
+      if (current_bucket_id) {
+        const [bucket] = await CloudBuckets(postgres).getAllForUser(
+          user.id,
+          current_bucket_id
+        )
+        if (bucket) {
+          users.setRecord({
+            current_bucket_id,
+            current_credential_id: bucket.credential_id,
+          })
+        }
+      } else if (current_credential_id) {
+        // credential but no bucket, make sure they have access to cred
+        const [hasAccess] = await CloudCredentials(postgres).getAllForUser(
+          user.id,
+          current_credential_id
+        )
+        if (hasAccess) {
+          users.setRecord({ current_credential_id })
+        }
+      }
+
+      users.setRecord({
+        id: user.id,
+        username: username || user.username,
+        email_address: email_address || user.email_address,
+        first_name: first_name || user.first_name,
+        last_name: last_name || user.last_name,
+      })
+      await users.save()
+      await login.standardLogin(await users.find(user.id), true)
+
+      res.json(true)
+    },
+
     // async ['password/forgot'](req, res) {
     //   const users = Users(postgres)
-    
+
     //   const username = req.body.email
     //   const userRecord = await users.findBy({ username: username })
     //   if (!userRecord)
     //     return res.status(404).json({ error: `We didn't find a user record with the email address provided.` })
-    
+
     //   const tempPassword = users.generateTempPassword()
     //   const tempPwHash = await users.hashPassword(tempPassword)
     //   users.setRecord({
@@ -58,7 +107,7 @@ export default function({ log, postgres, redis }) {
     //     needs_password_reset: true,
     //     password_hash: tempPwHash
     //   }, true)
-    
+
     //   await Promise.all([
     //     users.save(),
     //     BackgroundWorker({ redis }).enqueue('sendVerificationMailer', {
@@ -66,7 +115,7 @@ export default function({ log, postgres, redis }) {
     //       temp_pw:    tempPassword
     //     }, config.resque.mailer_queue)
     //   ])
-    
+
     //   res.json({ success: `An e-mail has been sent to restore your password.` })
     // },
 

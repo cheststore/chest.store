@@ -28,8 +28,7 @@ export default function FsProvider(): ICloudProvider {
           allFilePaths.map(async (fp) => {
             const fileInfo: fs.Stats = await fileMgmt.getFileInfo(fp)
             const pathFromBase = fp.replace(basePath, '')
-            const pathSplit = fp.split('/')
-            const fileName = pathSplit[pathSplit.length - 1]
+            const fileName = path.basename(fp)
             return {
               bucketUid: basePath,
               fullPath: pathFromBase, // cwd is base path, so this is from WITHIN the base dir

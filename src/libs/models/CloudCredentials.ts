@@ -10,16 +10,17 @@ export default function CloudCredentials(postgres: any): IModel {
       'secret',
     ],
 
-    async getAllForUser(userId: number | string) {
+    async getAllForUser(userId: string, id?: string) {
       const { rows } = await postgres.query(
         `
         select c.*
         from cloud_credentials as c
         inner join cloud_credential_user_map as m on m.credential_id = c.id
         where m.user_id = $1
+        ${id ? `and c.id = $2` : ''}
         order by c.created_at
       `,
-        [userId]
+        [userId].concat(id ? [id] : [])
       )
       return rows
     },

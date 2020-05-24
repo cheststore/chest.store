@@ -13,12 +13,9 @@ export default function CloudDirectories(postgres: object) {
       'name',
     ],
 
-    async getDirectChildren(
-      bucketId: number | string,
-      directoryId: null | number | string
-    ) {
+    async getDirectChildren(bucketId: string, directoryId?: string) {
       let filters: string[] = [`d.bucket_id = $1`]
-      let params: Array<number | string> = [bucketId]
+      let params: string[] = [bucketId]
       if (directoryId) {
         filters.push(`d.parent_directory_id = $2`)
         params.push(directoryId)
@@ -39,9 +36,9 @@ export default function CloudDirectories(postgres: object) {
     },
 
     async createDirsAndObjectFromFullPath(
-      bucketId: number | string,
+      bucketId: string,
       fullObjectPath: string,
-      objectId?: number | string
+      objectId?: string
     ): Promise<StringMap[]> {
       const splitInfo: string[] = fullObjectPath
         .split('/')
@@ -50,9 +47,8 @@ export default function CloudDirectories(postgres: object) {
 
       for (let ind: number = 0; ind < splitInfo.length; ind++) {
         const dirOrObj: string = splitInfo[ind]
-        const parentDirId: number | string = (
-          (info[info.length - 1] as any) || {}
-        ).id
+        const parentDirId: string = ((info[info.length - 1] as StringMap) || {})
+          .id
 
         // object name
         if (ind === splitInfo.length - 1) {

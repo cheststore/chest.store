@@ -2,7 +2,7 @@ import CheststoreFetch from './CheststoreFetch'
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
-  isValidEmail(text='') {
+  isValidEmail(text = '') {
     return /^.+@.+\.([a-zA-Z\d]{1,15})$/.test(text || '')
   },
 
@@ -20,7 +20,7 @@ export default {
     const response = await CheststoreFetch(`/api/1.0/auth/password/forgot`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email }),
     })
     return await handleFetchResponse(response)
   },
@@ -29,8 +29,17 @@ export default {
     const response = await CheststoreFetch(`/api/1.0/auth/password/reset`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ current_password, new_password })
+      body: JSON.stringify({ current_password, new_password }),
     })
     return await handleFetchResponse(response)
-  }
+  },
+
+  async selfUpdate(info) {
+    const response = await CheststoreFetch(`/api/1.0/auth/self/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(info),
+    })
+    return await handleFetchResponse(response)
+  },
 }

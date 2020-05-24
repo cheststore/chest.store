@@ -23,6 +23,13 @@ export default {
     state.session = sessionObj
   },
 
+  SET_USER_KEY(state, { key, value }) {
+    state.session.user = {
+      ...state.session.user,
+      [key]: value,
+    }
+  },
+
   SET_PROVIDER_TYPES(state, types) {
     state.providerTypes = types
   },

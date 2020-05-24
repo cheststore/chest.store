@@ -7,6 +7,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async syncCurrentBucket() {
+    const response = await CheststoreFetch(`/api/1.0/providers/bucket/sync`)
+    return await handleFetchResponse(response)
+  },
+
   async checkAndSaveFsDir(dir) {
     const response = await CheststoreFetch(`/api/1.0/providers/fs/checkdir`, {
       method: 'POST',

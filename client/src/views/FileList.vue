@@ -41,11 +41,17 @@
                   btn-variant="warning"
                   @added="fileUploaded")
             div.card-header.py-2.border-top
-              base-input.m-0(
-                v-model="searchQuery"
-                :alternative="true"
-                placeholder="Search for objects..."
-                addon-left-icon="ni ni-tag")
+              //- addon-left-icon="ni ni-tag"
+              div.row
+                div.col-lg-6.p-lg-2(v-if="allBuckets && allBuckets.length > 0")
+                  select.form-control(v-model="currentBucketId")
+                    option(v-for="bucket in allBuckets",:value="bucket.id")
+                      | {{ bucket.name }} ({{ getProviderType(bucket.type).text }})
+                div.col.p-lg-2
+                  base-input.m-0(
+                    v-model="searchQuery"
+                    :valid="(searchQuery && searchQuery.length > 0) || null"
+                    placeholder="Search for objects...")
             div.card-body.py-2.d-flex.justify-content-end
               base-pagination.mb-0(
                 :total="objectInfo.totalCount"
@@ -102,7 +108,8 @@
   import DomHelpers from '../factories/DomHelpers'
   import StringHelpers from '../factories/StringHelpers'
   import TimeHelpers from '../factories/TimeHelpers'
-  import ApiAws from '../factories/ApiAws'
+  import ApiAuth from '../factories/ApiAuth'
+  import ApiProviders from '../factories/ApiProviders'
   import ApiCloudObjects from '../factories/ApiCloudObjects'
   import { debounce, isImage } from '../factories/Utilities'
 
@@ -130,6 +137,7 @@
 
     computed: {
       ...mapState({
+        allBuckets: (state) => state.session.buckets,
         currentDir: (state) => state.objects.currentDirectory,
         currentDirPath: (state) =>
           state.objects.currentDirectory &&
@@ -139,6 +147,7 @@
           state.objects.currentDirectory.parent_directory_id,
         currentBucket: (state) => state.session.current_bucket,
         objectInfo: (state) => state.objects.currentList,
+        providerTypes: (state) => state.providerTypes,
 
         directories(state) {
           return this.directoryId != null
@@ -148,6 +157,19 @@
             : state.objects.directories
         },
       }),
+
+      currentBucketId: {
+        get() {
+          return this.currentBucket.id
+        },
+
+        async set(newId) {
+          await ApiAuth.selfUpdate({ current_bucket_id: newId })
+          await this.$store.dispatch('getUserSession', true)
+          this.directoryId = null
+          await this.getObjectList()
+        },
+      },
 
       dirOrBucket() {
         return this.currentDir ? `/${this.currentDir.full_path}` : '/'
@@ -179,6 +201,10 @@
 
       downloadObject(objId) {
         DomHelpers.downloadUri(`/file/download/${objId}`)
+      },
+
+      getProviderType(type) {
+        return this.providerTypes.find((t) => t.value === type) || {}
       },
 
       promptDeleteObject(obj) {
@@ -223,7 +249,7 @@
 
       async syncBucket() {
         try {
-          await ApiAws.syncCurrentBucket()
+          await ApiProviders.syncCurrentBucket()
           this.$notify(
             `Began syncing bucket! Any new objects should show up shortly.`
           )

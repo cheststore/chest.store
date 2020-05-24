@@ -38,7 +38,7 @@
 
           await ApiProviders.checkAndSaveFsDir(this.baseDir)
           await this.$store.dispatch('getUserSession', true)
-          this.$router.push('/')
+          this.$emit('created')
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }

@@ -104,6 +104,10 @@ export default function ProviderWorkers({
             (bucket as StringMap).type
           } - ${(bucket as StringMap).bucket_uid}`
         )
+
+        // if manually synced, clear the key preventing rage
+        // clicking and trying to sync multiple times
+        await redis.client.del(`chest.store_manual_sync_${bucketId}`)
       },
     },
   }

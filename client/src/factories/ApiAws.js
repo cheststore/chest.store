@@ -2,8 +2,8 @@ import CheststoreFetch from './CheststoreFetch'
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
-  async listBuckets() {
-    const response = await CheststoreFetch(`/api/1.0/aws/buckets/list`)
+  async listBuckets(id) {
+    const response = await CheststoreFetch(`/api/1.0/aws/buckets/list?id=${id}`)
     return await handleFetchResponse(response)
   },
 
@@ -11,22 +11,17 @@ export default {
     const response = await CheststoreFetch(`/api/1.0/aws/key/check/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ providerType, awsKey, awsSecret })
+      body: JSON.stringify({ providerType, awsKey, awsSecret }),
     })
     return await handleFetchResponse(response)
   },
 
-  async saveBucket(bucketName) {
+  async saveBucket(bucketName, credentialId) {
     const response = await CheststoreFetch(`/api/1.0/aws/bucket/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bucket: bucketName })
+      body: JSON.stringify({ credentialId, bucket: bucketName }),
     })
     return await handleFetchResponse(response)
   },
-
-  async syncCurrentBucket() {
-    const response = await CheststoreFetch(`/api/1.0/aws/bucket/sync`)
-    return await handleFetchResponse(response)
-  }
 }

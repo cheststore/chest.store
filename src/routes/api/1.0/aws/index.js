@@ -1,16 +1,17 @@
+import providerRouteFactory from '../providers'
 import Providers from '../../../../libs/cloud/Providers'
-import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import LoginHandler from '../../../../libs/LoginHandler'
 import SessionHandler from '../../../../libs/SessionHandler'
-import AuditLog from '../../../../libs/models/AuditLog'
 import CloudBuckets from '../../../../libs/models/CloudBuckets'
 import CloudBucketUserMap from '../../../../libs/models/CloudBucketUserMap'
 import CloudCredentials from '../../../../libs/models/CloudCredentials'
 import CloudCredentialUserMap from '../../../../libs/models/CloudCredentialUserMap'
 import Users from '../../../../libs/models/Users'
-import config from '../../../../config'
+// import config from '../../../../config'
 
 export default function ({ log, postgres, redis }) {
+  const providerRoute = providerRouteFactory({ log, postgres, redis })
+
   return {
     async ['key/check/save'](req, res) {
       const login = LoginHandler(postgres, req)
@@ -43,7 +44,7 @@ export default function ({ log, postgres, redis }) {
           await users.save()
           await login.standardLogin(users.record, true)
         }
-        res.json(true)
+        res.json({ id: credId })
       } catch (err) {
         res
           .status(err.statusCode)
@@ -53,7 +54,12 @@ export default function ({ log, postgres, redis }) {
 
     async ['buckets/list'](req, res) {
       const session = SessionHandler(req.session)
-      const cred = session.getLoggedInCredentialId(true)
+      const userId = session.getLoggedInUserId()
+      const credId = req.query.id
+      const [cred] = await CloudCredentials(postgres).getAllForUser(
+        userId,
+        credId
+      )
 
       const provider = Providers(cred.type, {
         apiKey: cred.key,
@@ -68,8 +74,9 @@ export default function ({ log, postgres, redis }) {
       const session = SessionHandler(req.session)
       const buckets = CloudBuckets(postgres)
       const users = Users(postgres)
-      const credId = session.getLoggedInCredentialId()
+      // const credId = session.getLoggedInCredentialId()
       const user = session.getLoggedInUserId(true)
+      const credId = req.body.credentialId
       const bucket = req.body.bucket
 
       const cred = await CloudCredentials(postgres).find(credId)
@@ -80,7 +87,10 @@ export default function ({ log, postgres, redis }) {
         })
 
       await buckets.findOrCreateBy({ type: cred.type, bucket_uid: bucket })
-      buckets.setRecord({ name: buckets.record.name || bucket })
+      buckets.setRecord({
+        name: buckets.record.name || bucket,
+        credential_id: credId,
+      })
 
       await Promise.all([
         buckets.save(),
@@ -88,7 +98,7 @@ export default function ({ log, postgres, redis }) {
           user_id: user.id,
           bucket_id: buckets.record.id,
         }),
-        this['bucket/sync'](
+        providerRoute['bucket/sync'](
           {
             ...req,
             session: {
@@ -114,37 +124,6 @@ export default function ({ log, postgres, redis }) {
       }
 
       await login.standardLogin({ ...user, ...users.record }, true)
-      res.json(true)
-    },
-
-    async ['bucket/sync'](req, res) {
-      const session = SessionHandler(req.session)
-      const credId = session.getLoggedInCredentialId()
-      const buckId = session.getLoggedInBucketId()
-      const userId = session.getLoggedInUserId()
-
-      // We don't have trigger happy users from queueing up
-      // a ton of manual syncs back to back. This will enforce
-      // a minumum 10 minute delay between manual syncs per bucket.
-      const canManualSync = await redis.client.set(
-        `chest.store_manual_sync_${buckId}`,
-        'true',
-        'NX',
-        'EX',
-        60 * 10
-      ) // 10 min
-
-      if (!canManualSync)
-        return res.status(400).json({
-          error: `This bucket was recently synced. Please wait up to 10 minutes before trying to manually sync again.`,
-        })
-
-      await BackgroundWorker({ redis }).enqueue('providerSyncObjects', {
-        bucketId: buckId,
-        credentialId: credId,
-        userId: userId,
-      })
-
       res.json(true)
     },
   }

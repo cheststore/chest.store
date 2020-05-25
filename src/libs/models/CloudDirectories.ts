@@ -40,6 +40,7 @@ export default function CloudDirectories(postgres: object) {
       fullObjectPath: string,
       objectId?: string
     ): Promise<StringMap[]> {
+      fullObjectPath = fullObjectPath.replace(/\/\//g, '/')
       const splitInfo: string[] = fullObjectPath
         .split('/')
         .filter((str: string) => str !== '')

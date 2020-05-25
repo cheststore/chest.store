@@ -29,7 +29,7 @@ from within your account, but you can get by with read access to the bucket(s)
 you'd like to manage, chest.store just won't be able to save version history or upload
 new files to the bucket.
 
-![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82731922-03de7100-9cd8-11ea-8b48-9705cd1fd06a.png)
+![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png)
 
 #### Local File System
 
@@ -38,7 +38,7 @@ You can integrate a directory on your local file system to use as a
 
 ## Install
 
-### Docker
+### Docker (recommended)
 
 1. Clone chest.store (`git clone https://github.com/cheststore/chest.store`)
 2. `cd chest.store`

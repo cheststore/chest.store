@@ -4,7 +4,7 @@
       div.container
         div.row
           div.col-lg-12.mb-4
-            div.mt-4.text-white {{ `${(currentBucket || {}).name}/${directoryPath}` }}
+            div.mt-4.text-white {{ `${(currentBucket || {}).name}${directoryPath}` }}
             div.display-4.text-white {{ file.name }}
 
         div.row
@@ -14,7 +14,7 @@
                 stats-card(
                   title="Object Size"
                   type="gradient-orange"
-                  :sub-title="humanFileSize(file.size_bytes)"
+                  :sub-title="humanFileSize(file.size_bytes || 0)"
                   icon="ni ni-box-2"
                   class="mb-4")
                   //- template(slot="footer")

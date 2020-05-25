@@ -43,9 +43,10 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
           const objectIds = await Promise.all(
             files.map(
               async (file: any): Promise<StringMap> => {
-                const finalFilePath: string = `${
-                  cleanedDir ? `${cleanedDir}/` : ''
-                }${file.name}`.replace(/\/\//g, '/')
+                const finalFilePath: string = `${cleanedDir}/${file.name}`.replace(
+                  /\/\//g,
+                  '/'
+                )
 
                 // if this is a new version of an existing object,
                 // handle cleaning up the current version and adding this

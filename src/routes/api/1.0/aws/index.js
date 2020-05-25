@@ -103,6 +103,7 @@ export default function ({ log, postgres, redis }) {
             ...req,
             session: {
               ...req.session,
+              current_credential: cred,
               current_bucket: buckets.record,
             },
           },

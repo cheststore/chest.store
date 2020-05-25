@@ -78,7 +78,7 @@ export default function ({ log, postgres, redis }) {
             provider.getObjectStreamWithBackoff(
               res,
               bucket.bucket_uid,
-              object.full_path
+              object.full_path.replace(/\/\//g, '/')
             ),
             AuditLog(postgres).log({
               credential_id: cred.id,

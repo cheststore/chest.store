@@ -68,6 +68,11 @@ export default function Routes(options) {
           // API key provided
           const apiKeyProvided = req.cheststoreAuth
           if (!!apiKeyProvided) {
+            if (apiKeyProvided === config.app.masterKey) {
+              await session.setSession({ masterKeyProvided: true })
+              return next()
+            }
+
             const apiKeys = UserApiKeys(postgres)
             const userApiKey = await apiKeys.findBy({ key: apiKeyProvided })
 
@@ -120,6 +125,7 @@ function isRouteNotNeedingAuth(currentRoute) {
 
 function routesNotNeedingAuth() {
   return [
+    '/api/1.0/auth/apikeys/get',
     '/api/1.0/auth/create/user',
     '/api/1.0/auth/password/forgot',
     '/api/1.0/auth/password/reset',

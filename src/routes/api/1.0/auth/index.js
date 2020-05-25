@@ -2,10 +2,11 @@ import Errors from '../../../../errors'
 // import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import LoginHandler from '../../../../libs/LoginHandler'
 import SessionHandler from '../../../../libs/SessionHandler'
-import Users from '../../../../libs/models/Users'
-import LocalStrategy from '../../../../passport_strategies/local'
 import CloudCredentials from '../../../../libs/models/CloudCredentials'
 import CloudBuckets from '../../../../libs/models/CloudBuckets'
+import Users from '../../../../libs/models/Users'
+import UserApiKeys from '../../../../libs/models/UserApiKeys'
+import LocalStrategy from '../../../../passport_strategies/local'
 // import config from '../../../../config'
 
 export default function ({ log, postgres, redis }) {
@@ -90,6 +91,21 @@ export default function ({ log, postgres, redis }) {
       await login.standardLogin(await users.find(user.id), true)
 
       res.json(true)
+    },
+
+    async ['apikeys/get'](req, res) {
+      const apiKeys = UserApiKeys(postgres)
+      const session = SessionHandler(req.session)
+      const userId = session.getLoggedInUserId()
+
+      const userFilter = { user_id: userId }
+      let keys = await apiKeys.getAllBy(userFilter)
+      if (keys.length === 0) {
+        await apiKeys.findOrCreateBy(userFilter)
+        keys = [await apiKeys.find(userFilter)]
+      }
+
+      res.json({ keys })
     },
 
     // async ['password/forgot'](req, res) {

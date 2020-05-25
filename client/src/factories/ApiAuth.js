@@ -16,6 +16,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
+  async getApiKeys() {
+    const response = await CheststoreFetch(`/api/1.0/auth/apikeys/get`)
+    return await handleFetchResponse(response)
+  },
+
   async forgotPassword(email) {
     const response = await CheststoreFetch(`/api/1.0/auth/password/forgot`, {
       method: 'POST',

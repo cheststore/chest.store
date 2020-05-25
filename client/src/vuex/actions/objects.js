@@ -13,7 +13,7 @@ export default {
       state.objects.currentList.perPage
     )
 
-    commit('SET_BUCKET_OBJECT_LIST', objectInfo)
+    commit('SOCKET_SET_BUCKET_OBJECT_LIST', objectInfo)
     commit('SET_BUCKET_CURRENT_DIRECTORY', directory)
     commit('SET_BUCKET_DIRECTORIES', directories)
   },

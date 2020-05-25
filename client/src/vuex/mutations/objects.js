@@ -7,7 +7,7 @@ export default {
     state.objects.currentList.perPage = perPage
   },
 
-  SET_BUCKET_OBJECT_LIST(state, info) {
+  SOCKET_SET_BUCKET_OBJECT_LIST(state, info) {
     state.objects.currentList = info
   },
 

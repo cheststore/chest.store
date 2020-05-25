@@ -114,6 +114,12 @@
                                     strong {{ row.bucket_uid }}
                                 div.ml-auto.text-light
                                   div.ml-2 {{ getProviderType(row.type).text }}
+                hr.my-4
+                h6.heading-small.text-muted.mb-4
+                  | API Key
+                div.pl-lg-4
+                  div.row
+                    div.col-lg-12.text-center #[strong {{ userApiKey }}]
                 //- .pl-lg-4
                 //-   .form-group
                 //-     base-input(alternative='', label='About Me')
@@ -136,6 +142,7 @@
       ...mapState({
         allBuckets: (state) => Object.values(state.session.buckets || {}),
         providerTypes: (state) => state.providerTypes,
+        userApiKey: (state) => state.userApiKeys[0].key,
       }),
 
       userEmail: {

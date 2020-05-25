@@ -30,6 +30,10 @@ export default {
     }
   },
 
+  SET_USER_API_KEYS(state, keys) {
+    state.userApiKeys = keys
+  },
+
   SET_PROVIDER_TYPES(state, types) {
     state.providerTypes = types
   },

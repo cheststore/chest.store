@@ -10,6 +10,7 @@ export default {
   pageSizes: [10, 15, 20, 25, 50, 100],
 
   session: {},
+  userApiKeys: [],
   providerTypes: [],
 
   getRowNumber(index, currentPage = 1, perPage = 20) {

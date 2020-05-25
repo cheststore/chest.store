@@ -1,9 +1,10 @@
+import axios from 'axios'
 import Providers, { ICloudObject } from '../libs/cloud/Providers'
 import CloudBuckets from '../libs/models/CloudBuckets'
 import CloudCredentials from '../libs/models/CloudCredentials'
 import CloudDirectories from '../libs/models/CloudDirectories'
 import CloudObjects from '../libs/models/CloudObjects'
-// import config from '../config'
+import config from '../config'
 
 const BackgroundWorker = require('../libs/BackgroundWorker').default
 // import BackgroundWorker from '../libs/BackgroundWorker'
@@ -77,6 +78,19 @@ export default function ProviderWorkers({
             })
             await objInst.save()
           }
+
+          axios.post(
+            `${config.server.host}/api/1.0/admin/socket/update/clients`,
+            {
+              bucketId: bucketId,
+              type: 'objects',
+            },
+            {
+              headers: {
+                [config.apiKeyHeader]: config.app.masterKey,
+              },
+            }
+          )
         }
 
         if (object) {

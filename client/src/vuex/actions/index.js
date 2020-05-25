@@ -17,6 +17,7 @@ export default {
       commit('SET_INIT_PROCESSING', true)
 
       await Promise.all([
+        dispatch('getUserApiKeys'),
         dispatch('getUserSession'),
         dispatch('getProviderTypes'),
       ])
@@ -51,6 +52,13 @@ export default {
       commit('APP_NO_LONGER_LOADING')
       commit('SET_INIT_PROCESSING', false)
     }
+  },
+
+  async getUserApiKeys({ commit, state }, reset = false) {
+    if (state.userApiKeys.length > 0 && !reset) return
+
+    const { keys } = await ApiAuth.getApiKeys()
+    commit('SET_USER_API_KEYS', keys)
   },
 
   async getUserSession({ commit, state }, reset = false) {

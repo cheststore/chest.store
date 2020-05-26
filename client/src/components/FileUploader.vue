@@ -46,6 +46,7 @@
 
         return {
           url: () =>
+            this.url ||
             `/object/upload?dir=${encodeURIComponent(
               this.dir || ''
             )}&objectId=${this.objectId || ''}`,

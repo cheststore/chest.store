@@ -92,6 +92,7 @@ export default function ({ log, postgres, redis }) {
         const providers = Providers(bucket.type, {
           apiKey: cred.key,
           apiSecret: cred.secret,
+          extra: cred.extra,
         })
         await providers.getObjectStreamWithBackoff(
           fs.createWriteStream(path.join(client.workingDir, object.name)),
@@ -136,6 +137,7 @@ export default function ({ log, postgres, redis }) {
       const providers = Providers(bucket.type, {
         apiKey: cred.key,
         apiSecret: cred.secret,
+        extra: cred.extra,
       })
       objects.setRecord({ id: objId, is_deleted: true })
 

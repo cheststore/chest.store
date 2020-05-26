@@ -6,12 +6,12 @@ const Aws = require('../Aws').default
 export default function AwsProvider({
   apiKey,
   apiSecret,
-  region,
+  extra,
 }: ICloudFactoryOptions): ICloudProvider {
   const aws = Aws({
     accessKeyId: apiKey,
     secretAccessKey: apiSecret,
-    region,
+    region: extra && extra.region,
   })
 
   return {
@@ -137,8 +137,8 @@ export default function AwsProvider({
       return await aws.S3.createBucket(name)
     },
 
-    async createPresignedUrl(options: any) {
-      return await aws.S3.createPresignedPost(options)
-    },
+    // async createPresignedUrl(options: any) {
+    //   return await aws.S3.createPresignedPost(options)
+    // },
   }
 }

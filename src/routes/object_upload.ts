@@ -33,6 +33,7 @@ export default function ({ log, postgres, redis }: IFactoryOptions): StringMap {
           const provider = Providers(cred.type, {
             apiKey: cred.key,
             apiSecret: cred.secret,
+            extra: cred.extra,
           })
           const files = Object.values(req.files)
           const cleanedDir = (dir || '')

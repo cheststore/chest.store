@@ -102,7 +102,7 @@ export default function ({ log, postgres, redis }) {
       let keys = await apiKeys.getAllBy(userFilter)
       if (keys.length === 0) {
         await apiKeys.findOrCreateBy(userFilter)
-        keys = [await apiKeys.find(userFilter)]
+        keys = [await apiKeys.findBy(userFilter)]
       }
 
       res.json({ keys })

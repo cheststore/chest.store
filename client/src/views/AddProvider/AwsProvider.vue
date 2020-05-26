@@ -34,7 +34,7 @@
 
 <script>
   // import { mapState } from 'vuex'
-  import ApiAws from '../../factories/ApiAws'
+  import ApiProviders from '../../factories/ApiProviders'
 
   export default {
     data() {
@@ -61,7 +61,7 @@
             })
 
           this.isCheckingKey = true
-          const { id } = await ApiAws.checkAndSaveKey(
+          const { id } = await ApiProviders.checkAndSaveKey(
             'aws',
             this.awsKey,
             this.awsSecret
@@ -87,7 +87,10 @@
               message: `Please enter a valid bucket to integrate with.`,
             })
 
-          await ApiAws.saveBucket(this.selectedBucketName, this.credentialId)
+          await ApiProviders.saveBucket(
+            this.selectedBucketName,
+            this.credentialId
+          )
           await this.$store.dispatch('getUserSession', true)
           this.$emit('created')
         } catch (err) {
@@ -97,7 +100,7 @@
 
       async listBuckets() {
         try {
-          const { Buckets } = await ApiAws.listBuckets(this.credentialId)
+          const { Buckets } = await ApiProviders.listBuckets(this.credentialId)
           this.buckets = Buckets
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })

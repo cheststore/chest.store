@@ -25,6 +25,7 @@
   import { mapState } from 'vuex'
   import AwsProvider from './AwsProvider'
   import FsProvider from './FsProvider'
+  import GcpProvider from './GcpProvider'
 
   export default {
     data() {
@@ -34,6 +35,7 @@
         typeProviderComponentMap: {
           aws: AwsProvider,
           fs: FsProvider,
+          gcp: GcpProvider,
         },
       }
     },

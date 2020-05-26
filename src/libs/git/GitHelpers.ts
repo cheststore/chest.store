@@ -122,9 +122,12 @@ export default function GitHelpers(
         fileMgmt.checkAndCreateDirectoryOrFile(userGitDir),
       ])
 
-      const provider = Providers((cred as StringMap).type, {
-        apiKey: (cred as StringMap).key,
-        apiSecret: (cred as StringMap).secret,
+      if (!cred) throw new Error(`credential not found`)
+
+      const provider = Providers(cred.type, {
+        apiKey: cred.key,
+        apiSecret: cred.secret,
+        extra: cred.extra,
       })
       await provider.getObjectStreamWithBackoff(
         tar.x({

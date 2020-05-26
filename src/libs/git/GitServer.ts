@@ -159,14 +159,12 @@ export default function GitServer(
         helpers.tarRepo(this.user.username, push.repo),
       ])
 
-      log.info(
-        `git handle push`,
-        this.user.username,
-        (bucket as StringMap).bucket_uid
-      )
+      if (!(bucket && cred)) throw new Error(`No bucket or credential found`)
+
+      log.info(`git handle push`, this.user.username, bucket.bucket_uid)
 
       const newRepo = await gitRepos.findOrCreateBy({
-        bucket_id: (bucket as StringMap).id,
+        bucket_id: bucket.id,
         repo: push.repo,
       })
 
@@ -184,25 +182,23 @@ export default function GitServer(
       let fullTarPath = `.chest.store.git/${this.user.username}/${tarInfo.name}`
       if (!gitRepos.isNewRecord) {
         const repoObj = await CloudObjects(postgres).findBy({
-          bucket_id: (bucket as StringMap).id,
+          bucket_id: bucket.id,
           id: gitRepos.record.object_id,
         })
         fullTarPath = (repoObj as StringMap).full_path
       }
 
-      const provider = Providers((bucket as StringMap).type, {
-        apiKey: (cred as StringMap).key,
-        apiSecret: (cred as StringMap).secret,
+      const provider = Providers(bucket.type, {
+        apiKey: cred.key,
+        apiSecret: cred.secret,
+        extra: cred.extra,
       })
 
       const [newRecInfo]: any[] = await Promise.all([
-        directories.createDirsAndObjectFromFullPath(
-          (bucket as StringMap).id,
-          fullTarPath
-        ),
+        directories.createDirsAndObjectFromFullPath(bucket.id, fullTarPath),
 
         provider.writeObject(
-          (bucket as StringMap).bucket_uid,
+          bucket.bucket_uid,
           fullTarPath,
           fs.createReadStream(tarInfo.path)
         ),

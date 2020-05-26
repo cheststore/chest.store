@@ -64,6 +64,7 @@ export default function ({ log, postgres, redis }) {
       const provider = Providers(cred.type, {
         apiKey: cred.key,
         apiSecret: cred.secret,
+        extra: cred.extra,
       })
       const buckets = await provider.listBuckets()
       res.json(buckets)

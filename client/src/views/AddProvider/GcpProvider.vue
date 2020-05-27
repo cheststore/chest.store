@@ -22,8 +22,8 @@
         hr
         div.form-group
           label(for="all-gcp-buckets") Select Bucket
-          //- select#all-gcp-buckets.form-control(v-model="selectedBucketName",@change="selectBucket")
-          //-   option(v-for="bucket in buckets",:value="bucket.Name") {{ bucket.Name }}
+          select#all-gcp-buckets.form-control(v-model="selectedBucketName",@change="selectBucket")
+            option(v-for="bucket in buckets",:value="bucket.id") {{ bucket.name }}
 
 </template>
 
@@ -49,27 +49,29 @@
         await this.listBuckets()
       },
 
-      // async selectBucket() {
-      //   try {
-      //     if (!this.selectedBucketName)
-      //       return this.$notify({
-      //         type: 'danger',
-      //         message: `Please enter a valid bucket to integrate with.`,
-      //       })
+      async selectBucket() {
+        try {
+          if (!this.selectedBucketName)
+            return this.$notify({
+              type: 'danger',
+              message: `Please enter a valid bucket to integrate with.`,
+            })
 
-      //     await ApiProviders.saveBucket(this.selectedBucketName, this.credentialId)
-      //     await this.$store.dispatch('getUserSession', true)
-      //     this.$emit('created')
-      //   } catch (erstr) {
-      //     this.$notify({ type: 'danger', message: err.message })
-      //   }
-      // },
+          await ApiProviders.saveBucket(
+            this.selectedBucketName,
+            this.savedCred.id
+          )
+          await this.$store.dispatch('getUserSession', true)
+          this.$emit('created')
+        } catch (err) {
+          this.$notify({ type: 'danger', message: err.message })
+        }
+      },
 
       async listBuckets() {
         try {
           const [data] = await ApiProviders.listBuckets(this.savedCred.id)
           this.buckets = data
-          console.log('BUCKETS', this.buckets)
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }

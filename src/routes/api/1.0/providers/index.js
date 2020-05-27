@@ -16,9 +16,9 @@ import Users from '../../../../libs/models/Users'
 
 const fileMgmt = FileManagement()
 
-export default function ({ postgres, redis }) {
+export default function ({ log, postgres, redis }) {
   return {
-    ...NewCredEndpoints,
+    ...NewCredEndpoints({ log, postgres, redis }),
 
     async ['types'](req, res) {
       const pt = ProviderTypes(postgres)

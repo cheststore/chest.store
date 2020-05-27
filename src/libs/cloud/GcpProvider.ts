@@ -52,10 +52,10 @@ export default function GcpProvider({
           bucketUid: bucket,
           fullPath: obj.name,
           name: obj.name,
-          // lastModified: obj.,
-          // etag: obj.ETag,
-          // sizeBytes: obj.Size,
-          // storageClass: obj.StorageClass,
+          lastModified: obj.metadata.updated,
+          etag: obj.metadata.etag,
+          sizeBytes: obj.metadata.size,
+          storageClass: obj.metadata.storageClass,
         }
       })
       await setCallback(cloudObjects)
@@ -77,10 +77,10 @@ export default function GcpProvider({
         bucketUid: bucket,
         fullPath: obj.name,
         name: obj.name,
-        // lastModified: obj.,
-        // etag: obj.ETag,
-        // sizeBytes: obj.Size,
-        // storageClass: obj.StorageClass,
+        lastModified: obj.metadata.updated,
+        etag: obj.metadata.etag,
+        sizeBytes: obj.metadata.size,
+        storageClass: obj.metadata.storageClass,
       }
     },
 

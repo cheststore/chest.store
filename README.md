@@ -1,19 +1,24 @@
 # chest.store
 
-Open-source, lightweight, and hackable cloud object explorer,
-storage, and git HTTP server. Object versioning happens
-with git version control and any object version history repo
-can easily be cloned and/or `git pull`ed to see complete object history.
+Open-source, lightweight, and hackable cloud file/object explorer,
+storage, and git HTTP server. Integrations to your favorite cloud
+providers are available and more will be added.
+Object versioning happens with git version control and any
+object version history repo can easily be cloned and/or
+`git pull`ed to see complete object history.
 
 ## Version history & built-in git server
 
 chest.store has a built in git HTTP server that is used for object version history.
-Version histories are stored in a new `.chest.store` folder at the root of the buckets
-you integrate with chest.store. As a bonus, the git server can be
-used like any other git remote (think github, gitlab, etc.)
-to clone, push, pull, etc. with any repository that uses git for its version control.
-Simply setup a new remote in your repository(ies) of choice to your
-chest.store server and push/pull as desired.
+Version histories are stored in a new `.chest.store` folder at the root of the
+buckets/directories you integrate with chest.store.
+
+As a bonus, the git server can be used like any other git remote
+(think github, gitlab, etc.) to clone, push, pull, etc. with any
+repository that uses git for its version control. Simply
+[setup a new remote](https://github.com/cheststore/chest.store#git-remote-example)
+in your repository(ies) of choice to your chest.store server and push/pull
+as desired.
 
 When interacting with chest.store as a traditional git remote you will be
 prompted to authenticate, which you'll enter your chest.store
@@ -36,7 +41,7 @@ You can integrate a directory on your (or a docker container's)
 local file system to use as a "bucket" to manage files/objects
 from within chest.store.
 
-#### AWS S3
+#### Amazon Web Services (AWS) S3
 
 AWS S3 buckets can be integrated with a valid AWS access key and secret.
 For the best experience you will want AWS S3 full access IAM permissions to the
@@ -45,6 +50,13 @@ chest.store can't save version histories when objects are updated either through
 the UI or by pushing updates through git.
 
 ![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png)
+
+#### Google Cloud Storage (GCS)
+
+In order to integrate with GCS buckets(s) you will need to create a service account
+with appropriate read/write GCS permissions and download the JSON containing the
+key information about the service account. This JSON file will be uploaded to
+chest.store adding GCS as a provider.
 
 ## Install
 
@@ -144,7 +156,7 @@ required to create and use the new table.
 
 ## TODOS
 
-- More integrations (GCP, Wasabi, Dropbox?, more?)
+- More integrations (Wasabi, Dropbox?, more?)
 - chest.store subscription service (would anyone pay for a cloud offering of this?)
 - Hooks
   - webhook integration when objects are downloaded, uploaded, synced, new version, etc.

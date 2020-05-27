@@ -1,4 +1,3 @@
-import providerRouteFactory from '../providers'
 import Providers from '../../../../libs/cloud/Providers'
 import LoginHandler from '../../../../libs/LoginHandler'
 import SessionHandler from '../../../../libs/SessionHandler'
@@ -10,8 +9,6 @@ import Users from '../../../../libs/models/Users'
 // import config from '../../../../config'
 
 export default function ({ log, postgres, redis }) {
-  const providerRoute = providerRouteFactory({ log, postgres, redis })
-
   return {
     async ['key/check/save'](req, res) {
       const login = LoginHandler(postgres, req)
@@ -64,6 +61,7 @@ export default function ({ log, postgres, redis }) {
       const provider = Providers(cred.type, {
         apiKey: cred.key,
         apiSecret: cred.secret,
+        extra: cred.extra,
       })
       const buckets = await provider.listBuckets()
       res.json(buckets)
@@ -98,7 +96,7 @@ export default function ({ log, postgres, redis }) {
           user_id: user.id,
           bucket_id: buckets.record.id,
         }),
-        providerRoute['bucket/sync'](
+        this['bucket/sync'](
           {
             ...req,
             session: {

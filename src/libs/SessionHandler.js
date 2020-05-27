@@ -25,7 +25,9 @@ export default function SessionHandler(session) {
 
     getAllBucketIds(fullRecord = false) {
       if (session && session.buckets)
-        return fullRecord ? session.buckets : session.buckets.map((c) => c.id)
+        return fullRecord
+          ? session.buckets
+          : Object.values(session.buckets).map((c) => c.id)
 
       return null
     },
@@ -34,7 +36,7 @@ export default function SessionHandler(session) {
       if (session && session.credentials)
         return fullRecord
           ? session.credentials
-          : session.credentials.map((c) => c.id)
+          : Object.values(session.credentials).map((c) => c.id)
 
       return null
     },

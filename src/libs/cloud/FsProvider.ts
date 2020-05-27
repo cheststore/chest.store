@@ -47,7 +47,8 @@ export default function FsProvider(): ICloudProvider {
 
     async getObject(basePath: string, name: string): Promise<Buffer> {
       const fullPath = path.join(basePath, name)
-      return await fileMgmt.getLocalFile(fullPath, null)
+      const data: Buffer | string = await fileMgmt.getLocalFile(fullPath, null)
+      return data instanceof Buffer ? data : Buffer.from(data, 'utf-8')
     },
 
     async getObjectInfo(basePath: string, name: string): Promise<ICloudObject> {
@@ -120,10 +121,6 @@ export default function FsProvider(): ICloudProvider {
 
     async createBucket(basePath: string) {
       return await fileMgmt.checkAndCreateDirectoryOrFile(basePath, false)
-    },
-
-    async createPresignedUrl() {
-      return null
     },
   }
 }

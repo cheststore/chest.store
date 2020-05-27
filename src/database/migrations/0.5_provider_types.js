@@ -26,4 +26,17 @@ export default [
       ('fs', 'File System', '/public/img/fs.png')
     `)
   },
+
+  async function seedGoogle(postgres) {
+    const { rows } = await postgres.query(
+      `select * from provider_types where value = 'gcp' limit 1`
+    )
+    if (rows.length > 0) return
+
+    await postgres.query(`
+      INSERT INTO provider_types (value, text, img_icon_path)
+      VALUES
+      ('gcp', 'GCP (Google Cloud Platform)', '/public/img/vendors/google_cloud.png')
+    `)
+  },
 ]

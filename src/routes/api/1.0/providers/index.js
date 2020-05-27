@@ -1,3 +1,5 @@
+import NewCredEndpoints from './newcredendpoints'
+
 import path from 'path'
 import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import FileManagement from '../../../../libs/FileManagement'
@@ -14,8 +16,10 @@ import Users from '../../../../libs/models/Users'
 
 const fileMgmt = FileManagement()
 
-export default function ({ postgres, redis }) {
+export default function ({ log, postgres, redis }) {
   return {
+    ...NewCredEndpoints({ log, postgres, redis }),
+
     async ['types'](req, res) {
       const pt = ProviderTypes(postgres)
       const types = await pt.getAllBy(

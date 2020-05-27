@@ -142,7 +142,7 @@
       ...mapState({
         allBuckets: (state) => Object.values(state.session.buckets || {}),
         providerTypes: (state) => state.providerTypes,
-        userApiKey: (state) => state.userApiKeys[0].key,
+        userApiKey: (state) => (state.userApiKeys[0] || {}).key,
       }),
 
       userEmail: {

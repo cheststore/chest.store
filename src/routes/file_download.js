@@ -34,6 +34,7 @@ export default function ({ log, postgres, redis }) {
           const provider = Providers(bucket.type, {
             apiKey: cred.key,
             apiSecret: cred.secret,
+            extra: cred.extra,
           })
 
           const object = await CloudObjects(postgres).findBy({

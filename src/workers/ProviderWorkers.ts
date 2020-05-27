@@ -42,14 +42,18 @@ export default function ProviderWorkers({
           })(),
         ])
 
+        if (!(bucket && credential))
+          throw new Error(`no credential or bucket found`)
+
         const [
           object,
           objectHistoryObj,
         ]: StringMap[] = objectInfo as StringMap[]
 
-        const providers = Providers((credential as StringMap).type, {
-          apiKey: (credential as StringMap).key,
-          apiSecret: (credential as StringMap).secret,
+        const providers = Providers(credential.type, {
+          apiKey: credential.key,
+          apiSecret: credential.secret,
+          extra: credential.extra,
         })
 
         const processObjects = async function processObjects(
@@ -95,7 +99,7 @@ export default function ProviderWorkers({
 
         if (object) {
           const obj: ICloudObject = await providers.getObjectInfo(
-            (bucket as StringMap).bucket_uid,
+            bucket.bucket_uid,
             object.full_path
           )
           await processObjects([obj])
@@ -108,15 +112,13 @@ export default function ProviderWorkers({
           }
         } else {
           await providers.listObjectsRecursive(
-            (bucket as StringMap).bucket_uid,
+            bucket.bucket_uid,
             processObjects
           )
         }
 
         log.info(
-          `Successfully processed all objects for bucket ${
-            (bucket as StringMap).type
-          } - ${(bucket as StringMap).bucket_uid}`
+          `Successfully processed all objects for bucket ${bucket.type} - ${bucket.bucket_uid}`
         )
 
         // if manually synced, clear the key preventing rage

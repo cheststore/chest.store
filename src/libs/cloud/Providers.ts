@@ -1,6 +1,7 @@
 import fs from 'fs'
 import AwsProvider from './AwsProvider'
 import FsProvider from './FsProvider'
+import GcpProvider from './GcpProvider'
 
 export default function Providers(
   type: string,
@@ -11,6 +12,8 @@ export default function Providers(
       return AwsProvider(options)
     case 'fs':
       return FsProvider()
+    case 'gcp':
+      return GcpProvider(options)
     default:
       throw new Error(`Invalid provider type.`)
   }
@@ -45,7 +48,7 @@ export interface ICloudProvider {
   listObjectsRecursive: (
     bucket: string,
     setCallback: (set: ICloudObject[]) => Promise<void>,
-    nextPageToken?: string
+    nextPageToken?: any
   ) => Promise<void>
   getObject: (bucket: string, name: string, options?: object) => Promise<Buffer>
   getObjectInfo: (bucket: string, name: string) => Promise<ICloudObject>
@@ -69,13 +72,12 @@ export interface ICloudProvider {
   ) => Promise<void>
   listBuckets: () => Promise<ICloudBucket[]>
   createBucket: (name: string) => Promise<any>
-  createPresignedUrl: (options?: any) => Promise<any>
 }
 
 export interface ICloudFactoryOptions {
   apiKey: string
   apiSecret: string
-  region?: string
+  extra?: StringMap
 }
 
 export interface ICloudProviderFactory {

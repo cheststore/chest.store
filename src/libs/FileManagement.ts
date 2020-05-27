@@ -15,10 +15,22 @@ const readdirPromise = fs.promises.readdir
 export default function FileManagement() {
   return {
     async getLocalFile(
-      filePath: string,
-      encoding?: null | undefined
-    ): Promise<Buffer> {
-      return await readFilePromise(filePath, { encoding: encoding || null })
+      filePath: string | Buffer,
+      encoding?:
+        | 'utf-8'
+        | 'ascii'
+        | 'utf8'
+        | 'utf16le'
+        | 'ucs2'
+        | 'ucs-2'
+        | 'base64'
+        | 'latin1'
+        | 'binary'
+        | 'hex'
+        | null
+        | undefined
+    ): Promise<string | Buffer> {
+      return await readFilePromise(filePath, { encoding })
     },
 
     async deleteFile(filePath: string): Promise<void> {

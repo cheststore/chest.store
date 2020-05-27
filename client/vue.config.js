@@ -13,6 +13,7 @@ module.exports = {
       ['/api']: { target: 'http://dev.chest.store:8000' },
       ['/auth/']: { target: 'http://dev.chest.store:8000' },
       ['/file/']: { target: 'http://dev.chest.store:8000' },
+      ['/gcp/']: { target: 'http://dev.chest.store:8000' },
       ['/git/']: { target: 'http://dev.chest.store:8000' },
       ['/logout']: { target: 'http://dev.chest.store:8000' },
       ['/object/upload']: { target: 'http://dev.chest.store:8000' },

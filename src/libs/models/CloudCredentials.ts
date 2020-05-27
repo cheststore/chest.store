@@ -8,6 +8,7 @@ export default function CloudCredentials(postgres: any): IModel {
       'type', // 'aws', 'gcp', etc.
       'key',
       'secret',
+      'extra', // any extra information needed for the provider
     ],
 
     async getAllForUser(userId: string, id?: string) {

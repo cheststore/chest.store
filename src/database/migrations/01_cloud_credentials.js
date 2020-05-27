@@ -5,11 +5,12 @@ export default [
         id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
         type varchar(20), -- 'aws', 'gcp', etc.
         key varchar(255),
-        secret varchar(255),
+        secret text,
+        extra jsonb,
         created_at timestamptz NOT NULL DEFAULT now(),
         updated_at timestamptz NOT NULL DEFAULT now(),
         UNIQUE(type, key)
       );
     `)
-  }
+  },
 ]

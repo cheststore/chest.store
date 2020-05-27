@@ -1,13 +1,13 @@
 # chest.store
 
 Open-source, lightweight, and hackable cloud file/object explorer,
-storage, and git HTTP server. Integrations to your favorite cloud
-providers are available and more will be added.
-Object versioning happens with git version control and any
-object version history repo can easily be cloned and/or
-`git pull`ed to see complete object history.
+storage, and git HTTP server. Integrations to several cloud providers
+are available with more being added (please open an issue if your provider
+of choice is not available yet). Object versioning happens
+with git version control and any object version history repo can
+easily be cloned and/or `git pull`ed to see complete object history.
 
-## Version history & built-in git server
+## Version history & built-in git HTTP server
 
 chest.store has a built in git HTTP server that is used for object version history.
 Version histories are stored in a new `.chest.store` folder at the root of the

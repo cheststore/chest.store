@@ -2,12 +2,14 @@ import Errors from '../errors'
 import CloudBuckets from './models/CloudBuckets'
 import CloudCredentials from './models/CloudCredentials'
 import Users from './models/Users'
+import UserOauthTokens from './models/UserOauthTokens'
 
 export default function LoginHandler(postgres, request, options = null) {
   const session = request.session
   const creds = CloudCredentials(postgres)
   const buckets = CloudBuckets(postgres)
   const users = Users(postgres, session)
+  const oauth = UserOauthTokens(postgres)
 
   return {
     async standardLogin(
@@ -25,12 +27,14 @@ export default function LoginHandler(postgres, request, options = null) {
         currentCred,
         currentBucket,
         allBuckets,
+        oauthTokens,
       ] = await Promise.all([
         creds.getAllForUser(userRecord.id),
         buckets.getAllForUser(userRecord.id),
         creds.find(overrideCredentialId || userRecord.current_credential_id),
         buckets.find(overrideBucketId || userRecord.current_bucket_id),
         buckets.getAllForUser(userRecord.id),
+        oauth.getAllBy({ user_id: userRecord.id }),
       ])
 
       if (options && options.log)
@@ -42,6 +46,7 @@ export default function LoginHandler(postgres, request, options = null) {
       await users.login({ ...userRecord, password_hash: undefined })
       await users.setSession({
         last_login: new Date(),
+        oauth_tokens: oauthTokens,
         buckets: allUserBuckets,
         credentials: allUserCreds,
         current_credential: currentCred,

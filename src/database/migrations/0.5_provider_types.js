@@ -39,4 +39,17 @@ export default [
       ('gcp', 'GCP (Google Cloud Platform)', '/public/img/vendors/google_cloud.png')
     `)
   },
+
+  async function seedDropbox(postgres) {
+    const { rows } = await postgres.query(
+      `select * from provider_types where value = 'dropbox' limit 1`
+    )
+    if (rows.length > 0) return
+
+    await postgres.query(`
+      INSERT INTO provider_types (value, text, img_icon_path)
+      VALUES
+      ('dropbox', 'Dropbox', '/public/img/vendors/dropbox_logo.png')
+    `)
+  },
 ]

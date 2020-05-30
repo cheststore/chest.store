@@ -23,5 +23,5 @@ export default {
   OrganizationDeactivated,
   PasswordNotValid,
   PasswordsNotMatch,
-  UsernameAlreadyExists
+  UsernameAlreadyExists,
 }

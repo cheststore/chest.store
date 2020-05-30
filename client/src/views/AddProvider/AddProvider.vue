@@ -24,6 +24,7 @@
 <script>
   import { mapState } from 'vuex'
   import AwsProvider from './AwsProvider'
+  import DropboxProvider from './DropboxProvider'
   import FsProvider from './FsProvider'
   import GcpProvider from './GcpProvider'
 
@@ -34,6 +35,7 @@
 
         typeProviderComponentMap: {
           aws: AwsProvider,
+          dropbox: DropboxProvider,
           fs: FsProvider,
           gcp: GcpProvider,
         },
@@ -46,7 +48,9 @@
 
     components: {
       AwsProvider,
+      DropboxProvider,
       FsProvider,
+      GcpProvider,
     },
   }
 </script>

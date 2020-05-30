@@ -17,6 +17,7 @@ import PostgresClient from './PostgresClient'
 import RedisHelper from './RedisHelper'
 import SessionHandler from './SessionHandler'
 import Routes from './Routes'
+import PassportStrategies from '../passport'
 import config from '../config'
 
 const log = bunyan.createLogger(config.logger.options)
@@ -150,39 +151,30 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
         })
 
         //passport setup
-        const strategies =
-          fs.readdirSync(path.join(__dirname, '..', 'passport_strategies')) ||
-          []
-        strategies.forEach((stratFile) => {
+        const strategies = PassportStrategies({ log, postgres, redis })
+        Object.values(strategies).forEach((strategy) => {
           try {
-            const oStrat = require(path.join(
-              __dirname,
-              '..',
-              'passport_strategies',
-              stratFile
-            )).default({ log, postgres, redis })
-
             // If bindCondition exists, make sure it's truthy before
             // proceeding in case there isn't something required to
             // bind the strategy
             if (
-              typeof oStrat.bindCondition !== 'function' ||
-              oStrat.bindCondition()
+              typeof strategy.bindCondition !== 'function' ||
+              strategy.bindCondition()
             ) {
-              const stratName = path.basename(stratFile, '.js')
+              const stratName = strategy.name
 
-              if (oStrat.options)
+              if (strategy.options)
                 return passport.use(
                   stratName,
-                  new oStrat.strategy(oStrat.options, oStrat.handler)
+                  new strategy.strategy(strategy.options, strategy.handler)
                 )
               return passport.use(
                 stratName,
-                new oStrat.strategy(oStrat.handler)
+                new strategy.strategy(strategy.handler)
               )
             }
           } catch (err) {
-            log.error(`Error binding passport strategy: ${stratFile}`, err)
+            log.error(`Error binding passport strategy: ${strategy.name}`, err)
           }
         })
 

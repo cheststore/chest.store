@@ -1,5 +1,6 @@
 import fs from 'fs'
 import AwsProvider from './AwsProvider'
+import DropboxProvider from './DropboxProvider'
 import FsProvider from './FsProvider'
 import GcpProvider from './GcpProvider'
 
@@ -10,6 +11,8 @@ export default function Providers(
   switch (type.toLowerCase()) {
     case 'aws':
       return AwsProvider(options)
+    case 'dropbox':
+      return DropboxProvider(options)
     case 'fs':
       return FsProvider()
     case 'gcp':
@@ -76,7 +79,7 @@ export interface ICloudProvider {
 
 export interface ICloudFactoryOptions {
   apiKey: string
-  apiSecret: string
+  apiSecret?: string
   extra?: StringMap
 }
 

@@ -5,11 +5,18 @@ import { Dropbox } from 'dropbox'
 import { ICloudFactoryOptions, ICloudObject, ICloudProvider } from './Providers'
 // import config from '../../config'
 
+// import fetch from 'isomorphic-fetch'
+const fetch = require('isomorphic-fetch')
+const getObFullpathWithoutBaseDir = (bucket: string, full: string) => {
+  const findBucket = new RegExp(`^(${bucket}\/*)(.*)`)
+  return full.replace(findBucket, '$2')
+}
+
 export default function DropboxProvider({
-  apiKey,
+  apiSecret,
 }: ICloudFactoryOptions): ICloudProvider {
   // https://dropbox.github.io/dropbox-sdk-js/tutorial-Authentication.html
-  const dropbox = new Dropbox({ accessToken: apiKey })
+  const dropbox = new Dropbox({ accessToken: apiSecret, fetch })
 
   return {
     async areValidCredentials(): Promise<boolean> {
@@ -27,7 +34,8 @@ export default function DropboxProvider({
     async listObjectsRecursive(
       bucket: string,
       setCallback: (set: ICloudObject[]) => Promise<void>,
-      nextPageToken?: string
+      nextPageToken?: string,
+      subFolder?: string
     ): Promise<void> {
       let res
       if (nextPageToken) {
@@ -36,16 +44,20 @@ export default function DropboxProvider({
         })
       } else {
         res = await dropbox.filesListFolder({
-          path: bucket,
+          path: subFolder || bucket,
         })
       }
       const { entries, cursor, has_more } = res
+      const subDirs = entries.filter((o) => o['.tag'] === 'folder')
       const cloudObjects: ICloudObject[] = entries
         .filter((o) => o['.tag'] === 'file')
         .map((obj) => {
           return {
             bucketUid: bucket,
-            fullPath: obj.path_lower || '',
+            fullPath: getObFullpathWithoutBaseDir(
+              bucket,
+              obj.path_display || ''
+            ),
             name: obj.name,
 
             // TODO: figure out how to cast to `FilesFileMetadata`
@@ -61,6 +73,20 @@ export default function DropboxProvider({
         })
 
       await setCallback(cloudObjects)
+
+      // process any sub directories in this directory
+      await Promise.all(
+        subDirs.map(async ({ path_display }) => {
+          if (typeof path_display === 'string')
+            await this.listObjectsRecursive(
+              bucket,
+              setCallback,
+              null,
+              path_display
+            )
+        })
+      )
+
       if (has_more) await this.listObjectsRecursive(bucket, setCallback, cursor)
     },
 
@@ -78,7 +104,7 @@ export default function DropboxProvider({
       const obj = await dropbox.filesDownload({ path: path.join(bucket, name) })
       return {
         bucketUid: bucket,
-        fullPath: obj.name,
+        fullPath: getObFullpathWithoutBaseDir(bucket, obj.path_display || ''),
         name: obj.name,
         lastModified: obj.server_modified,
         // etag: obj.metadata.etag,
@@ -139,9 +165,10 @@ export default function DropboxProvider({
 
     async listBuckets() {
       let allEntries: any[] = []
-      let entries, cursor, has_more
+      let cursor, has_more
+      const onlyFolders = (e: StringMap) => e['.tag'] === 'folder'
       const resOriginal = await dropbox.filesListFolder({ path: '' })
-      allEntries.push(entries)
+      allEntries = allEntries.concat(resOriginal.entries.filter(onlyFolders))
       cursor = resOriginal.cursor
       has_more = resOriginal.has_more
 
@@ -149,7 +176,7 @@ export default function DropboxProvider({
         // TODO: figure out how to cast to `FilesFileMetadata`
         // http://dropbox.github.io/dropbox-sdk-js/global.html#FilesFileMetadata
         const resCont: any = await dropbox.filesListFolderContinue({ cursor })
-        allEntries.push(resCont.entries)
+        allEntries = allEntries.concat(resCont.entries.filter(onlyFolders))
         has_more = resCont.has_more
         cursor = resCont.cursor
       }

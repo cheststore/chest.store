@@ -51,7 +51,8 @@ export interface ICloudProvider {
   listObjectsRecursive: (
     bucket: string,
     setCallback: (set: ICloudObject[]) => Promise<void>,
-    nextPageToken?: any
+    nextPageToken?: any,
+    subFolder?: string
   ) => Promise<void>
   getObject: (bucket: string, name: string, options?: object) => Promise<Buffer>
   getObjectInfo: (bucket: string, name: string) => Promise<ICloudObject>

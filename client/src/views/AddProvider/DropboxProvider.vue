@@ -15,10 +15,10 @@
         div.small.mb-3
           | Select the Dropbox base directory for chest.store to sync with, which
           | will serve as the top level directory chest.store will sync.
-        //- div.form-group
-        //-   label(for="all-gcp-buckets") Select Bucket
-        //-   select#all-gcp-buckets.form-control(v-model="selectedBucketName",@change="checkAndSaveDirectory")
-        //-     option(v-for="bucket in buckets",:value="bucket.id") {{ bucket.name }}
+        div.form-group
+          label(for="all-gcp-buckets") Select Directory
+          select#all-gcp-buckets.form-control(v-model="baseDir",@change="checkAndSaveDirectory")
+            option(v-for="bucket in buckets",:value="bucket.path_lower") {{ bucket.path_display }}
 
 </template>
 
@@ -30,6 +30,7 @@
     data() {
       return {
         baseDir: null,
+        buckets: [],
       }
     },
 
@@ -50,8 +51,7 @@
       async listBuckets() {
         try {
           const info = await ApiProviders.listBuckets(this.dropboxOauthCred.id)
-          console.log('DBBUCKETS', info)
-          // this.buckets = info
+          this.buckets = info
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
@@ -59,14 +59,15 @@
 
       async checkAndSaveDirectory() {
         try {
-          // if (!this.baseDir)
-          //   return this.$notify({
-          //     type: 'danger',
-          //     message: `Please enter a base directory to use.`,
-          //   })
-          // await ApiProviders.checkAndSaveFsDir(this.baseDir)
-          // await this.$store.dispatch('getUserSession', true)
-          // this.$emit('created')
+          if (!this.baseDir)
+            return this.$notify({
+              type: 'danger',
+              message: `Please enter a valid bucket to integrate with.`,
+            })
+
+          await ApiProviders.saveBucket(this.baseDir, this.dropboxOauthCred.id)
+          await this.$store.dispatch('getUserSession', true)
+          this.$emit('created')
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }

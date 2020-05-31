@@ -6,7 +6,7 @@ import CloudCredentials from '../../../../libs/models/CloudCredentials'
 import CloudBuckets from '../../../../libs/models/CloudBuckets'
 import Users from '../../../../libs/models/Users'
 import UserApiKeys from '../../../../libs/models/UserApiKeys'
-import LocalStrategy from '../../../../passport_strategies/local'
+import LocalStrategy from '../../../../passport/local'
 // import config from '../../../../config'
 
 export default function ({ log, postgres, redis }) {

@@ -1,5 +1,7 @@
-export default class NoPassword extends Error {
-  constructor(...args) {
+import IError from './IError'
+
+export default class NoPassword extends IError {
+  constructor(...args: any[]) {
     super(...args)
     Error.captureStackTrace(this, NoPassword)
 

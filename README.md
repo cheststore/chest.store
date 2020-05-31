@@ -33,7 +33,7 @@ $ git push chest master
 # when prompted, enter your chest.store username and password to authenticate
 ```
 
-## Current cloud storage support (see [TODOS](#TODOS) for upcoming integrations)
+## Current cloud storage support (see [TODOS](#TODOS) for future possible integrations)
 
 #### Local File System
 
@@ -57,6 +57,17 @@ In order to integrate with GCS buckets(s) you will need to create a service acco
 with appropriate read/write GCS permissions and download the JSON containing the
 key information about the service account. This JSON file will be uploaded to
 chest.store adding GCS as a provider.
+
+#### Dropbox
+
+Dropbox requires you to authenticate users (or yourself) via
+[OAuth 2.0](https://www.dropbox.com/developers/reference/oauth-guide).
+You will need to create a new app in the [developer portal](https://www.dropbox.com/developers/apps),
+configure it and the callback URL to be `$HOSTNAME/auth/dropbox/callback` where `$HOSTNAME` is the
+[HOSTNAME environment variable](#Environment-Variables) you have setup,
+update the `DROPBOX_APP_ID` and `DROPBOX_APP_SECRET` environment variables in your .env
+from this new app, and restart your chest.store server. At this point, Dropbox
+should be available to use as a provider in your chest.store instance.
 
 ## Install
 
@@ -115,6 +126,12 @@ any respective fields to match your environment or server configuration.
 DATABASE_TEST_URL=postgres://localhost:5432/cheststore_test
 DATABASE_URL=postgres://localhost:5432/cheststore
 
+# only needed if you would like to integrate with Dropbox as
+# a storage provider. See [Dropbox provider support](#Dropbox)
+# for more information.
+DROPBOX_APP_ID=
+DROPBOX_APP_SECRET=
+
 # 'http(s)://[IP/DNS]:port' of the chest.store server
 #
 # if you don't use localhost or an IP address,
@@ -156,7 +173,7 @@ required to create and use the new table.
 
 ## TODOS
 
-- More integrations (Wasabi, Dropbox?, more?)
+- More provider integrations (MS OneDrive, Wasabi, DigitalOcean, more?)
 - chest.store subscription service (would anyone pay for a cloud offering of this?)
 - Hooks
   - webhook integration when objects are downloaded, uploaded, synced, new version, etc.

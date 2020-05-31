@@ -53,6 +53,12 @@ export default {
     url: process.env.REDIS_URL || 'redis://localhost:6379',
   },
 
+  dropbox: {
+    appId: process.env.DROPBOX_APP_ID,
+    appSecret: process.env.DROPBOX_APP_SECRET,
+    loginCallbackUrl: `${hostName}/auth/dropbox/callback`,
+  },
+
   session: {
     sessionSecret: process.env.SESSION_SECRET,
     sessionCookieKey: process.env.SESSION_COOKIE_KEY || 'cheststore',

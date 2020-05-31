@@ -1,5 +1,7 @@
-export default class InvalidVerificationCode extends Error {
-  constructor(...args) {
+import IError from './IError'
+
+export default class InvalidVerificationCode extends IError {
+  constructor(...args: any[]) {
     super(...args)
     Error.captureStackTrace(this, InvalidVerificationCode)
 

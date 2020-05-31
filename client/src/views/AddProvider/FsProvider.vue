@@ -5,9 +5,10 @@
         h3.m-0 File System Base Directory
       div.card-body.py-lg-3.px-lg-5
         div.small.mb-3
-          | The base directory is a directory on your file system
+          | The base directory is a directory on your machine/server's
+          | file system (i.e. the machine that chest.store is installed on)
           | that you'd like to manage and store version history using
-          | chest.store. Please enter an absolute file path to The
+          | chest.store. Please enter an absolute file path to the
           | directory on your file system.
         base-input.input-group-alternative(
           v-model="baseDir"

@@ -74,14 +74,18 @@
 
       errorAddingFile(...args) {
         this.$emit('error', args)
+        this.removeFile()
       },
 
       successAddingFile(...args) {
         this.$emit('added', args)
+        this.removeFile()
+      },
 
+      removeFile() {
         if (this.removeAfterUpload) {
-          if (this.$refs[`file-uploader`])
-            this.$refs[`file-uploader`].dropzone.removeAllFiles()
+          if (this.$refs[`file-uploader-${this._uid}`])
+            this.$refs[`file-uploader-${this._uid}`].dropzone.removeAllFiles()
         }
       },
     },

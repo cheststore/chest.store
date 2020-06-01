@@ -1,5 +1,5 @@
 # Base image
-FROM node:14.0.0
+FROM node:14.3.0
 
 LABEL AUTHOR="Lance Whatley"
 

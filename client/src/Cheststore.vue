@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <notifications></notifications>
-    <router-view />
+    <loader v-if="isLoading"></loader>
+    <router-view v-else />
   </div>
 </template>
 

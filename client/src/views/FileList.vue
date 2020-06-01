@@ -8,21 +8,21 @@
 
     div.container.mt--7
       div.row
-        div.col-lg-3.mb-4
-          div.card.shadow
-            div.card-header.border-0
-              h6.mb-0 Bucket Directories
-            div.table-responsive.mb-0
-              base-table.table.align-items-center.table-flush(
-                thead-classes="thead-light"
-                tbody-classes="list"
-                no-data-placeholder="No directories at this level..."
-                :data="directories")
-                template(slot="columns")
-                  th.py-1 Directory
-                template(slot-scope="{row}")
-                  td.py-1
-                    router-link.text-primary.small(:to="`/directory/${row.id}`") {{ row.full_path }}
+        //- div.col-lg-3.mb-4
+        //-   div.card.shadow
+        //-     div.card-header.border-0
+        //-       h6.mb-0 Bucket Directories
+        //-     div.table-responsive.mb-0
+        //-       base-table.table.align-items-center.table-flush(
+        //-         thead-classes="thead-light"
+        //-         tbody-classes="list"
+        //-         no-data-placeholder="No directories at this level..."
+        //-         :data="directories")
+        //-         template(slot="columns")
+        //-           th.py-1 Directory
+        //-         template(slot-scope="{row}")
+        //-           td.py-1
+        //-             router-link.text-primary.small(:to="`/directory/${row.id}`") {{ row.full_path }}
         div.col.mb-4
           div.card.shadow
             div.card-header.border-0.d-flex.align-items-center
@@ -59,34 +59,45 @@
                 :perPage="objectInfo.perPage"
                 @input="changePage")
             div.table-responsive.mb-0
-              base-table.table.align-items-center.table-flush(
-                thead-classes="thead-light"
-                tbody-classes="list"
-                :no-data-placeholder="`No objects in ${dirOrBucket}`"
-                :data="objectInfo.data")
-                template(slot="columns")
-                  th Object
-                  th Size
-                  th Last Modified
-                  th
-                template(slot-scope="{row}")
-                  th(scope="row")
-                    router-link(:to="`/object/${row.id}`")
-                      div.d-flex.align-items-center
-                        span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
-                          img(:src="`/file/download/${row.id}`")
-                        div
-                          div {{ row.name }}
-                          div.text-light(style="font-size: 0.6rem") {{ row.full_path }}
-                  td {{ humanFileSize(row.size_bytes || 0) }}
-                  td {{ getFormattedDate(row.last_modified) }}
-                  td
-                    base-dropdown.dropdown(position="right")
-                      a(slot="title")
-                        i.fa.fa-ellipsis-h
-                      template
-                        a.dropdown-item(@click="downloadObject(row.id)") Download Object
-                        a.dropdown-item(@click="promptDeleteObject(row)") Delete Object
+              table.table.tablesorter.align-items-center.table-flush
+                thead.thead-light
+                  tr
+                    th Object
+                    th Size
+                    th Last Modified
+                    th
+                tbody.list(v-if="directories.length > 0")
+                  tr(v-for="dir in directories")
+                    td.py-2(colspan="100%")
+                      router-link(:to="`/directory/${dir.id}`")
+                        div.d-flex.align-items-center.ml-4
+                          i.fa.fa-2x.fa-level-up.mr-3(v-if="dir.back")
+                          i.fa.fa-2x.fa-folder.mr-2(v-else)
+                          div
+                            div(:to="`/directory/${dir.id}`") {{ dir.name || dir.full_path }}
+                            div.text-light(v-if="dir.name",style="font-size: 0.6rem") {{ dir.full_path }}
+                tbody.list(style="border-width: 1px")
+                  tr(v-if="objectInfo.totalCount === 0")
+                    td(colspan="100%") No objects in {{ dirOrBucket }}
+                  tr(v-else,v-for="(row, index) in objectInfo.data")
+                    th(scope="row")
+                      router-link(:to="`/object/${row.id}`")
+                        div.d-flex.align-items-center
+                          span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
+                            img(:src="`/file/download/${row.id}`")
+                          i.fa.fa-2x.mr-2(v-else,:class="getFileIconClass(row.full_path)")
+                          div
+                            div {{ row.name }}
+                            div.text-light(style="font-size: 0.6rem") {{ row.full_path }}
+                    td {{ humanFileSize(row.size_bytes || 0) }}
+                    td {{ getFormattedDate(row.last_modified) }}
+                    td
+                      base-dropdown.dropdown(position="right")
+                        a(slot="title")
+                          i.fa.fa-ellipsis-h
+                        template
+                          a.dropdown-item(@click="downloadObject(row.id)") Download Object
+                          a.dropdown-item(@click="promptDeleteObject(row)") Delete Object
             div.card-footer.py-2.d-flex.justify-content-end
               base-pagination.mb-0(
                 :total="objectInfo.totalCount"
@@ -111,7 +122,11 @@
   import ApiAuth from '../factories/ApiAuth'
   import ApiProviders from '../factories/ApiProviders'
   import ApiCloudObjects from '../factories/ApiCloudObjects'
-  import { debounce, isImage } from '../factories/Utilities'
+  import {
+    debounce,
+    isImage,
+    fileExtensionIconClasses,
+  } from '../factories/Utilities'
 
   export default {
     props: {
@@ -152,7 +167,11 @@
         directories(state) {
           return this.directoryId != null
             ? [
-                { full_path: '<<< back', id: this.currentParentDirId || '' },
+                {
+                  back: true,
+                  full_path: 'up one folder',
+                  id: this.currentParentDirId || '',
+                },
               ].concat(state.objects.directories)
             : state.objects.directories
         },
@@ -198,6 +217,15 @@
       getFormattedDate: TimeHelpers.getFormattedDate,
       humanFileSize: StringHelpers.humanFileSize,
       isImage,
+
+      getFileIconClass(fileName) {
+        const fileSplit = (fileName || '').toLowerCase().split('.')
+        const extension = fileSplit[fileSplit.length - 1]
+        return (
+          fileExtensionIconClasses[extension || 'default'] ||
+          fileExtensionIconClasses['default']
+        )
+      },
 
       downloadObject(objId) {
         DomHelpers.downloadUri(`/file/download/${objId}`)

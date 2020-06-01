@@ -93,8 +93,8 @@ should be available to use as a provider in your chest.store instance.
 3. Make sure `git` is installed (`git version`), and if not install it
    - `brew install git`
 4. Install NodeJS via [nvm](https://github.com/nvm-sh/nvm)
-   - `nvm install 14.0.0`
-   - `nvm alias default 14.0.0`
+   - `nvm install 14.3.0`
+   - `nvm alias default 14.3.0`
 5. Install PostgreSQL via [Postgres.app](https://postgresapp.com/)
    - Create DBs in `psql` or your client of choice
    - `CREATE DATABASE cheststore`

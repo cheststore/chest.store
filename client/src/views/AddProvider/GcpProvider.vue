@@ -6,7 +6,8 @@
       div.small.mb-3
         | In order to integrate with your GCP storage account and bucket(s),
         | you need to upload the service account JSON file downloadable from 
-        | the GCP console.
+        | the GCP console, where the service account is used to authenticate and
+        | make requests to sync to your bucket(s) of choice.
       div
         div(v-if="savedCred")
           label Email of service account
@@ -17,7 +18,8 @@
           size="sm"
           url="/gcp/creds"
           :remove-after-upload="true"
-          @added="createdCredential")
+          @added="createdCredential"
+          @error="errorCreatingCreds")
       template(v-if="savedCred")
         hr
         div.form-group
@@ -44,6 +46,13 @@
     },
 
     methods: {
+      errorCreatingCreds([, err]) {
+        return this.$notify({
+          type: 'danger',
+          message: err.error || err.message,
+        })
+      },
+
       async createdCredential([, res]) {
         this.savedCred = res
         await this.listBuckets()

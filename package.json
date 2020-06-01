@@ -4,7 +4,7 @@
   "author": "Lance Whatley <whatl3y@gmail.com>",
   "description": "Open-source, lightweight, and hackable cloud object explorer & git server",
   "engines": {
-    "node": "14.0.0"
+    "node": "14.3.0"
   },
   "repository": {
     "type": "git",

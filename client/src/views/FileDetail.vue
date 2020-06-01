@@ -47,8 +47,10 @@
                   //-     | 3.48%
                   //-   span.text-nowrap Since last month
           div.col-lg-3
-            router-link.mb-2.btn.btn-sm.btn-secondary.w-100(
-              :to="currentDir ? `/directory/${currentDir.id}` : '/'") &lt; Back to {{ (currentBucket || {}).bucket_uid }}
+            router-link.mb-2.btn.btn-sm.btn-secondary.w-100.d-flex.align-items-center.justify-content-center(
+              :to="currentDir ? `/directory/${currentDir.id}` : '/'")
+              | #[i.ni.ni-bold-left.mr-2]
+              | Back to Object List View
             file-uploader.mb-2(
               :dir="currentDir && currentDir.full_path"
               :object-id="objectId"
@@ -57,9 +59,14 @@
               btn-size="sm"
               :btn-text="`Upload New Version`"
               btn-class="w-100"
-              btn-variant="success"
+              btn-icon="ni ni-cloud-upload-96"
+              btn-variant="default"
               @added="init()")
-            base-button.mb-2.w-100(type="default",size="sm",@click="downloadObject()") Download Object
+            base-button.mb-2.w-100.d-flex.align-items-center.justify-content-center(
+              type="info",
+              size="sm",
+              @click="downloadObject()")
+              | #[i.ni.ni-cloud-download-95.mr-2] Download Object
     div.container.mt--7
       div.row
         loader.col-12(v-if="isLoadingLocal")
@@ -94,6 +101,8 @@
                       div(v-else)
                         base-alert.mb-0(type="warning")
                           | This is a binary file that can't yet be displayed in the browser.
+                          | #[base-button(type="info",size="sm",@click="downloadObject()") Download Object] to
+                          | open it and review it's contents.
                     //- div.col-lg-6.border-left
                     //-   div put something here
             div.col-lg-3.mb-4

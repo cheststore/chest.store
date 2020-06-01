@@ -8,14 +8,15 @@ export default {
   },
 
   async listObjects(
+    bucketId = null,
     directoryId = null,
     filters = null,
     page = 1,
     perPage = 30
   ) {
     const response = await CheststoreFetch(
-      `/api/1.0/objects/list?directoryId=${directoryId ||
-        ''}&filters=${encodeURIComponent(
+      `/api/1.0/objects/list?bucketId=${bucketId ||
+        ''}&directoryId=${directoryId || ''}&filters=${encodeURIComponent(
         JSON.stringify(filters)
       )}&page=${page || 1}&perPage=${perPage || 30}`
     )

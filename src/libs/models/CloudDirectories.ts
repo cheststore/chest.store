@@ -13,9 +13,9 @@ export default function CloudDirectories(postgres: object) {
       'name',
     ],
 
-    async getDirectChildren(bucketId: string, directoryId?: string) {
-      let filters: string[] = [`d.bucket_id = $1`]
-      let params: string[] = [bucketId]
+    async getDirectChildren(bucketId: string[], directoryId?: string) {
+      let filters: string[] = [`d.bucket_id = ANY($1)`]
+      let params: any[] = [bucketId]
       if (directoryId) {
         filters.push(`d.parent_directory_id = $2`)
         params.push(directoryId)

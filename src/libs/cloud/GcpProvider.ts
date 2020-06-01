@@ -84,7 +84,7 @@ export default function GcpProvider({
       }
     },
 
-    async getObjectStreamWithBackoff(
+    async pipeObjectStreamToWriteStream(
       stream: fs.WriteStream,
       bucket: string,
       name: string

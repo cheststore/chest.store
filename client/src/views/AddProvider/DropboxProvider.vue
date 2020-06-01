@@ -35,10 +35,7 @@
     },
 
     computed: mapState({
-      dropboxOauthCred: (state) =>
-        Object.values(state.session.credentials).find(
-          (t) => t.type === 'dropbox'
-        ),
+      dropboxOauthCred: (_, getters) => getters.dropboxOauthCred,
     }),
 
     watch: {

@@ -3,6 +3,8 @@ import path from 'path'
 import BackgroundWorker from '../../../../libs/BackgroundWorker'
 import SessionHandler from '../../../../libs/SessionHandler'
 import AuditLog from '../../../../libs/models/AuditLog'
+import CloudBuckets from '../../../../libs/models/CloudBuckets'
+import CloudCredentials from '../../../../libs/models/CloudCredentials'
 import CloudDirectories from '../../../../libs/models/CloudDirectories'
 import CloudObjects from '../../../../libs/models/CloudObjects'
 import Providers from '../../../../libs/cloud/Providers'
@@ -16,12 +18,17 @@ export default function ({ log, postgres, redis }) {
       const session = SessionHandler(req.session)
       const dir = CloudDirectories(postgres)
       const objects = CloudObjects(postgres)
-      const buckId = session.getLoggedInBucketId()
-      const { directoryId, filters, page, perPage } = req.query
+      let allBucketIds = session.getAllBucketIds()
+      const { bucketId, directoryId, filters, page, perPage } = req.query
+
+      if (bucketId) {
+        if (allBucketIds.includes(bucketId))
+          allBucketIds = bucketId instanceof Array ? bucketId : [bucketId]
+      }
 
       const [info, directory, directories] = await Promise.all([
         objects.getObjectsInBucket(
-          buckId,
+          allBucketIds,
           directoryId,
           JSON.parse(filters || 'null'),
           page,
@@ -29,9 +36,12 @@ export default function ({ log, postgres, redis }) {
         ),
         (async function getDir() {
           if (directoryId)
-            return await dir.findBy({ bucket_id: buckId, id: directoryId })
+            return await dir.findBy({
+              bucket_id: allBucketIds,
+              id: directoryId,
+            })
         })(),
-        dir.getDirectChildren(buckId, directoryId),
+        dir.getDirectChildren(allBucketIds, directoryId),
       ])
 
       res.json({
@@ -45,17 +55,15 @@ export default function ({ log, postgres, redis }) {
       const session = SessionHandler(req.session)
       const dirs = CloudDirectories(postgres)
       const objects = CloudObjects(postgres)
-      const buckId = session.getLoggedInBucketId()
+      const allBucketIds = session.getAllBucketIds()
       const objId = req.query.id
 
-      const object = await objects.findBy({ bucket_id: buckId, id: objId })
+      const object = await objects.find(objId)
+      if (!allBucketIds.includes(object.bucket_id))
+        return res.status(401).json({ error: config.errors['401'] })
 
       let directory = null
-      if (object.directory_id)
-        directory = await dirs.findBy({
-          bucket_id: buckId,
-          id: object.directory_id,
-        })
+      if (object.directory_id) directory = await dirs.find(object.directory_id)
 
       res.json({ object, directory })
     },
@@ -63,16 +71,22 @@ export default function ({ log, postgres, redis }) {
     async ['get/history'](req, res) {
       const session = SessionHandler(req.session)
       const objects = CloudObjects(postgres)
-      const bucket = session.getLoggedInBucketId(true)
-      const cred = session.getLoggedInCredentialId(true)
+      const allBucketIds = session.getAllBucketIds()
+      const allCredIds = session.getAllCredentialIds()
       const user = session.getLoggedInUserId(true)
       const objId = req.query.id
 
-      const object = await objects.findBy({ bucket_id: bucket.id, id: objId })
+      const object = await objects.find(objId)
       if (!object)
         return res
           .status(404)
           .json({ error: 'No object to get version history.' })
+
+      const bucket = await CloudBuckets(postgres).find(object.bucket_id)
+      if (!(bucket && allBucketIds.includes(bucket.id)))
+        return res.status(401).json({ error: config.errors['401'] })
+
+      const cred = await CloudCredentials(postgres).find(bucket.credential_id)
 
       const helpers = GitHelpers({ log, postgres })
       await helpers.checkAndCreateNewObjectVersionRepo(user.username, objId)
@@ -94,7 +108,7 @@ export default function ({ log, postgres, redis }) {
           apiSecret: cred.secret,
           extra: cred.extra,
         })
-        await providers.getObjectStreamWithBackoff(
+        await providers.pipeObjectStreamToWriteStream(
           fs.createWriteStream(path.join(client.workingDir, object.name)),
           bucket.bucket_uid,
           object.full_path

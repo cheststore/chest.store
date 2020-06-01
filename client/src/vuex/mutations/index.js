@@ -19,6 +19,10 @@ export default {
     state.router.push(newPath)
   },
 
+  SET_OAUTH_BINDINGS(state, bindings) {
+    state.oauthBindings = bindings
+  },
+
   SET_SESSION(state, sessionObj) {
     state.session = sessionObj
   },

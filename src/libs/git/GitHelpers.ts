@@ -129,7 +129,7 @@ export default function GitHelpers(
         apiSecret: cred.secret,
         extra: cred.extra,
       })
-      await provider.getObjectStreamWithBackoff(
+      await provider.pipeObjectStreamToWriteStream(
         tar.x({
           onwarn: (code: number | string, message: string, data: any) =>
             log.error(`Error with tar.x`, code, message, data),

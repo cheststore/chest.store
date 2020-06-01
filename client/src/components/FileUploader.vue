@@ -14,6 +14,7 @@
       :id="`uploader-btn-${_uid}`",
       :class="btnClass"
       :size="btnSize"
+      :icon="btnIcon"
       :type="btnVariant") {{ btnText || 'Upload Files' }}
 </template>
 
@@ -35,6 +36,7 @@
       btnText: { type: String, default: null },
       btnSize: { type: String, default: null },
       btnClass: { type: String, default: null },
+      btnIcon: { type: String, default: null },
       btnVariant: { type: String, default: 'primary' },
     },
 

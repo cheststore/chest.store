@@ -130,6 +130,7 @@ function routesNotNeedingAuth() {
     '/api/1.0/auth/password/forgot',
     '/api/1.0/auth/password/reset',
     '/api/1.0/auth/session',
+    '/api/1.0/global/oauth/bindings/get',
     '/api/1.0/providers/types',
   ]
 }

@@ -113,7 +113,7 @@ export default function DropboxProvider({
       }
     },
 
-    async getObjectStreamWithBackoff(
+    async pipeObjectStreamToWriteStream(
       stream: fs.WriteStream,
       bucket: string,
       name: string

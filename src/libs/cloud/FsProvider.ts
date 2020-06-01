@@ -67,7 +67,7 @@ export default function FsProvider(): ICloudProvider {
       }
     },
 
-    async getObjectStreamWithBackoff(
+    async pipeObjectStreamToWriteStream(
       stream: fs.WriteStream,
       basePath: string,
       name: string

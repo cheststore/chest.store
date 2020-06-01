@@ -16,7 +16,7 @@ buckets/directories you integrate with chest.store.
 As a bonus, the git server can be used like any other git remote
 (think github, gitlab, etc.) to clone, push, pull, etc. with any
 repository that uses git for its version control. Simply
-[setup a new remote](https://github.com/cheststore/chest.store#git-remote-example)
+[setup a remote](https://github.com/cheststore/chest.store#git-remote-example)
 in your repository(ies) of choice to your chest.store server and push/pull
 as desired.
 
@@ -33,13 +33,7 @@ $ git push chest master
 # when prompted, enter your chest.store username and password to authenticate
 ```
 
-## Current cloud storage support (see [TODOS](#TODOS) for future possible integrations)
-
-#### Local File System
-
-You can integrate a directory on your (or a docker container's)
-local file system to use as a "bucket" to manage files/objects
-from within chest.store.
+## Support for cloud storage providers (see [TODOS](#TODOS) for future possible integrations)
 
 #### Amazon Web Services (AWS) S3
 
@@ -53,7 +47,7 @@ the UI or by pushing updates through git.
 
 #### Google Cloud Storage (GCS)
 
-In order to integrate with GCS buckets(s) you will need to create a service account
+In order to integrate with GCS buckets(s) you'll need to create a service account
 with appropriate read/write GCS permissions and download the JSON containing the
 key information about the service account. This JSON file will be uploaded to
 chest.store adding GCS as a provider.
@@ -68,6 +62,12 @@ configure it and the callback URL to be `$HOSTNAME/auth/dropbox/callback` where 
 update the `DROPBOX_APP_ID` and `DROPBOX_APP_SECRET` environment variables in your .env
 from this new app, and restart your chest.store server. At this point, Dropbox
 should be available to use as a provider in your chest.store instance.
+
+#### Local File System
+
+You can integrate a directory on your (or a docker container's)
+local file system to use as a "bucket" to manage files/objects
+from within chest.store.
 
 ## Install
 

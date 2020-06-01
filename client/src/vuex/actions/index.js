@@ -1,6 +1,7 @@
 import Objects from './objects'
 
 import ApiAuth from '../../factories/ApiAuth'
+import ApiGlobal from '../../factories/ApiGlobal'
 import ApiProviders from '../../factories/ApiProviders'
 
 export default {
@@ -17,6 +18,7 @@ export default {
       commit('SET_INIT_PROCESSING', true)
 
       await Promise.all([
+        dispatch('getOauthBindings'),
         dispatch('getUserApiKeys'),
         dispatch('getUserSession'),
         dispatch('getProviderTypes'),
@@ -52,6 +54,13 @@ export default {
       commit('APP_NO_LONGER_LOADING')
       commit('SET_INIT_PROCESSING', false)
     }
+  },
+
+  async getOauthBindings({ commit, state }, reset = false) {
+    if (state.oauthBindings && !reset) return
+
+    const bindings = await ApiGlobal.getOauthBindings()
+    commit('SET_OAUTH_BINDINGS', bindings)
   },
 
   async getUserApiKeys({ commit, state }, reset = false) {

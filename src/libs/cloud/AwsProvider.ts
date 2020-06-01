@@ -82,7 +82,7 @@ export default function AwsProvider({
       }
     },
 
-    async getObjectStreamWithBackoff(
+    async pipeObjectStreamToWriteStream(
       stream: fs.WriteStream,
       bucket: string,
       name: string,

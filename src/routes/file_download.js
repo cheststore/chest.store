@@ -2,7 +2,10 @@ import Providers from '../libs/cloud/Providers'
 import Routes from '../libs/Routes'
 import SessionHandler from '../libs/SessionHandler'
 import AuditLog from '../libs/models/AuditLog'
+import CloudBuckets from '../libs/models/CloudBuckets'
+import CloudCredentials from '../libs/models/CloudCredentials'
 import CloudObjects from '../libs/models/CloudObjects'
+import config from '../config'
 
 export default function ({ log, postgres, redis }) {
   return {
@@ -13,8 +16,8 @@ export default function ({ log, postgres, redis }) {
       Routes().requireAuthExpressMiddleware({ postgres, redis }),
       async function FileDownload(req, res) {
         const session = SessionHandler(req.session)
-        const bucket = session.getLoggedInBucketId(true)
-        const cred = session.getLoggedInCredentialId(true)
+        const allBucketIds = session.getAllBucketIds()
+        const allCredIds = session.getAllCredentialIds()
         const userId = session.getLoggedInUserId()
         const objId = req.params[0]
 
@@ -31,16 +34,20 @@ export default function ({ log, postgres, redis }) {
               error: `You've tried accessing nonexistent files too many times. Please try again in 5 minutes.`,
             })
 
+          const object = await CloudObjects(postgres).find(objId)
+          const bucket = await CloudBuckets(postgres).find(object.bucket_id)
+          if (!(bucket && allBucketIds.includes(bucket.id)))
+            return res.status(401).json({ error: config.errors['401'] })
+
+          const cred = await CloudCredentials(postgres).find(
+            bucket.credential_id
+          )
           const provider = Providers(bucket.type, {
             apiKey: cred.key,
             apiSecret: cred.secret,
             extra: cred.extra,
           })
 
-          const object = await CloudObjects(postgres).findBy({
-            bucket_id: bucket.id,
-            id: objId,
-          })
           if (!object) {
             await redis.client
               .pipeline()
@@ -76,7 +83,7 @@ export default function ({ log, postgres, redis }) {
             res.attachment(decodeURIComponent(object.full_path))
 
           await Promise.all([
-            provider.getObjectStreamWithBackoff(
+            provider.pipeObjectStreamToWriteStream(
               res,
               bucket.bucket_uid,
               object.full_path.replace(/\/\//g, '/')

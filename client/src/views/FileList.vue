@@ -43,13 +43,19 @@
             div.card-header.py-2.border-top
               //- addon-left-icon="ni ni-tag"
               div.row
-                div.col-lg-6.p-lg-2(v-if="allBuckets && allBuckets.length > 0")
-                  select.form-control(v-model="currentBucketId")
-                    option(v-for="bucket in allBuckets",:value="bucket.id")
-                      | {{ bucket.name }} ({{ getProviderType(bucket.type).text }})
+                div.col-lg-5.p-lg-2.border-right(v-if="allBuckets && allBuckets.length > 0")
+                  label.form-control-label.mb-0(for="current-bucket") Bucket
+                  div.d-flex.align-items-center
+                    select#current-bucket.form-control.form-control-sm(v-model="currentBucketId",@change="changePage(1)")
+                      option(v-for="bucket in allBuckets",:value="bucket.id")
+                        | {{ bucket.name }} ({{ getProviderType(bucket.type).text || 'N/A' }})
+                    base-checkbox.ml-3.nowrap(v-model="includeAllBuckets") All Buckets?
                 div.col.p-lg-2
                   base-input.m-0(
                     v-model="searchQuery"
+                    label="Quick Search"
+                    label-classes="mb-0"
+                    input-classes="form-control-sm"
                     :valid="(searchQuery && searchQuery.length > 0) || null"
                     placeholder="Search for objects...")
             div.card-body.py-2.d-flex.justify-content-end
@@ -58,7 +64,7 @@
                 :value="objectInfo.currentPage"
                 :perPage="objectInfo.perPage"
                 @input="changePage")
-            div.table-responsive.mb-0
+            div.table-responsive.mb-0(style="overflow: visible;")
               table.table.tablesorter.align-items-center.table-flush
                 thead.thead-light
                   tr
@@ -66,29 +72,35 @@
                     th Size
                     th Last Modified
                     th
-                tbody.list(v-if="directories.length > 0")
+                tbody.list(v-if="directories.length > 0 && !searchQuery")
                   tr(v-for="dir in directories")
                     td.py-2(colspan="100%")
-                      router-link(:to="`/directory/${dir.id}`")
-                        div.d-flex.align-items-center.ml-4
-                          i.fa.fa-2x.fa-level-up.mr-3(v-if="dir.back")
-                          i.fa.fa-2x.fa-folder.mr-2(v-else)
-                          div
-                            div(:to="`/directory/${dir.id}`") {{ dir.name || dir.full_path }}
-                            div.text-light(v-if="dir.name",style="font-size: 0.6rem") {{ dir.full_path }}
+                      div.d-flex.align-items-center
+                        router-link(:to="`/directory/${dir.id}`")
+                          div.d-flex.align-items-center
+                            span.avatar.avatar-vsm.bg-white.mr-4
+                              img(:src="$store.state.getBucket(dir.bucket_id).img_icon_path")
+                            i.fa.fa-2x.fa-level-up.mr-3(v-if="dir.back")
+                            i.fa.fa-2x.fa-folder.mr-2(v-else)
+                            div
+                              div(:to="`/directory/${dir.id}`") {{ dir.name || dir.full_path }}
+                              div.text-light(v-if="dir.name",style="font-size: 0.6rem") {{ dir.full_path }}
                 tbody.list(style="border-width: 1px")
                   tr(v-if="objectInfo.totalCount === 0")
                     td(colspan="100%") No objects in {{ dirOrBucket }}
                   tr(v-else,v-for="(row, index) in objectInfo.data")
                     th(scope="row")
-                      router-link(:to="`/object/${row.id}`")
-                        div.d-flex.align-items-center
-                          span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
-                            img(:src="`/file/download/${row.id}`")
-                          i.fa.fa-2x.mr-2(v-else,:class="getFileIconClass(row.full_path)")
-                          div
-                            div {{ row.name }}
-                            div.text-light(style="font-size: 0.6rem") {{ row.full_path }}
+                      div.d-flex.align-items-center
+                        span.avatar.avatar-vsm.bg-white.mr-4
+                          img(:src="$store.state.getBucket(row.bucket_id).img_icon_path")
+                        router-link(:to="`/object/${row.id}`")
+                          div.d-flex.align-items-center
+                            span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
+                              img(:src="`/file/download/${row.id}`")
+                            i.fa.fa-2x.mr-2(v-else,:class="getFileIconClass(row.full_path)")
+                            div
+                              div {{ row.name }}
+                              div.text-light(style="font-size: 0.6rem") {{ row.full_path }}
                     td {{ humanFileSize(row.size_bytes || 0) }}
                     td {{ getFormattedDate(row.last_modified) }}
                     td
@@ -108,7 +120,7 @@
     confirmation-modal(
       :show="showDeleteObjectModal"
       header="Are you sure?",
-      :text="`Are you sure you want to delete <strong>${objectToDelete.full_path}</strong>? This is an irreversible action.`"
+      :text="deleteObjectModalText"
       variant="danger"
       @close="showDeleteObjectModal = false",
       @confirm="deleteObject(objectToDelete.id)")
@@ -144,7 +156,15 @@
         showDeleteObjectModal: false,
         objectToDelete: {},
 
-        delayRefresh: debounce(async () => {
+        objectListUpdate: debounce(
+          async () => {
+            await this.getObjectList()
+          },
+          300,
+          true
+        ),
+
+        objectListUpdateDelay: debounce(async () => {
           await this.changePage(1)
         }, 300),
       }
@@ -152,7 +172,8 @@
 
     computed: {
       ...mapState({
-        allBuckets: (state) => state.session.buckets,
+        allBuckets: (state) =>
+          [{ id: null, name: 'All Buckets' }].concat(state.session.buckets),
         currentDir: (state) => state.objects.currentDirectory,
         currentDirPath: (state) =>
           state.objects.currentDirectory &&
@@ -163,6 +184,7 @@
         currentBucket: (state) => state.session.current_bucket,
         objectInfo: (state) => state.objects.currentList,
         providerTypes: (state) => state.providerTypes,
+        username: (state) => state.session.user && state.session.user.username,
 
         directories(state) {
           return this.directoryId != null
@@ -179,15 +201,40 @@
 
       currentBucketId: {
         get() {
-          return this.currentBucket.id
+          return this.includeAllBuckets ? null : this.currentBucket.id
         },
 
         async set(newId) {
+          this.includeAllBuckets = false
           await ApiAuth.selfUpdate({ current_bucket_id: newId })
           await this.$store.dispatch('getUserSession', true)
           this.directoryId = null
-          await this.getObjectList()
+          await this.objectListUpdate()
         },
+      },
+
+      includeAllBuckets: {
+        get() {
+          return this.$store.state.objects.includeAllBuckets
+        },
+
+        async set(bool) {
+          this.$store.commit('SET_INCLUDE_ALL_BUCKETS', bool)
+          await this.changePage(1)
+        },
+      },
+
+      deleteObjectModalText() {
+        return `
+          Are you sure you want to delete <strong>${this.objectToDelete.full_path}</strong>?
+          This deletes the object in the target bucket, although all versions of
+          this object are still accessible in your bucket in its version git repo.
+          
+          <div class="card border mt-3 small">
+            <div class="card-body bg-white p-3">
+              <code class="text-default">git clone ${location.origin}/git/${this.username}/${this.objectToDelete.id}
+            </div>
+          </code></div>`
       },
 
       dirOrBucket() {
@@ -242,7 +289,7 @@
 
       async fileUploaded(/* [, {objectIds}] */) {
         // console.log('FILE', arguments)
-        await this.getObjectList()
+        await this.objectListUpdate()
       },
 
       async deleteObject(objId) {
@@ -250,29 +297,32 @@
           await ApiCloudObjects.deleteObject(objId)
           this.showDeleteObjectModal = false
 
-          await this.getObjectList()
+          await this.objectListUpdate()
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
       },
 
       refreshList() {
-        this.delayRefresh()
+        this.objectListUpdateDelay()
       },
 
       async changePage(newPage) {
         this.$store.commit('SET_BUCKET_OBJECT_LIST_PAGE', newPage)
-        await this.getObjectList()
+        await this.objectListUpdate()
       },
 
       async changePerPage(newPerPage) {
         this.$store.commit('SET_BUCKET_OBJECT_LIST_PER_PAGE', newPerPage)
         this.$store.commit('SET_BUCKET_OBJECT_LIST_PAGE', 1)
-        await this.getObjectList()
+        await this.objectListUpdate()
       },
 
       async getObjectList() {
-        await this.$store.dispatch('getObjectsList', this.directoryId)
+        await this.$store.dispatch('getObjectsList', {
+          bucketId: this.currentBucketId,
+          directoryId: this.directoryId,
+        })
       },
 
       async syncBucket() {
@@ -288,7 +338,7 @@
     },
 
     async created() {
-      await this.getObjectList()
+      await this.objectListUpdate()
     },
   }
 </script>

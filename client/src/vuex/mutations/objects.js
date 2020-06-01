@@ -33,4 +33,8 @@ export default {
   SET_BUCKET_OBJECT_HISTORY(state, history) {
     state.objects.currentObjectHistory = history
   },
+
+  SET_INCLUDE_ALL_BUCKETS(state, bool) {
+    state.objects.includeAllBuckets = bool
+  },
 }

@@ -43,7 +43,7 @@
     },
 
     computed: mapState({
-      types: (state) => state.providerTypes,
+      types: (_, getters) => getters.getActiveProviderTypes,
     }),
 
     components: {

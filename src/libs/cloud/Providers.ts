@@ -56,7 +56,7 @@ export interface ICloudProvider {
   ) => Promise<void>
   getObject: (bucket: string, name: string, options?: object) => Promise<Buffer>
   getObjectInfo: (bucket: string, name: string) => Promise<ICloudObject>
-  getObjectStreamWithBackoff: (
+  pipeObjectStreamToWriteStream: (
     stream: fs.WriteStream,
     bucket: string,
     name: string,

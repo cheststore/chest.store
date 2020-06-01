@@ -57,14 +57,14 @@ export default function CloudObjects(postgres: any) {
     },
 
     async getObjectsInBucket(
-      bucketId: number | string,
+      bucketId: any[],
       directoryId: number | string | null = null,
       filters: null | StringMap,
       page: number = 1,
       perPage: number = 30
     ): Promise<StringMap[]> {
-      let filterClauses: string[] = [`bucket_id = $1`]
-      let params: (number | string)[] = [bucketId]
+      let filterClauses: string[] = [`bucket_id = ANY($1)`]
+      let params: any[] = [bucketId]
 
       // TODO: for now if there are filters present disregard the
       // directory ID. Probably should respect directory ID at

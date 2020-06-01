@@ -1,5 +1,6 @@
 export default {
   objects: {
+    includeAllBuckets: false,
     directories: [],
     currentDirectory: {},
     currentObject: {},

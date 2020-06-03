@@ -98,6 +98,12 @@
                         div.card-body.bg-secondary
                           pre
                             code.sh(:style="getPreviewStyle") {{ fileAsciiCache }}
+                      div(v-else-if="!pdfParseError")
+                        div.card
+                          div.card-body
+                            pdf-viewer(
+                              :src="`/file/download/${file.id}`",
+                              @error="setPdfParseError")
                       div(v-else)
                         base-alert.mb-0(type="warning")
                           | This is a binary file that can't yet be displayed in the browser.
@@ -164,6 +170,7 @@
         isLoadingLocal: true,
         fileAsciiCache: false,
         wrapPreview: false,
+        pdfParseError: null,
       }
     },
 
@@ -198,6 +205,11 @@
 
       downloadObject() {
         DomHelpers.downloadUri(`/file/download/${this.objectId}`)
+      },
+
+      setPdfParseError(err) {
+        this.pdfParseError = err
+        console.error('ERR', this.pdfParseError)
       },
 
       async checkAndCacheIsFileAscii(id = this.objectId) {

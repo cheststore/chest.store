@@ -1,17 +1,17 @@
 # chest.store
 
-Open-source, lightweight, and hackable cloud file/object explorer,
-storage, and git HTTP server. Integrations to several cloud providers
+Open-source, lightweight, and hackable cloud file/object explorer
+and git HTTP server. Integrations to several cloud providers
 are available with more being added (please open an issue if your provider
 of choice is not available yet). Object versioning happens
-with git version control and any object version history repo can
+with git version control and any version history repo can
 easily be cloned and/or `git pull`ed to see complete object history.
 
 ## Version history & built-in git HTTP server
 
 chest.store has a built in git HTTP server that is used for object version history.
 Version histories are stored in a new `.chest.store` folder at the root of the
-buckets/directories you integrate with chest.store.
+buckets/directories you integrate with.
 
 As a bonus, the git server can be used like any other git remote
 (think github, gitlab, etc.) to clone, push, pull, etc. with any
@@ -27,10 +27,12 @@ username and password via the CLI.
 ### git remote example
 
 ```sh
-# `https://chest.store` can be replaced with your server
-$ git remote add chest https://chest.store/git/YOUR_USERNAME/REPO_NAME
+$ git clone https://github.com/antirez/redis
+$ cd redis
+$ # `https://chest.store` below can be replaced with your server
+$ git remote add chest https://chest.store/git/$YOUR_USERNAME/redis
 $ git push chest master
-# when prompted, enter your chest.store username and password to authenticate
+$ # when prompted, enter your chest.store username and password to authenticate
 ```
 
 ## Support for cloud storage providers (see [TODOS](#TODOS) for future possible integrations)
@@ -112,8 +114,6 @@ from within chest.store.
 14. `npm install`
 15. `npm run serve`
 
-## Development
-
 ### Environment Variables
 
 Create a file named `.env` in the root directory of the repo and insert
@@ -127,7 +127,7 @@ DATABASE_TEST_URL=postgres://localhost:5432/cheststore_test
 DATABASE_URL=postgres://localhost:5432/cheststore
 
 # only needed if you would like to integrate with Dropbox as
-# a storage provider. See [Dropbox provider support](#Dropbox)
+# a storage provider. See Dropbox provider support above
 # for more information.
 DROPBOX_APP_ID=
 DROPBOX_APP_SECRET=
@@ -140,8 +140,7 @@ DROPBOX_APP_SECRET=
 # for the server.
 HOSTNAME=http://dev.chest.store:8000
 
-# can be `error` in prod or `debug` when developing
-# to make more verbose
+# can be `error` in prod or `debug` when developing to make more verbose
 LOGGING_LEVEL=info
 
 # MASTER_KEY can be anything you want, but make long and hard to guess (i.e. a UUID)
@@ -162,6 +161,8 @@ REDIS_URL=redis://localhost:6379
 SESSION_SECRET=[ANY SECRET VALUE]
 ```
 
+## Development
+
 ### Create PostgreSQL table/model
 
 If you're contributing and/or doing development and need
@@ -173,16 +174,23 @@ required to create and use the new table.
 
 ## TODOS
 
-- More provider integrations (MS OneDrive, Wasabi, DigitalOcean, more?)
-- chest.store subscription service (would anyone pay for a cloud offering of this?)
+- More provider integrations
+  - MS OneDrive
+  - Wasabi
+  - MinIO
+  - DigitalOcean
+  - more?
 - Hooks
   - webhook integration when objects are downloaded, uploaded, synced, new version, etc.
   - custom extensions on download, upload, etc.
 - Mobile app(s)
-- Blockchain integration
-  - Store SHA256 bit hash of file contents in blockchain txns for tamper-proofing
-  - Could be used by/for legal services or compliance auditors for proof object(s) haven't changed/been tampered with
-- Object editing in-app (google or O365 integrations?)
-- Collaborate tools
-  - Notes/comments, scheduling?
-- Teams/enterprise(y) features
+- chest.store subscription service (would anyone pay for a cloud offering of this?)
+- Premium features
+  - Object editing in-app (google or O365 integrations?)
+  - Collaboration tools
+    - Notes/comments, scheduling?
+  - Better git repo management
+  - Teams/enterprise(y) features
+  - Blockchain integration
+    - Store SHA256 bit hash of file contents in blockchain txns for tamper-proofing
+    - Could be used by/for legal services or compliance auditors for proof object(s) haven't changed/been tampered with

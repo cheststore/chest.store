@@ -25,6 +25,7 @@ import ConfirmationPopover from '../components/ConfirmationPopover'
 import FileUploader from '../components/FileUploader'
 import Loader from '../components/Loader'
 import LoaderInline from '../components/LoaderInline'
+import PdfViewer from '../components/PdfViewer'
 import StatsCard from '../components/StatsCard'
 import Modal from '../components/Modal'
 import TabPane from '../components/Tabs/TabPane'
@@ -55,6 +56,7 @@ export default {
     Vue.component(FileUploader.name, FileUploader)
     Vue.component(Loader.name, Loader)
     Vue.component(LoaderInline.name, LoaderInline)
+    Vue.component(PdfViewer.name, PdfViewer)
     Vue.component(StatsCard.name, StatsCard)
     Vue.component(Modal.name, Modal)
     Vue.component(TabPane.name, TabPane)

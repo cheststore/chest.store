@@ -26,7 +26,7 @@
         div.col.mb-4
           div.card.shadow
             div.card-header.border-0.d-flex.align-items-center
-              h3.mb-0 {{ dirOrBucket == '/' ? currentBucket.name : dirOrBucket }} objects
+              h3.mb-0 {{ includeAllBuckets ? "All buckets'" : (dirOrBucket == '/' ? currentBucket.name : dirOrBucket) }} objects
               div.ml-auto.d-flex.align-items-center
                 base-button(
                   type="primary",
@@ -46,7 +46,7 @@
                 div.col-lg-5.p-lg-2.border-right(v-if="allBuckets && allBuckets.length > 0")
                   label.form-control-label.mb-0(for="current-bucket") Bucket
                   div.d-flex.align-items-center
-                    select#current-bucket.form-control.form-control-sm(v-model="currentBucketId",@change="changePage(1)")
+                    select#current-bucket.form-control.form-control-sm(v-model="currentBucketId")
                       option(v-for="bucket in allBuckets",:value="bucket.id")
                         | {{ bucket.name }} ({{ getProviderType(bucket.type).text || 'N/A' }})
                     base-checkbox.ml-3.nowrap(v-model="includeAllBuckets") All Buckets?
@@ -79,7 +79,11 @@
                         router-link(:to="`/directory/${dir.id}`")
                           div.d-flex.align-items-center
                             span.avatar.avatar-vsm.bg-white.mr-4
-                              img(:src="$store.state.getBucket(dir.bucket_id).img_icon_path")
+                              img(
+                                :id="`dir-bucket-icon-${dir.id}`"
+                                :src="$store.state.getBucket(dir.bucket_id).img_icon_path")
+                              b-tooltip(:target="`dir-bucket-icon-${dir.id}`")
+                                | {{ $store.state.getBucket(dir.bucket_id).name }}
                             i.fa.fa-2x.fa-level-up.mr-3(v-if="dir.back")
                             i.fa.fa-2x.fa-folder.mr-2(v-else)
                             div
@@ -92,7 +96,11 @@
                     th(scope="row")
                       div.d-flex.align-items-center
                         span.avatar.avatar-vsm.bg-white.mr-4
-                          img(:src="$store.state.getBucket(row.bucket_id).img_icon_path")
+                          img(
+                            :id="`obj-bucket-icon-${row.id}`"
+                            :src="$store.state.getBucket(row.bucket_id).img_icon_path")
+                          b-tooltip(:target="`obj-bucket-icon-${row.id}`")
+                            | {{ $store.state.getBucket(row.bucket_id).name }}
                         router-link(:to="`/object/${row.id}`")
                           div.d-flex.align-items-center
                             span.bg-white.avatar.avatar-sm.border.mr-2(v-if="isImage(row.full_path) && row.size_bytes < maxShowSize")
@@ -172,8 +180,7 @@
 
     computed: {
       ...mapState({
-        allBuckets: (state) =>
-          [{ id: null, name: 'All Buckets' }].concat(state.session.buckets),
+        allBuckets: (state) => state.session.buckets,
         currentDir: (state) => state.objects.currentDirectory,
         currentDirPath: (state) =>
           state.objects.currentDirectory &&
@@ -205,11 +212,12 @@
         },
 
         async set(newId) {
-          this.includeAllBuckets = false
           await ApiAuth.selfUpdate({ current_bucket_id: newId })
           await this.$store.dispatch('getUserSession', true)
           this.directoryId = null
-          await this.objectListUpdate()
+
+          // NOTE: setter function for this var will refresh the list (see below)
+          this.includeAllBuckets = false
         },
       },
 
@@ -255,7 +263,7 @@
             key: 'searchQuery',
             value,
           })
-          this.refreshList()
+          await this.objectListUpdateDelay()
         },
       },
     },
@@ -288,7 +296,6 @@
       },
 
       async fileUploaded(/* [, {objectIds}] */) {
-        // console.log('FILE', arguments)
         await this.objectListUpdate()
       },
 
@@ -301,10 +308,6 @@
         } catch (err) {
           this.$notify({ type: 'danger', message: err.message })
         }
-      },
-
-      refreshList() {
-        this.objectListUpdateDelay()
       },
 
       async changePage(newPage) {

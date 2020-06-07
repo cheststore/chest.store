@@ -2,8 +2,8 @@ import CheststoreFetch from './CheststoreFetch'
 import { handleFetchResponse } from './ApiHelpers'
 
 export default {
-  async downloadObjectBlob(objectId) {
-    const response = await CheststoreFetch(`/file/download/${objectId}`)
+  async downloadObjectBlob(objectId, prefix = '/file/download/') {
+    const response = await CheststoreFetch(`${prefix}${objectId}`)
     return await handleFetchResponse(response, 'blob')
   },
 

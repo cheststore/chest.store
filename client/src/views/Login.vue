@@ -18,25 +18,30 @@
           </div>
         </div> -->
         <div
-          :class="(errorMessage ? ['py-lg-3'] : ['py-lg-5']).concat(['card-body', 'px-lg-5'])">
+          :class="
+            (errorMessage ? ['py-lg-3'] : ['py-lg-5']).concat([
+              'card-body',
+              'px-lg-5',
+            ])
+          "
+        >
           <!-- <div class="text-center text-muted mb-4">
             <small>Or sign up with credentials</small>
           </div> -->
 
-          <base-alert
-            v-if="errorMessage"
-            class="my-4"
-            type="danger">{{ errorMessage }}</base-alert>
+          <base-alert v-if="errorMessage" class="my-4" type="danger">{{
+            errorMessage
+          }}</base-alert>
 
           <form role="form" :action="getFormAction" method="post">
-
-            <base-input 
-                  id="username"
-                  name="username"
-                  class="input-group-alternative"
-                  placeholder="Username"
-                  addon-left-icon="ni ni-hat-3"
-                  v-model="username">
+            <base-input
+              id="username"
+              name="username"
+              class="input-group-alternative"
+              placeholder="Username"
+              addon-left-icon="ni ni-hat-3"
+              v-model="username"
+            >
             </base-input>
 
             <!-- <base-input class="input-group-alternative mb-3"
@@ -45,25 +50,27 @@
                   v-model="model.email">
             </base-input> -->
 
-            <base-input 
-                  id="password"
-                  name="password"
-                  class="input-group-alternative mb-3"
-                  placeholder="Password"
-                  type="password"
-                  addon-left-icon="ni ni-lock-circle-open"
-                  v-model="password">
+            <base-input
+              id="password"
+              name="password"
+              class="input-group-alternative mb-3"
+              placeholder="Password"
+              type="password"
+              addon-left-icon="ni ni-lock-circle-open"
+              v-model="password"
+            >
             </base-input>
 
-            <base-input 
-                  v-if="createAccount"
-                  id="cpassword"
-                  name="cpassword"
-                  class="input-group-alternative mb-3"
-                  placeholder="Confirm Password"
-                  type="password"
-                  addon-left-icon="ni ni-lock-circle-open"
-                  v-model="cpassword">
+            <base-input
+              v-if="createAccount"
+              id="cpassword"
+              name="cpassword"
+              class="input-group-alternative mb-3"
+              placeholder="Confirm Password"
+              type="password"
+              addon-left-icon="ni ni-lock-circle-open"
+              v-model="cpassword"
+            >
             </base-input>
 
             <!-- <div class="text-muted font-italic">
@@ -78,10 +85,9 @@
               </div>
             </div> -->
             <div class="text-center">
-              <base-button
-                native-type="submit"
-                type="primary"
-                class="my-4">{{ createAccount ? 'Create account' : 'Login' }}</base-button>
+              <base-button native-type="submit" type="primary" class="my-4">{{
+                createAccount ? 'Create account' : 'Login'
+              }}</base-button>
             </div>
           </form>
         </div>
@@ -93,8 +99,15 @@
           </a> -->
         </div>
         <div class="col-6 text-right">
-          <router-link :to="createAccount ? '/account/login' : '/account/register'" class="text-light">
-            <small>{{ createAccount ? 'Login into your account' : 'Register a new account' }}</small>
+          <router-link
+            :to="createAccount ? '/account/login' : '/account/register'"
+            class="text-primary"
+          >
+            <small>{{
+              createAccount
+                ? 'Login into your account'
+                : 'Register a new account'
+            }}</small>
           </router-link>
         </div>
       </div>
@@ -103,7 +116,8 @@
     <forgot-password-modal
       id="forgot-password-modal"
       :show="showForgot"
-      @close="showForgot = false"></forgot-password-modal>
+      @close="showForgot = false"
+    ></forgot-password-modal>
   </div>
 </template>
 
@@ -114,7 +128,7 @@
   export default {
     props: {
       type: { type: String, default: 'login' },
-      error: { type: String, default: null }
+      error: { type: String, default: null },
     },
 
     data() {
@@ -123,7 +137,7 @@
 
         username: null,
         password: null,
-        cpassword: null
+        cpassword: null,
       }
     },
 
@@ -133,20 +147,19 @@
       },
 
       getFormAction() {
-        return this.createAccount
-          ? '/api/1.0/auth/create/user'
-          : '/auth/local'
+        return this.createAccount ? '/api/1.0/auth/create/user' : '/auth/local'
       },
 
       errorMessage() {
-        return this.error && ErrorMessages[this.error].toString() === '[object Object]'
+        return this.error &&
+          ErrorMessages[this.error].toString() === '[object Object]'
           ? ErrorMessages[this.error].error
           : ErrorMessages[this.error]
-      }
+      },
     },
 
     components: {
-      ForgotPasswordModal
-    }
+      ForgotPasswordModal,
+    },
   }
 </script>

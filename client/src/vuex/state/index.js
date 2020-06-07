@@ -1,6 +1,8 @@
+import Gitrepos from './gitrepos'
 import Objects from './objects'
 
 export default {
+  ...Gitrepos,
   ...Objects,
 
   isLoading: true,
@@ -20,7 +22,9 @@ export default {
 
   getBucket(bucketId) {
     const state = this
-    const bucket = state.session.buckets.find((b) => b.id === bucketId)
+    const bucket = Object.values(state.session.buckets).find(
+      (b) => b.id === bucketId
+    )
     if (!bucket) return {}
     return {
       ...state.providerTypes.find((t) => t.value === bucket.type),

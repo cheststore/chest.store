@@ -4,11 +4,10 @@
       base-dropdown.w-100(position="bottom")
         base-button.w-100.dropdown-toggle.d-flex.align-items-center.justify-content-center(
           slot="title"
-          type="secondary"
-          data-toggle="dropdown")
+          type="secondary")
           span.avatar.avatar-sm.rounded-circle.bg-white.mr-2(v-if="providerType")
             img.img-fluid.img-thumbnail(:src="types.find(t => t.value === providerType).img_icon_path")
-          div {{ providerType ? types.find(t => t.value === providerType).text : 'Select provider type' }}
+          div {{ providerType ? types.find(t => t.value === providerType).text : 'Select provider' }}
         a.dropdown-item.d-flex.align-items-center(v-for="t in types",@click="providerType = t.value")
           span.avatar.avatar-sm.rounded-circle.bg-white.mr-2(v-if="t.img_icon_path")
             img.img-fluid.img-thumbnail(:src="t.img_icon_path")

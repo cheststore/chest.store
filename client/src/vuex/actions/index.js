@@ -1,3 +1,4 @@
+import Gitrepos from './gitrepos'
 import Objects from './objects'
 
 import ApiAuth from '../../factories/ApiAuth'
@@ -5,6 +6,7 @@ import ApiGlobal from '../../factories/ApiGlobal'
 import ApiProviders from '../../factories/ApiProviders'
 
 export default {
+  ...Gitrepos,
   ...Objects,
 
   async init({ commit, dispatch, state }) {

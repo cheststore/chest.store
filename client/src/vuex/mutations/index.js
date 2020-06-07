@@ -1,6 +1,8 @@
+import Gitrepos from './gitrepos'
 import Objects from './objects'
 
 export default {
+  ...Gitrepos,
   ...Objects,
 
   APP_NO_LONGER_LOADING(state) {

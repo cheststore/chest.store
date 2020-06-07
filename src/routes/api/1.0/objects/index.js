@@ -89,7 +89,7 @@ export default function ({ log, postgres, redis }) {
       const cred = await CloudCredentials(postgres).find(bucket.credential_id)
 
       const helpers = GitHelpers({ log, postgres })
-      await helpers.checkAndCreateNewObjectVersionRepo(user.username, objId)
+      await helpers.checkAndCreateRepo(user.username, objId)
       const client = GitClient(objId, user.username)
       await client.gitClient.init()
 

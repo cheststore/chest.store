@@ -8,6 +8,9 @@
           | In order to integrate with your AWS account and S3 bucket(s),
           | you need to enter a valid AWS Access Key and Secret we will
           | use to make API requests to sync your S3 bucket information.
+        select-credential.mt-2.mb-3(
+          type="aws",
+          @input="selectExisting")
         base-input.input-group-alternative(
           v-model="awsKey"
           placeholder="AWS Access Key"
@@ -50,9 +53,15 @@
     },
 
     methods: {
+      async selectExisting(cred) {
+        this.awsKey = cred.key
+        this.awsSecret = cred.secret
+        await this.checkAndSaveAwsKeys()
+      },
+
       async checkAndSaveAwsKeys(evt) {
         try {
-          evt.preventDefault()
+          if (evt) evt.preventDefault()
 
           if (!(this.awsKey && this.awsSecret))
             return this.$notify({

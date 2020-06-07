@@ -91,7 +91,7 @@
                           base-button(
                             size='sm'
                             type='success'
-                            @click="showAddProviderModal = true") Add Provider
+                            @click="showAddProviderModal = true") Add Provider or Bucket
                       div.table-responsive.mb-0
                         base-table.table.align-items-center.table-flush(
                           thead-classes="thead-light"

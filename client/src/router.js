@@ -16,9 +16,35 @@ export default new Router({
         {
           path: '/profile',
           name: 'userprofile',
-          props: true,
           component: () =>
             import(/* webpackChunkName: "demo" */ './views/UserSettings.vue'),
+        },
+        {
+          path: '/repos',
+          name: 'repolist',
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/GitRepoList.vue'),
+        },
+        {
+          path: '/repo/:id',
+          name: 'repodirlist',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/GitRepoDirList.vue'),
+        },
+        {
+          path: '/repo/:id/file/*',
+          name: 'repofile',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/GitFileDetail.vue'),
+        },
+        {
+          path: '/repo/:id/*',
+          name: 'repodirlistsub',
+          props: true,
+          component: () =>
+            import(/* webpackChunkName: "demo" */ './views/GitRepoDirList.vue'),
         },
         {
           path: '/object/:objectId',

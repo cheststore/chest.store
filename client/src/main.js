@@ -16,6 +16,7 @@ import router from './router'
 
 // css
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import 'highlight.js/styles/default.css'
 import './css/app.scss'
 
 Vue.use(VueHighlightJS)

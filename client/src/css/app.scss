@@ -70,3 +70,25 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.overflow-ellipses {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.begin {
+    direction: rtl;
+  }
+
+  &.wrap-always {
+    white-space: normal;
+    word-break: break-all;
+  }
+
+  &:hover:not(.no-hover) {
+    word-break: break-all;
+    white-space: normal;
+    overflow: visible;
+  }
+}

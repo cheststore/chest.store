@@ -40,6 +40,53 @@ export default function GitHelpers(
       return fullDirPath
     },
 
+    async getRepoFilesInDir(
+      username: string,
+      repoName: string,
+      baseDir: null | string = null
+    ): Promise<object[]> {
+      const modifiedRepoForLstree: string = baseDir
+        ? path.join(repoName, baseDir)
+        : repoName
+      const g = GitClient(modifiedRepoForLstree, username)
+      const rawTreeInfo: string = await g.gitClient.raw(['ls-tree', 'HEAD'])
+      const processedFiles = await Promise.all(
+        rawTreeInfo
+          .split('\n')
+          .filter((i) => !!i)
+          .map(async (i: string) => {
+            const [blobInfo, file] = i.split('\t')
+            try {
+              const fullPath = path.join(g.workingDir, file)
+              const stat = await fileMgmt.getFileInfo(fullPath)
+              const fileType = await fileMgmt.getFileType(fullPath)
+              return { blobInfo, file: { stat, fileType, name: file } }
+            } catch (err) {
+              return {
+                blobInfo,
+                file: { stat: {}, fileType: 'file', name: file },
+              }
+            }
+          })
+      )
+
+      return processedFiles.sort((f1: any, f2: any) => {
+        if (f1.file.fileType !== f2.file.fileType) {
+          return f1.file.fileType === 'directory' ? -1 : 1
+        }
+        return f1.file.name.toLowerCase() < f2.file.name.toLowerCase() ? -1 : 1
+      })
+    },
+
+    getFileStreamInRepo(
+      username: string,
+      repoName: string,
+      filePathInRepo: string
+    ): fs.ReadStream {
+      const git = GitClient(repoName, username)
+      return fs.createReadStream(path.join(git.workingDir, filePathInRepo))
+    },
+
     async deleteLocalRepoDir(
       username: string,
       repoName: string
@@ -53,29 +100,29 @@ export default function GitHelpers(
       objectId: string,
       fileData: fs.ReadStream
     ): Promise<void> {
-      await this.checkAndCreateNewObjectVersionRepo(username, objectId)
+      await this.checkAndCreateRepo(username, objectId)
       const gitClient = GitClient(objectId, username)
       const object = await objects.getObjectAndBucket(objectId)
       await gitClient.overrideFileAndPush(object.name, fileData)
     },
 
-    async checkAndCreateNewObjectVersionRepo(
+    async checkAndCreateRepo(
       username: string,
-      objectId: string
+      repoOrObjectId: string
     ): Promise<void> {
-      if (await this.doesLocalRepoExist(username, objectId)) return
+      if (await this.doesLocalRepoExist(username, repoOrObjectId)) return
 
       // pull existing repo to client dir
-      const repo = await GitRepos(postgres).findBy({ repo: objectId })
+      const repo = await GitRepos(postgres).findBy({ repo: repoOrObjectId })
       if (repo) {
         await fileMgmt.checkAndCreateDirectoryOrFile(
-          path.join(clientRootDir, username, objectId)
+          path.join(clientRootDir, username, repoOrObjectId)
         )
-        await GitClient(objectId, username).pullRepo()
+        await GitClient(repoOrObjectId, username).pullRepo()
         return
       }
 
-      await this.createLocalRepoDir(username, objectId)
+      await this.createLocalRepoDir(username, repoOrObjectId)
     },
 
     async tarRepo(username: string, repoName: string): Promise<StringMap> {

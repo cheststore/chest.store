@@ -17,7 +17,7 @@ export default function ({ log, postgres, redis }) {
       async function FileDownload(req, res) {
         const session = SessionHandler(req.session)
         const allBucketIds = session.getAllBucketIds()
-        const allCredIds = session.getAllCredentialIds()
+        // const allCredIds = session.getAllCredentialIds()
         const userId = session.getLoggedInUserId()
         const objId = req.params[0]
 

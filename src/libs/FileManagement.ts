@@ -41,8 +41,11 @@ export default function FileManagement() {
       return await fs.promises.rename(sourcePath, destPath)
     },
 
-    async readDir(dirPath: string): Promise<string[]> {
-      return await readdirPromise(dirPath)
+    async readDir(
+      dirPath: string,
+      options: null | object = null
+    ): Promise<string[]> {
+      return await readdirPromise(dirPath, options)
     },
 
     async readDirRecursive(dirPath: string): Promise<string[]> {
@@ -115,6 +118,18 @@ export default function FileManagement() {
 
     async getFileInfo(filePath: string): Promise<fs.Stats> {
       return await fsStatPromise(filePath)
+    },
+
+    async getFileType(fullPath: string): Promise<string> {
+      try {
+        await fs.promises.access(fullPath)
+        return (
+          ((await fs.promises.lstat(fullPath)).isDirectory() && 'directory') ||
+          'file'
+        )
+      } catch (err) {
+        return 'file'
+      }
     },
 
     getFileName(

@@ -24,7 +24,7 @@ export async function sleep(timeoutMs = 1e3) {
 
 export function isImage(imageFile) {
   const splitName = imageFile.split('.')
-  return ['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg'].includes(
+  return ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg', 'webp'].includes(
     splitName[splitName.length - 1]
   )
 }
@@ -36,7 +36,7 @@ export async function checkFileAscii(fetchBlob) {
       return function(/*evt*/) {
         try {
           const fileContents = theReader.result
-          if (fileContents.match(/[^\u0000-\u007f]/)) return resolve(false)
+          // if (fileContents.match(/[^\u0000-\u007f]/)) return resolve(false)
           resolve(fileContents)
         } catch (err) {
           reject(err)
@@ -57,6 +57,7 @@ export var fileExtensionIconClasses = {
   docx: ['fa', 'fa-file-word'],
   gif: ['fa', 'fa-image'],
   gz: ['fa', 'fa-file-archive'],
+  ico: ['fa', 'fa-image'],
   img: ['fa', 'fa-image'],
   jpg: ['fa', 'fa-image'],
   jpeg: ['fa', 'fa-image'],
@@ -70,6 +71,7 @@ export var fileExtensionIconClasses = {
   ppt: ['fa', 'fa-file-powerpoint'],
   pptx: ['fa', 'fa-file-powerpoint'],
   tar: ['fa', 'fa-file-archive'],
+  webp: ['fa', 'fa-image'],
   wmv: ['fa', 'fa-file-video'],
   xls: ['fa', 'fa-file-excel'],
   xlsx: ['fa', 'fa-file-excel'],

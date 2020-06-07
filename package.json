@@ -2,7 +2,7 @@
   "name": "@cheststore/chest.store",
   "version": "0.0.1",
   "author": "Lance Whatley <whatl3y@gmail.com>",
-  "description": "Open-source, lightweight, and hackable cloud object explorer & git server",
+  "description": "Open-source, lightweight, and hackable single pane of glass cloud object explorer & git server",
   "engines": {
     "node": "14.3.0"
   },

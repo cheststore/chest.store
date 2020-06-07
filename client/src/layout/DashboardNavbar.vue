@@ -20,9 +20,11 @@
       <li class="nav-item dropdown">
         <base-dropdown class="nav-link pr-0" position="right">
           <div class="media align-items-center" slot="title">
-            <span class="avatar avatar-sm rounded-circle bg-warning">
+            <span class="avatar avatar-sm rounded-circle bg-yellow">
               <!-- <img alt="Image placeholder" src="img/theme/team-4-800x800.jpg"> -->
-              <div class="text-uppercase">{{ userName[0] }}</div>
+              <div class="text-uppercase text-primary">
+                <strong>{{ userName[0] }}</strong>
+              </div>
             </span>
             <div class="media-body ml-2 d-none d-lg-block">
               <span class="mb-0 text-sm  font-weight-bold">{{ userName }}</span>

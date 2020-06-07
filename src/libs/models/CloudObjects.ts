@@ -57,7 +57,7 @@ export default function CloudObjects(postgres: any) {
     },
 
     async getObjectsInBucket(
-      bucketId: any[],
+      bucketId: string[],
       directoryId: number | string | null = null,
       filters: null | StringMap,
       page: number = 1,

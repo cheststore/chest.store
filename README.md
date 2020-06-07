@@ -1,6 +1,6 @@
 # chest.store
 
-Open-source, lightweight, and hackable cloud file/object explorer
+Open-source, lightweight, and hackable single pane of glass cloud file/object explorer
 and git HTTP server. Integrations to several cloud providers
 are available with more being added (please open an issue if your provider
 of choice is not available yet). Object versioning happens
@@ -29,8 +29,8 @@ username and password via the CLI.
 ```sh
 $ git clone https://github.com/antirez/redis
 $ cd redis
-$ # `https://chest.store` below can be replaced with your server
-$ git remote add chest https://chest.store/git/$YOUR_USERNAME/redis
+$ # `https://app.chest.store` below can be replaced with your server
+$ git remote add chest https://app.chest.store/git/$YOUR_USERNAME/redis
 $ git push chest master
 $ # when prompted, enter your chest.store username and password to authenticate
 ```
@@ -45,7 +45,7 @@ bucket(s) you would like to integrate with chest.store. Without write access,
 chest.store can't save version histories when objects are updated either through
 the UI or by pushing updates through git.
 
-![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png)
+<!-- ![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png) -->
 
 #### Google Cloud Storage (GCS)
 

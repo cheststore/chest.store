@@ -1,5 +1,5 @@
 <template>
-  <div class="main-content bg-default">
+  <div class="main-content bg-yellow">
     <!-- Navbar -->
     <base-nav
       class="navbar-top navbar-horizontal navbar-dark"
@@ -84,10 +84,7 @@
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <polygon
-            class="fill-default"
-            points="2560 0 2560 100 0 100"
-          ></polygon>
+          <polygon class="fill-yellow" points="2560 0 2560 100 0 100"></polygon>
         </svg>
       </div>
     </div>
@@ -125,20 +122,12 @@
                   href="https://github.com/cheststore/chest.store"
                   class="nav-link"
                   target="_blank"
-                  >Github</a
-                >
+                  ><i class="fab fa-github"></i
+                ></a>
               </li>
               <!-- <li class="nav-item">
                                 <a href="http://blog.creative-tim.com" class="nav-link" target="_blank">Blog</a>
                             </li> -->
-              <li class="nav-item">
-                <a
-                  href="https://github.com/cheststore/chest.store/blob/master/LICENSE"
-                  class="nav-link"
-                  target="_blank"
-                  >MIT License</a
-                >
-              </li>
             </ul>
           </div>
         </div>

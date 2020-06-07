@@ -13,13 +13,16 @@
           label Email of service account
           div
             strong {{ savedCred.key }}
-        file-uploader(
-          v-else
-          size="sm"
-          url="/gcp/creds"
-          :remove-after-upload="true"
-          @added="createdCredential"
-          @error="errorCreatingCreds")
+        template(v-else)
+          select-credential.mt-2.mb-3(
+            type="gcp",
+            @input="selectExisting")
+          file-uploader(
+            size="sm"
+            url="/gcp/creds"
+            :remove-after-upload="true"
+            @added="createdCredential"
+            @error="errorCreatingCreds")
       template(v-if="savedCred")
         hr
         div.form-group
@@ -51,6 +54,12 @@
           type: 'danger',
           message: err.error || err.message,
         })
+      },
+
+      async selectExisting(cred) {
+        this.awsKey = cred.key
+        this.awsSecret = cred.secret
+        await this.checkAndSaveAwsKeys()
       },
 
       async createdCredential([, res]) {

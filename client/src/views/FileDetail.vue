@@ -1,51 +1,25 @@
 <template lang="pug">
   div
-    base-header.header.pb-7.pt-7(type="gradient-primary")
+    base-header.header.pb-7.pt-7(type="gradient-info")
       div.container
         div.row
-          div.col-lg-12.mb-4
-            div.mt-4.text-white {{ `${(currentBucket || {}).name}${directoryPath}` }}
-            div.display-4.text-white {{ file.name }}
+          div.col-lg-12.mb-4.mt-4
+            div.d-flex.align-items-center
+              div
+                span.avatar.bg-white.p-1.mr-2
+                  img(:src="$store.state.getBucket(file.bucket_id).img_icon_path")
+              div.row
+                div.col-lg-9.nowrap
+                  div.text-white.overflow-ellipses.begin.no-hover
+                    | {{ `${(currentBucket || {}).name}/${directoryPath}` }}
+                  div.display-4.text-white {{ file.name }}
 
         div.row
           div.col-lg-9
-            div.row
-              div.col-md-4.mb-1
-                stats-card(
-                  title="Object Size"
-                  type="gradient-orange"
-                  :sub-title="humanFileSize(file.size_bytes || 0)"
-                  icon="ni ni-box-2"
-                  class="mb-4")
-                  //- template(slot="footer")
-                  //-   span.text-success.mr-2
-                  //-     i.fa.fa-arrow-up
-                  //-     | 3.48%
-                  //-   span.text-nowrap Since last month
-              div.col-md-4.mb-1
-                stats-card(
-                  title="Versions"
-                  type="gradient-green"
-                  :sub-title="`${versionInfo.total}`"
-                  icon="ni ni-bullet-list-67"
-                  class="mb-4")
-                  //- template(slot="footer")
-                  //-   span.text-success.mr-2
-                  //-     i.fa.fa-arrow-up
-                  //-     | 3.48%
-                  //-   span.text-nowrap Since last month
-              div.col-md-4.mb-1
-                stats-card(
-                  title="Last Updated"
-                  type="gradient-default"
-                  :sub-title="getFormattedDate(file.last_modified, 'YYYY-MM-DD')"
-                  icon="ni ni-watch-time"
-                  class="text-nowrap mb-4")
-                  //- template(slot="footer")
-                  //-   span.text-success.mr-2
-                  //-     i.fa.fa-arrow-up
-                  //-     | 3.48%
-                  //-   span.text-nowrap Since last month
+            file-detail-stats(
+              :size-bytes="file.size_bytes"
+              :total-versions="versionInfo.total"
+              :last-modified="file.last_modified")
           div.col-lg-3
             router-link.mb-2.btn.btn-sm.btn-secondary.w-100.d-flex.align-items-center.justify-content-center(
               :to="currentDir ? `/directory/${currentDir.id}` : '/'")
@@ -76,39 +50,16 @@
               div.card.shadow
                 div.card-header
                   h4.m-0 {{ file.name }}
-                div.card-body.py-2.small.d-flex.justify-content-center.bg-secondary.border.border-success
+                div.card-body.py-2.small.d-flex.justify-content-center.bg-secondary.border
                   //- div.mb-2 Pull object and it's version history
-                  pre.m-0(v-highlightjs)
-                    code.sh
+                  pre.m-0
+                    code
                       | git clone {{ cloneUrl }}
                 div.card-body
                   div.row
-                    div.col
-                      div.d-flex.justify-content-center(v-if="isImage(file.full_path)")
-                        img.img-fluid.img-thumbnail(:src="`/file/download/${file.id}`")
-                      div.card(v-else-if="fileAsciiCache",v-highlightjs)
-                        div.card-header.py-2
-                          div.d-flex.align-items-center
-                            h5.m-0 Plain Text Preview
-                            div.ml-2
-                              base-button(
-                                type="primary",
-                                size="sm",
-                                @click="wrapPreview = !wrapPreview") {{ wrapPreview ? 'Unwrap' : 'Wrap' }} Text
-                        div.card-body.bg-secondary
-                          pre
-                            code.sh(:style="getPreviewStyle") {{ fileAsciiCache }}
-                      div(v-else-if="!pdfParseError")
-                        div.card
-                          div.card-body
-                            pdf-viewer(
-                              :src="`/file/download/${file.id}`",
-                              @error="setPdfParseError")
-                      div(v-else)
-                        base-alert.mb-0(type="warning")
-                          | This is a binary file that can't yet be displayed in the browser.
-                          | #[base-button(type="info",size="sm",@click="downloadObject()") Download Object] to
-                          | open it and review it's contents.
+                    preview-object.col(
+                      :object-id="file.id",
+                      :object-path="file.full_path")
                     //- div.col-lg-6.border-left
                     //-   div put something here
             div.col-lg-3.mb-4
@@ -148,11 +99,8 @@
 
 <script>
   import { mapState } from 'vuex'
-  import ApiCloudObjects from '../factories/ApiCloudObjects'
   import DomHelpers from '../factories/DomHelpers'
-  import StringHelpers from '../factories/StringHelpers'
   import TimeHelpers from '../factories/TimeHelpers'
-  import { isImage, checkFileAscii } from '../factories/Utilities'
 
   export default {
     props: {
@@ -168,9 +116,6 @@
     data() {
       return {
         isLoadingLocal: true,
-        fileAsciiCache: false,
-        wrapPreview: false,
-        pdfParseError: null,
       }
     },
 
@@ -192,35 +137,13 @@
         const pathInfo = this.file.full_path.split('/')
         return pathInfo.slice(0, pathInfo.length - 1).join('/')
       },
-
-      getPreviewStyle() {
-        return this.wrapPreview ? { whiteSpace: 'pre-wrap' } : ''
-      },
     },
 
     methods: {
       getFormattedDate: TimeHelpers.getFormattedDate,
-      humanFileSize: StringHelpers.humanFileSize,
-      isImage: isImage,
 
       downloadObject() {
         DomHelpers.downloadUri(`/file/download/${this.objectId}`)
-      },
-
-      setPdfParseError(err) {
-        this.pdfParseError = err
-        console.error('ERR', this.pdfParseError)
-      },
-
-      async checkAndCacheIsFileAscii(id = this.objectId) {
-        try {
-          if (this.fileAsciiCache) return
-          const fileBlob = await ApiCloudObjects.downloadObjectBlob(id)
-          return (this.fileAsciiCache = await checkFileAscii(fileBlob))
-        } catch (err) {
-          // console.error('error checking cache', err)
-          this.fileAsciiCache = false
-        }
       },
 
       async getObject(id = this.objectId) {
@@ -242,11 +165,7 @@
       },
 
       async init(id = this.objectId) {
-        this.fileAsciiCache = false
-        await Promise.all([
-          this.getObject(id),
-          this.checkAndCacheIsFileAscii(id),
-        ])
+        await this.getObject(id)
       },
     },
 

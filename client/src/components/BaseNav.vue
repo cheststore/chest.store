@@ -14,7 +14,12 @@
           class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
         >
           <!-- {{ $route.name }} -->
-          chest.store
+          <!-- chest.store -->
+          <img
+            style="max-width: 60px"
+            class="img-fluid"
+            src="/public/img/brand/cheststore-white-full.png"
+          />
         </router-link>
       </slot>
       <navbar-toggle-button

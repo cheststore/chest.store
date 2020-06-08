@@ -7,8 +7,7 @@
       expand
     >
       <router-link slot="brand" class="navbar-brand" to="/">
-        <!-- <img src="/public/img/brand/white.png"/> -->
-        <div>chest.store</div>
+        <img src="/public/img/brand/cheststore-white-full.png" />
       </router-link>
 
       <template v-slot="{ closeMenu }">
@@ -104,8 +103,11 @@
                 href="https://chest.store"
                 class="font-weight-bold ml-1"
                 target="_blank"
-                >chest.store</a
-              >
+                ><img
+                  style="max-width: 30px"
+                  class="img-fluid"
+                  src="/public/img/brand/cheststore-color-full.png"
+              /></a>
             </div>
           </div>
           <div class="col-xl-6">

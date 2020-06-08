@@ -24,12 +24,12 @@
       td {{ humanFileSize(row.size_bytes || 0) }}
       td {{ getFormattedDate(row.last_modified) }}
       td
-        base-dropdown.dropdown(position="right")
+        base-dropdown.dropdown(v-if="tableType !== 'git'",position="right")
           a(slot="title")
             i.fa.fa-ellipsis-h
           template
             a.dropdown-item(@click="downloadObject(row.id)") Download Object
-            a.dropdown-item(v-if="tableType !== 'git'",@click="deleteObject(row)") Delete Object
+            a.dropdown-item(@click="deleteObject(row)") Delete Object
 </template>
 
 <script>

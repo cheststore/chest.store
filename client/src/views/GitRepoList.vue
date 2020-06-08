@@ -15,12 +15,13 @@
       div.row
         div.col.mb-4
           div.card.shadow
-            div.card-header.border-0.d-block.d-lg-flex.align-items-center
-              div.col-lg-6
-                h3.mb-0.d-flex.align-items-center.nowrap
-                  bucket-repo-list-nav-tabs.mr-2
-                  div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
-                  div git repositories
+            div.card-header.border-0
+              div.row
+                div.col-lg-8
+                  h3.mb-0.d-flex.align-items-center.nowrap
+                    bucket-repo-list-nav-tabs.mr-2
+                    div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
+                    div git repositories
             div.card-header.py-2.border-top
               file-list-filters(@update="changePage(1)")
             div.card-body.py-2.d-flex.justify-content-end

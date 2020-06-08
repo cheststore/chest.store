@@ -15,28 +15,28 @@
       div.row
         div.col.mb-4
           div.card.shadow
-            div.card-header.border-0.d-block.d-lg-flex.align-items-center
-              div.col-lg-6
-                h3.mb-0.d-flex.align-items-center.nowrap
+            div.card-header.border-0
+              div.row
+                h3.col-lg-8.mb-0.d-flex.align-items-center.nowrap
                   bucket-repo-list-nav-tabs.mr-2
-                  div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
-                  div objects
-              div.ml-auto.d-flex.align-items-center
-                base-button(
-                  type="secondary",
-                  size="sm",
-                  @click="syncBucket()") Sync Entire Bucket
-                file-uploader(
-                  :dir="currentDirPath"
-                  :remove-after-upload="true"
-                  :btn-only="true"
-                  btn-size="sm"
-                  :btn-text="`Add File`"
-                  btn-variant="warning"
-                  @added="fileUploaded")
+                  div.overflow-ellipses.begin.no-hover.mr-1
+                    | {{ includeAllBuckets ? "All" : dirOrBucket }} objects
+                div.col-lg-4.d-flex.align-items-center.justify-content-end.nowrap
+                  base-button(
+                    type="secondary",
+                    size="sm",
+                    @click="syncBucket()") Sync Entire Bucket
+                  file-uploader(
+                    :dir="currentDirPath"
+                    :remove-after-upload="true"
+                    :btn-only="true"
+                    btn-size="sm"
+                    :btn-text="`Add File`"
+                    btn-variant="warning"
+                    @added="fileUploaded")
             div.card-header.py-2.border-top
               file-list-filters(@update="changePage(1)")
-            div.card-body.py-2.d-flex.justify-content-end
+            div.card-body.py-2.d-flex.justify-content-end(v-if="objectInfo.numberPages > 1")
               base-pagination.mb-0(
                 :total="objectInfo.totalCount"
                 :value="objectInfo.currentPage"

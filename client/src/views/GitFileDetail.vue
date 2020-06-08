@@ -18,7 +18,6 @@
             div.col
               file-detail-stats(
                 :size-bytes="file.file.stat.size"
-                total-versions="N/A"
                 :last-modified="file.file.stat.mtime")
       div.container.mt--7
         div.row
@@ -27,9 +26,19 @@
               div.col.mb-4
                 div.card.shadow
                   div.card-header.d-flex.align-items-center
-                    h4.m-0 {{ pathMatch }}
-                    div.ml-auto
-                      base-button.mb-2.w-100.d-flex.align-items-center.justify-content-center(
+                    h4.m-0.d-flex.align-items-center
+                      bucket-repo-list-nav-tabs.mr-2
+                      git-path-breadcrumbs(
+                        :repo-id="id",
+                        :repo-name="repo.repo",
+                        :path="pathMatch")
+                    div.ml-auto.d-flex.align-items-center.nowrap
+                      base-button.d-flex.align-items-center.mr-2(
+                        type="default",
+                        size="sm",
+                        @click="$router.push(`/repos`)")
+                        | #[i.fab.fa-git-alt.mr-2] Back to all git repos
+                      base-button.w-100.d-flex.align-items-center.justify-content-center(
                         type="info",
                         size="sm",
                         @click="downloadFile()")
@@ -64,6 +73,7 @@
     computed: {
       ...mapState({
         file: (state) => state.gitrepos.currentFile,
+        repo: (state) => state.gitrepos.currentRepo,
         username: (state) => state.session.user.username,
       }),
 

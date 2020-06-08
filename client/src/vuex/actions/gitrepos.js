@@ -20,8 +20,10 @@ export default {
     commit('SET_GITREPO_FILES', files)
   },
 
-  async getCurrentGitRepoFile({ commit }, { id, path }) {
-    commit('SET_GITREPO', { id })
+  async getCurrentGitRepoFile({ commit, state }, { id, path }) {
+    if (!state.gitrepos.currentRepo || state.gitrepos.currentRepo.id !== id)
+      commit('SET_GITREPO', { id })
+
     commit('SET_GITREPO_DIRPATH', path)
     const { file } = await ApiGitrepos.getFile(id, path)
     commit('SET_GITREPO_FILE', file)

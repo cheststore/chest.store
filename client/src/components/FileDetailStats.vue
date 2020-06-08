@@ -12,7 +12,7 @@
         //-     i.fa.fa-arrow-up
         //-     | 3.48%
         //-   span.text-nowrap Since last month
-    div.col-lg-4.mb-1
+    div.col-lg-4.mb-1(v-if="typeof totalVersions === 'number'")
       stats-card(
         title="Versions"
         type="gradient-green"

@@ -11,7 +11,8 @@
       //-           div.overflow-ellipses.begin.no-hover
       //-             strong {{ dirOrBucket }}
 
-    div.container.mt--7
+    loader(v-if="isLoadingLocal")
+    div.container.mt--7(v-else)
       div.row
         div.col.mb-4
           div.card.shadow
@@ -22,8 +23,17 @@
               //-   bucket-repo-list-nav-tabs.mr-2
               //-   div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
               //-   div objects
-            div.card-body.py-3.border-top
-              div breadcrumbs
+              div.ml-auto
+                base-button.d-flex.align-items-center(
+                  type="default",
+                  size="sm",
+                  @click="$router.push(`/repos`)")
+                  | #[i.fab.fa-git-alt.mr-2] Back to all git repos
+            div.card-body.py-3.border-top(v-if="pathMatch")
+              git-path-breadcrumbs(
+                :repo-id="id",
+                :repo-name="repo.repo",
+                :path="pathMatch")
             div.table-responsive.mb-0(style="overflow: visible;")
               table.table.tablesorter.align-items-center.table-flush
                 thead.thead-light
@@ -36,8 +46,7 @@
                   table-type="git"
                   :total-count="fileList.length"
                   :data="fileList"
-                  :row-link="fileLink"
-                  @download="downloadFile")
+                  :row-link="fileLink")
 </template>
 
 <script>
@@ -57,6 +66,12 @@
       async pathMatch() {
         await this.getRepoAndDirList()
       },
+    },
+
+    data() {
+      return {
+        isLoadingLocal: true,
+      }
     },
 
     computed: {
@@ -89,15 +104,15 @@
     },
 
     methods: {
-      async downloadFile() {
-        console.log('FILE', arguments)
-      },
-
       async getRepoAndDirList() {
-        await this.$store.dispatch('getCurrentGitRepoDir', {
-          id: this.id,
-          path: this.pathMatch,
-        })
+        try {
+          await this.$store.dispatch('getCurrentGitRepoDir', {
+            id: this.id,
+            path: this.pathMatch,
+          })
+        } finally {
+          this.isLoadingLocal = false
+        }
       },
     },
 

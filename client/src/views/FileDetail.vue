@@ -24,7 +24,7 @@
             router-link.mb-2.btn.btn-sm.btn-secondary.w-100.d-flex.align-items-center.justify-content-center(
               :to="currentDir ? `/directory/${currentDir.id}` : '/'")
               | #[i.ni.ni-bold-left.mr-2]
-              | Back to Object List View
+              | Back to Object Explorer
             file-uploader.mb-2(
               :dir="currentDir && currentDir.full_path"
               :object-id="objectId"

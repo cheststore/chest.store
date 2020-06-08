@@ -8,8 +8,11 @@
             href="https://chest.store"
             class=" text-primary font-weight-bold ml-1"
             target="_blank"
-            >chest.store</a
-          >
+            ><img
+              style="max-width: 30px"
+              class="img-fluid"
+              src="/public/img/brand/cheststore-black-full.png"
+          /></a>
         </div>
       </div>
       <div class="col-lg-6">

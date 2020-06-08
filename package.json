@@ -1,6 +1,7 @@
 {
   "name": "@cheststore/chest.store",
   "version": "0.0.1",
+  "license": "MIT",
   "author": "Lance Whatley <whatl3y@gmail.com>",
   "description": "Open-source, lightweight, and hackable single pane of glass cloud object explorer & git server",
   "engines": {
@@ -78,6 +79,5 @@
     "tar": "^6.0.2",
     "typescript": "^3.9.2",
     "uuid": "^8.0.0"
-  },
-  "license": "UNLICENSED"
+  }
 }

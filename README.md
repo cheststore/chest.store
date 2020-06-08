@@ -57,14 +57,11 @@ $ # when prompted, enter your chest.store username and password to authenticate
 2. Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 3. Create a new app in the heroku console and add a new remote for the app
    - `git remote add heroku $HEROKU_GIT_URL`
-4. Add Heroku Postgres and Rediscloud add-ons to the app (in Heroku console or via CLI)
+4. Add Heroku Postgres and rediscloud add-ons to the app (in Heroku console or via CLI). This is optional because the `heroky.yml` manifest also creates these
    - Populate the `DATABASE_URL` and `REDIS_URL` [Environment Variables](#Environment-Variables) in the heroku app with the URLs provided by the add-ons
-5. [Deploy the app to heroku](https://devcenter.heroku.com/articles/local-development-with-docker-compose#pushing-your-containers-to-heroku)
-   - `heroku container:push web`
-   - `git push heroku master`
-6. Run database migrations
-   - `heroku run --app $YOUR_HEROKU_APP npm run migrate`
-7. Make sure to run the `scheduler` and `worker` dynos as well, as they handle a number of background jobs required for chest.store to function as expected.
+5. [Deploy the app to heroku](https://devcenter.heroku.com/articles/build-docker-images-heroku-yml)
+   - `heroku container:push --recursive`
+   - `heroku container:release web worker scheduler`
 
 ### macOS
 

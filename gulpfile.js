@@ -34,7 +34,7 @@ gulp.task('txt', function () {
 
 gulp.task('start', function (done) {
   const stream = nodemon({
-    exec: 'npm start',
+    exec: 'npm run startPm2',
     ext: 'js ts',
     tasks: ['build'],
     watch: ['src/**/*.{js,ts}'],

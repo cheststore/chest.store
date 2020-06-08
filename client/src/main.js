@@ -4,6 +4,7 @@ import Vue from 'vue'
 // import $ from 'jquery'
 import 'bootstrap'
 import * as FastClick from 'fastclick'
+import VueLogger from 'vuejs-logger'
 import VueSocketIO from 'vue-socket.io'
 import store from './vuex/store'
 import Cheststore from './Cheststore'
@@ -20,6 +21,15 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'highlight.js/styles/agate.css'
 import './css/app.scss'
 
+Vue.use(VueLogger, {
+  isEnabled: true,
+  logLevel: !window.webpackHotUpdate ? 'error' : 'debug',
+  stringifyArguments: false,
+  showLogLevel: true,
+  showMethodName: true,
+  separator: '|',
+  showConsoleColors: true,
+})
 Vue.use(VueHighlightJS)
 Vue.use(
   new VueSocketIO({

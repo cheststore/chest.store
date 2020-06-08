@@ -8,15 +8,46 @@ services:
       - POSTGRES_DB=cheststore
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=cheststore
-  cheststore:
+  web:
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
       - 'postgres-server'
+      - 'redis-server'
     ports:
       - '8000:8000'
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:cheststore@postgres-server:5432/cheststore
+      - PORT=8000
+      - REDIS_URL=redis://redis-server:6379
+      - WAIT_HOSTS=postgres-server:5432, redis-server:6379
+  worker:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    depends_on:
+      - 'postgres-server'
+      - 'redis-server'
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:cheststore@postgres-server:5432/cheststore
+      - PORT=8000
+      - REDIS_URL=redis://redis-server:6379
+      - WAIT_HOSTS=postgres-server:5432, redis-server:6379
+  scheduler:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.scheduler
+    depends_on:
+      - 'postgres-server'
+      - 'redis-server'
     env_file:
       - .env
     environment:

@@ -3,10 +3,11 @@
 git config --global user.name chest.store
 git config --global user.email support@chest.store
 
-npm run migrate
-
-if "$NODE_ENV" == "production"; then
+if [ "$1" = "worker" ]; then
+  npm run worker
+elif [ "$1" = "scheduler" ]; then
+  npm run scheduler
+else # web
+  npm run migrate
   npm start
-else
-  npm run startDev
 fi

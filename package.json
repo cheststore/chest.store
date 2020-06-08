@@ -19,8 +19,8 @@
     "postinstall": "npm run build",
     "resqueRetry": "node dist/tasks/resque/retryFailedJobs",
     "scheduler": "node dist/bin/resqueScheduler",
-    "start": "pm2-runtime start ecosystem.config.js",
-    "startDev": "pm2-runtime start ecosystem.dev.config.js",
+    "start": "node dist/bin/app",
+    "startPm2": "pm2-runtime start ecosystem.config.js",
     "test": "NODE_ENV=test mocha --exit --require ./spec-babel-register.js --recursive './src/**/*.spec.js'",
     "worker": "node dist/bin/resqueWorker"
   },

@@ -92,7 +92,7 @@
           }
           return (this.objectAsciiCache = await checkFileAscii(fileBlob))
         } catch (err) {
-          // console.error('error checking cache', err)
+          this.$log.error('error setting cache', err)
           this.objectAsciiCache = false
         }
       },

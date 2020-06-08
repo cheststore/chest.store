@@ -2,7 +2,7 @@
   div
     div.d-flex.justify-content-center(v-if="isImage(objectPath)")
       img.img-fluid.img-thumbnail(:src="getDownloadLink")
-    div(v-else-if="!pdfParseError")
+    div(v-else-if="!pdfParseError && getObjectExtension === 'pdf'")
       div.card
         div.card-body
           pdf-viewer(
@@ -54,6 +54,11 @@
     computed: {
       getPreviewStyle() {
         return this.wrapPreview ? { whiteSpace: 'pre-wrap' } : ''
+      },
+
+      getObjectExtension() {
+        const pathSplit = (this.objectPath || '').split('.')
+        return pathSplit[pathSplit.length - 1]
       },
 
       getDownloadLink() {

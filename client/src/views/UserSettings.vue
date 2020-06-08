@@ -2,7 +2,7 @@
   div
     base-header.header.pb-8.pt-5.pt-lg-8.d-flex.align-items-center
       // Mask
-      span.mask.bg-gradient-success.opacity-8
+      span.mask.bg-gradient-yellow.opacity-8
       // Header container
       .container-fluid
         .row

@@ -29,6 +29,7 @@ import FileDetailStats from '../components/FileDetailStats'
 import FileListFilters from '../components/FileListFilters'
 import FileListTbody from '../components/FileListTbody'
 import FileUploader from '../components/FileUploader'
+import GitCloneUrl from '../components/GitCloneUrl'
 import GitPathBreadcrumbs from '../components/GitPathBreadcrumbs'
 import Loader from '../components/Loader'
 import LoaderInline from '../components/LoaderInline'
@@ -70,6 +71,7 @@ export default {
     Vue.component(FileListFilters.name, FileListFilters)
     Vue.component(FileListTbody.name, FileListTbody)
     Vue.component(FileUploader.name, FileUploader)
+    Vue.component(GitCloneUrl.name, GitCloneUrl)
     Vue.component(GitPathBreadcrumbs.name, GitPathBreadcrumbs)
     Vue.component(Loader.name, Loader)
     Vue.component(LoaderInline.name, LoaderInline)

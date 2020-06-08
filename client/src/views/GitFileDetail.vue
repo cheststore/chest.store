@@ -2,7 +2,7 @@
   div
     loader.col-12(v-if="isLoadingLocal")
     div(v-else)
-      base-header.header.pb-7.pt-7(type="gradient-warning")
+      base-header.header.pb-7.pt-7(type="gradient-success")
         div.container
           //- div.row
           //-   div.col-lg-12.mb-4.mt-4
@@ -43,6 +43,8 @@
                         size="sm",
                         @click="downloadFile()")
                         | #[i.ni.ni-cloud-download-95.mr-2] Download File
+                  //- div.card-body.p-0
+                  //-   git-clone-url.text-center(:repo-name="repo.repo")
                   div.card-body
                     div.row
                       preview-object.col(

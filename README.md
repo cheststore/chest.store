@@ -7,10 +7,10 @@ of choice is not available yet). Object versioning happens
 with git version control and any version history repo can
 easily be cloned and/or `git pull`ed to see complete object history.
 
-## Version history & built-in git HTTP server
+## Built-in git server
 
 chest.store has a built in git HTTP server that is used for object version history.
-Version histories are stored in a new `.chest.store` folder at the root of the
+Version histories are stored in a new `.chest.store` directory at the root of the
 buckets/directories you integrate with.
 
 As a bonus, the git server can be used like any other git remote
@@ -35,42 +35,6 @@ $ git push chest master
 $ # when prompted, enter your chest.store username and password to authenticate
 ```
 
-## Support for cloud storage providers (see [TODOS](#TODOS) for future possible integrations)
-
-#### Amazon Web Services (AWS) S3
-
-AWS S3 buckets can be integrated with a valid AWS access key and secret.
-For the best experience you will want AWS S3 full access IAM permissions to the
-bucket(s) you would like to integrate with chest.store. Without write access,
-chest.store can't save version histories when objects are updated either through
-the UI or by pushing updates through git.
-
-<!-- ![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png) -->
-
-#### Google Cloud Storage (GCS)
-
-In order to integrate with GCS buckets(s) you'll need to create a service account
-with appropriate read/write GCS permissions and download the JSON containing the
-key information about the service account. This JSON file will be uploaded to
-chest.store adding GCS as a provider.
-
-#### Dropbox
-
-Dropbox requires you to authenticate users (or yourself) via
-[OAuth 2.0](https://www.dropbox.com/developers/reference/oauth-guide).
-You will need to create a new app in the [developer portal](https://www.dropbox.com/developers/apps),
-configure it and the callback URL to be `$HOSTNAME/auth/dropbox/callback` where `$HOSTNAME` is the
-[HOSTNAME environment variable](#Environment-Variables) you have setup,
-update the `DROPBOX_APP_ID` and `DROPBOX_APP_SECRET` environment variables in your .env
-from this new app, and restart your chest.store server. At this point, Dropbox
-should be available to use as a provider in your chest.store instance.
-
-#### Local File System
-
-You can integrate a directory on your (or a docker container's)
-local file system to use as a "bucket" to manage files/objects
-from within chest.store.
-
 ## Install
 
 ### Docker (recommended)
@@ -87,7 +51,22 @@ from within chest.store.
    - 6.3. `npm install`
    - 6.4. `npm run serve`
 
-### Manual (macOS)
+### Heroku
+
+1. Clone chest.store (`git clone https://github.com/cheststore/chest.store`)
+2. Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
+3. Create a new app in the heroku console and add a new remote for the app
+   - `git remote add heroku $HEROKU_GIT_URL`
+4. Add Heroku Postgres and Rediscloud add-ons to the app (in Heroku console or via CLI)
+   - Populate the `DATABASE_URL` and `REDIS_URL` [Environment Variables](#Environment-Variables) in the heroku app with the URLs provided by the add-ons
+5. [Deploy the app to heroku](https://devcenter.heroku.com/articles/local-development-with-docker-compose#pushing-your-containers-to-heroku)
+   - `heroku container:push web`
+   - `git push heroku master`
+6. Run database migrations
+   - `heroku run --app $YOUR_HEROKU_APP npm run migrate`
+7. Make sure to run the `scheduler` and `worker` dynos as well, as they handle a number of background jobs required for chest.store to function as expected.
+
+### macOS
 
 1. Add entry to `/etc/hosts` to point to localhost for dev URL
    - `127.0.0.1 dev.chest.store`
@@ -160,6 +139,42 @@ REDIS_URL=redis://localhost:6379
 # for more details see: https://www.npmjs.com/package/express-session#secret
 SESSION_SECRET=[ANY SECRET VALUE]
 ```
+
+## Cloud Provider Support (see [TODOS](#TODOS) for future possible integrations)
+
+#### Amazon Web Services (AWS) S3
+
+AWS S3 buckets can be integrated with a valid AWS access key and secret.
+For the best experience you will want AWS S3 full access IAM permissions to the
+bucket(s) you would like to integrate with chest.store. Without write access,
+chest.store can't save version histories when objects are updated either through
+the UI or by pushing updates through git.
+
+<!-- ![AWS S3 Full Access](https://user-images.githubusercontent.com/13718950/82766574-37132400-9dee-11ea-9b8a-58087425c9a4.png) -->
+
+#### Google Cloud Storage (GCS)
+
+In order to integrate with GCS buckets(s) you'll need to create a service account
+with appropriate read/write GCS permissions and download the JSON containing the
+key information about the service account. This JSON file will be uploaded to
+chest.store adding GCS as a provider.
+
+#### Dropbox
+
+Dropbox requires you to authenticate users (or yourself) via
+[OAuth 2.0](https://www.dropbox.com/developers/reference/oauth-guide).
+You will need to create a new app in the [developer portal](https://www.dropbox.com/developers/apps),
+configure it and the callback URL to be `$HOSTNAME/auth/dropbox/callback` where `$HOSTNAME` is the
+[HOSTNAME environment variable](#Environment-Variables) you have setup,
+update the `DROPBOX_APP_ID` and `DROPBOX_APP_SECRET` environment variables in your .env
+from this new app, and restart your chest.store server. At this point, Dropbox
+should be available to use as a provider in your chest.store instance.
+
+#### Local File System
+
+You can integrate a directory on your (or a docker container's)
+local file system to use as a "bucket" to manage files/objects
+from within chest.store.
 
 ## Development
 

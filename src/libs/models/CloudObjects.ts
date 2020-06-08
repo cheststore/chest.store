@@ -92,8 +92,12 @@ export default function CloudObjects(postgres: any) {
       return await PostgresSqlParser().runPaginationQuery(
         postgres,
         `
-          select o.*
+          select
+            o.*,
+            b.type as bucket_type,
+            b.bucket_uid as bucket_uid
           from cloud_objects as o
+          inner join cloud_buckets as b on b.id = o.bucket_id
           where
             o.is_deleted is not true and
             ${filterClauses.join(' and ')}

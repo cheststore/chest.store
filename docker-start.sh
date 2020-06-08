@@ -5,4 +5,8 @@ git config --global user.email support@chest.store
 
 npm run migrate
 
-npm start
+if "$NODE_ENV" == "production"; then
+  npm start
+else
+  npm run startDev
+fi

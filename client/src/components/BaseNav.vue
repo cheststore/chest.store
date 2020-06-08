@@ -18,7 +18,7 @@
           <img
             style="max-width: 60px"
             class="img-fluid"
-            src="/public/img/brand/cheststore-white-full.png"
+            src="/public/img/brand/cheststore-color-full.png"
           />
         </router-link>
       </slot>

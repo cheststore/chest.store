@@ -43,9 +43,9 @@ export default function ({ log, postgres, redis }) {
         }
         res.json({ id: credId })
       } catch (err) {
-        res
-          .status(err.statusCode)
-          .json({ error: `${err.code} - ${err.message}` })
+        return res
+          .status(err.statusCode || 400)
+          .json({ error: `${err.code || 'N/A'} - ${err.message}` })
       }
     },
 
@@ -63,8 +63,14 @@ export default function ({ log, postgres, redis }) {
         apiSecret: cred.secret,
         extra: cred.extra,
       })
-      const buckets = await provider.listBuckets()
-      res.json(buckets)
+      try {
+        const buckets = await provider.listBuckets()
+        res.json(buckets)
+      } catch (err) {
+        return res
+          .status(err.statusCode || 400)
+          .json({ error: `${err.code || 'N/A'} - ${err.message}` })
+      }
     },
 
     async ['bucket/save'](req, res) {

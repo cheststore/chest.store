@@ -19,7 +19,14 @@ export default function ({ log, postgres, redis }) {
       const dir = CloudDirectories(postgres)
       const objects = CloudObjects(postgres)
       let allBucketIds = session.getAllBucketIds()
-      const { bucketId, directoryId, filters, page, perPage } = req.query
+      const {
+        bucketId,
+        allDirectories,
+        directoryId,
+        filters,
+        page,
+        perPage,
+      } = req.query
 
       if (bucketId) {
         if (allBucketIds.includes(bucketId))
@@ -27,13 +34,14 @@ export default function ({ log, postgres, redis }) {
       }
 
       const [info, directory, directories] = await Promise.all([
-        objects.getObjectsInBucket(
-          allBucketIds,
+        objects.getObjectsInBucket({
+          bucketId: allBucketIds,
+          allDirectories,
           directoryId,
-          JSON.parse(filters || 'null'),
+          filters: JSON.parse(filters || 'null'),
           page,
-          perPage
-        ),
+          perPage,
+        }),
         (async function getDir() {
           if (directoryId)
             return await dir.findBy({

@@ -20,7 +20,7 @@
               div
                 div {{ truncateString(row.name, 80) }}
                 div.text-light(style="font-size: 0.6rem;")
-                  | {{ truncateString(row.full_path, 60) }}
+                  | {{ $store.state.getBucket(row.bucket_id).name }}/{{ truncateString(row.full_path, 60) }}
       td {{ humanFileSize(row.size_bytes || 0) }}
       td {{ getFormattedDate(row.last_modified) }}
       td

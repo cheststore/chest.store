@@ -86,7 +86,10 @@ export default function WebServer(/*portToListenOn=config.server.port, shouldLis
             : next()
         )
 
-        app.use(function passIoToReq(req, res, next) {
+        app.use(function initCacheControlAndPassIoToReq(req, res, next) {
+          // initialize cache control to 0 (do not cache) and
+          // we can override in specific routes as needed
+          res.set('Cache-Control', `public, max-age=0`)
           req.cheststoreIo = io
           next()
         })

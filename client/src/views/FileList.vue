@@ -20,7 +20,7 @@
                 h3.col-lg-8.mb-0.d-flex.align-items-center.nowrap
                   bucket-repo-list-nav-tabs.mr-2
                   div.overflow-ellipses.begin.no-hover.mr-1
-                    | {{ includeAllBuckets ? "All" : dirOrBucket }} objects
+                    | {{ includeAllBuckets && allBuckets.length > 0 ? "All" : dirOrBucket }} objects
                 div.col-lg-4.d-flex.align-items-center.justify-content-end.nowrap
                   base-button(
                     type="secondary",
@@ -34,7 +34,11 @@
                     :btn-text="`Add File`"
                     btn-variant="warning"
                     @added="fileUploaded")
-            div.card-header.py-2.border-top
+            div.card-header.border-top
+              object-path-breadcrumbs(
+                :current-directory-id="'123'",
+                :path="dirOrBucket")
+            div.card-header.py-2
               file-list-filters(@update="changePage(1)")
             div.card-body.py-2.d-flex.justify-content-end(v-if="objectInfo.numberPages > 1")
               base-pagination.mb-0(
@@ -66,7 +70,8 @@
                             i.fa.fa-2x.fa-folder.mr-2(v-else)
                             div
                               div(:to="`/directory/${dir.id}`") {{ truncateString(dir.name || dir.full_path, 80) }}
-                              div.text-light(v-if="dir.name",style="font-size: 0.6rem") {{ truncateString(dir.full_path, 160) }}
+                              div.text-light(v-if="dir.name",style="font-size: 0.6rem")
+                                | {{ $store.state.getBucket(dir.bucket_id).name }}/{{ truncateString(dir.full_path, 160) }}
                 file-list-tbody(
                   :total-count="objectInfo.totalCount"
                   :data="objectInfo.data"
@@ -133,7 +138,7 @@
         currentParentDirId: (state) =>
           state.objects.currentDirectory &&
           state.objects.currentDirectory.parent_directory_id,
-        currentBucket: (state) => state.session.current_bucket,
+        currentBucket: (state) => state.session.current_bucket || {},
         includeAllBuckets: (state) => state.objects.includeAllBuckets,
         objectInfo: (state) => state.objects.currentList,
         searchQuery: (state) => state.objects.currentListFilters.searchQuery,
@@ -171,11 +176,12 @@
 
       dirOrBucket() {
         let bucketName = this.currentBucket.name
-        if (this.includeAllBuckets) bucketName = ``
+        if (this.includeAllBuckets && this.allBuckets.length > 1)
+          bucketName = ``
 
         return this.currentDir
           ? `${bucketName}/${this.currentDir.full_path}`
-          : `${bucketName}/`
+          : `${bucketName}`
       },
     },
 

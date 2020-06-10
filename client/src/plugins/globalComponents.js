@@ -33,6 +33,7 @@ import GitCloneUrl from '../components/GitCloneUrl'
 import GitPathBreadcrumbs from '../components/GitPathBreadcrumbs'
 import Loader from '../components/Loader'
 import LoaderInline from '../components/LoaderInline'
+import ObjectPathBreadcrumbs from '../components/ObjectPathBreadcrumbs'
 import PdfViewer from '../components/PdfViewer'
 import PreviewObject from '../components/PreviewObject'
 import SelectCredential from '../components/SelectCredential'
@@ -75,6 +76,7 @@ export default {
     Vue.component(GitPathBreadcrumbs.name, GitPathBreadcrumbs)
     Vue.component(Loader.name, Loader)
     Vue.component(LoaderInline.name, LoaderInline)
+    Vue.component(ObjectPathBreadcrumbs.name, ObjectPathBreadcrumbs)
     Vue.component(PdfViewer.name, PdfViewer)
     Vue.component(PreviewObject.name, PreviewObject)
     Vue.component(SelectCredential.name, SelectCredential)

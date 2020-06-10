@@ -8,10 +8,10 @@
               div
                 span.avatar.bg-white.p-1.mr-2
                   img(:src="$store.state.getBucket(file.bucket_id).img_icon_path")
-              div.row
+              div.row.w-100
                 div.col-lg-9.nowrap
                   div.text-white.overflow-ellipses.begin.no-hover
-                    | {{ `${(currentBucket || {}).name}/${directoryPath}` }}
+                    | {{ directoryPath ? `${currentBucket.name}/${directoryPath}` : currentBucket.name }}
                   div.display-4.text-white {{ file.name }}
 
         div.row

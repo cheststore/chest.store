@@ -95,6 +95,10 @@
 
 // https://github.com/wcoder/highlightjs-line-numbers.js
 // override for line numbers to add some padding
-.hljs-ln td {
-  padding-right: 1rem;
+.hljs {
+  .hljs-ln {
+    td {
+      padding-right: 1rem;
+    }
+  }
 }

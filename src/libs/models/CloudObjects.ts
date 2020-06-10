@@ -56,13 +56,14 @@ export default function CloudObjects(postgres: any) {
       return rows[0]
     },
 
-    async getObjectsInBucket(
-      bucketId: string[],
-      directoryId: number | string | null = null,
-      filters: null | StringMap,
-      page: number = 1,
-      perPage: number = 30
-    ): Promise<StringMap[]> {
+    async getObjectsInBucket({
+      bucketId,
+      allDirectories = false,
+      directoryId = null,
+      filters = null,
+      page = 1,
+      perPage = 30,
+    }: IGetObjectsParams): Promise<StringMap[]> {
       let filterClauses: string[] = [`bucket_id = ANY($1)`]
       let params: any[] = [bucketId]
 
@@ -75,6 +76,7 @@ export default function CloudObjects(postgres: any) {
           (bool, val) => bool || !!filters[val],
           false
         )
+
       if (filters && hasFilterPresent) {
         if (filters.searchQuery) {
           filterClauses.push(`o.name ilike '%' || $${params.length + 1} || '%'`)
@@ -84,7 +86,7 @@ export default function CloudObjects(postgres: any) {
         if (directoryId) {
           filterClauses.push(`directory_id = $${params.length + 1}`)
           params.push(directoryId)
-        } else {
+        } else if (!allDirectories) {
           filterClauses.push(`directory_id is null`)
         }
       }
@@ -109,4 +111,13 @@ export default function CloudObjects(postgres: any) {
       )
     },
   })
+}
+
+interface IGetObjectsParams {
+  bucketId: string[]
+  allDirectories: boolean
+  directoryId: number | string | null
+  filters: null | StringMap
+  page: number
+  perPage: number
 }

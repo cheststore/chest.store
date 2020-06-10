@@ -70,7 +70,7 @@
                     .col-lg-6
                       base-input(alternative='', label='Username', placeholder='Username', input-classes='form-control-alternative', v-model='userName')
                     .col-lg-6
-                      base-input(alternative='', label='Email address', placeholder='jesse@example.com', input-classes='form-control-alternative', v-model='userEmail')
+                      base-input(alternative='', label='Email address', placeholder='support@chest.store', input-classes='form-control-alternative', v-model='userEmail')
                   .row
                     .col-lg-6
                       base-input(alternative='', label='First name', placeholder='First name', input-classes='form-control-alternative', v-model='userFirstName')

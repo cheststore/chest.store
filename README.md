@@ -7,7 +7,7 @@ of choice is not available yet). Object versioning happens
 with git version control and any version history repo can
 easily be cloned and/or `git pull`ed to see complete object history.
 
-## Built-in git server
+## git server
 
 chest.store has a built in git HTTP server that is used for object version history.
 Version histories are stored in a new `.chest.store` directory at the root of the
@@ -37,7 +37,7 @@ $ # when prompted, enter your chest.store username and password to authenticate
 
 ## Install
 
-### Docker (recommended)
+### Docker Compose
 
 1. Make sure [Docker and Docker Compose](https://docs.docker.com/engine/install) are installed
 2. Clone chest.store (`git clone https://github.com/cheststore/chest.store`)
@@ -46,10 +46,9 @@ $ # when prompted, enter your chest.store username and password to authenticate
 5. `docker-compose up`
 6. Open the app in a browser (i.e. `http://localhost:8000`)
 7. Optional: If you're doing front-end dev and want to run the hot reloading webpack dev server:
-   - 6.1 Add an /etc/hosts entry for `127.0.0.1 dev.chest.store` and make sure the docker container is port forwarding to 8000 on your machine (the [webpack proxy config for the server](https://github.com/cheststore/chest.store/blob/master/client/vue.config.js#L12) assumes the server is listening on 8000)
-   - 6.2. In new terminal window/tab `cd [chest.store/]client`
-   - 6.3. `npm install`
-   - 6.4. `npm run serve`
+   - 7.1. In new terminal window/tab `cd [chest.store/]client`
+   - 6.2. `npm install`
+   - 6.3. `npm run dev`
 
 ### Heroku
 
@@ -57,10 +56,11 @@ $ # when prompted, enter your chest.store username and password to authenticate
 2. Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli#download-and-install)
 3. Create a new app in the heroku console and add a new remote for the app
    - `git remote add heroku $HEROKU_GIT_URL`
-4. Add Heroku Postgres and rediscloud add-ons to the app (in Heroku console or via CLI). This is optional because the `heroky.yml` manifest also creates these
+4. Add Heroku Postgres and Redis Cloud add-ons to the app (in Heroku console or via CLI). This is optional because the `heroky.yml` manifest also creates these
    - Populate the `DATABASE_URL` and `REDIS_URL` [Environment Variables](#Environment-Variables) in the heroku app with the URLs provided by the add-ons
-5. [Deploy the app to heroku](https://devcenter.heroku.com/articles/build-docker-images-heroku-yml)
-   - `heroku container:push --recursive`
+5. [Deploy the app to heroku](https://devcenter.heroku.com/articles/container-registry-and-runtime#building-and-pushing-image-s)
+   - `heroku container:push web`
+   - `heroku container:push --recursive` (all non-web Dockerfile.\*'s)
    - `heroku container:release web worker scheduler`
 
 ### macOS
@@ -137,7 +137,7 @@ REDIS_URL=redis://localhost:6379
 SESSION_SECRET=[ANY SECRET VALUE]
 ```
 
-## Cloud Provider Support (see [TODOS](#TODOS) for future possible integrations)
+## Cloud Storage Support (see [TODOS](#TODOS) for future possible integrations)
 
 #### Amazon Web Services (AWS) S3
 
@@ -196,12 +196,13 @@ required to create and use the new table.
   - webhook integration when objects are downloaded, uploaded, synced, new version, etc.
   - custom extensions on download, upload, etc.
 - Mobile app(s)
-- chest.store subscription service (would anyone pay for a cloud offering of this?)
 - Premium features
+  - chest.store subscription service (would anyone pay for a cloud offering of this?)
   - Object editing in-app (google or O365 integrations?)
+  - slackbot integration
   - Collaboration tools
     - Notes/comments, scheduling?
-  - Better git repo management
+  - Better git repo management (github-like features)
   - Teams/enterprise(y) features
   - Blockchain integration
     - Store SHA256 bit hash of file contents in blockchain txns for tamper-proofing

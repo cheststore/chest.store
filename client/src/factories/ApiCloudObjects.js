@@ -43,4 +43,11 @@ export default {
     })
     return await handleFetchResponse(response)
   },
+
+  async getDirectoryHierarchy(dirId) {
+    const response = await CheststoreFetch(
+      `/api/1.0/objects/directory/hierarchy?id=${dirId}`
+    )
+    return await handleFetchResponse(response)
+  },
 }

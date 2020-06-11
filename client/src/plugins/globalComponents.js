@@ -26,6 +26,7 @@ import Card from '../components/Card'
 import ConfirmationModal from '../components/ConfirmationModal'
 import ConfirmationPopover from '../components/ConfirmationPopover'
 import FileDetailStats from '../components/FileDetailStats'
+import FileLinkIcon from '../components/FileLinkIcon'
 import FileListFilters from '../components/FileListFilters'
 import FileListTbody from '../components/FileListTbody'
 import FileUploader from '../components/FileUploader'
@@ -69,6 +70,7 @@ export default {
     Vue.component(ConfirmationModal.name, ConfirmationModal)
     Vue.component(ConfirmationPopover.name, ConfirmationPopover)
     Vue.component(FileDetailStats.name, FileDetailStats)
+    Vue.component(FileLinkIcon.name, FileLinkIcon)
     Vue.component(FileListFilters.name, FileListFilters)
     Vue.component(FileListTbody.name, FileListTbody)
     Vue.component(FileUploader.name, FileUploader)

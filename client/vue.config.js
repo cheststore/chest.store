@@ -12,7 +12,7 @@ module.exports = {
     proxy: {
       ['/api']: { target: 'http://localhost:8000' },
       ['/auth/']: { target: 'http://localhost:8000' },
-      ['/file/download']: { target: 'http://localhost:8000' },
+      ['/download/']: { target: 'http://localhost:8000' },
       ['/gcp/']: { target: 'http://localhost:8000' },
       ['/git/']: { target: 'http://localhost:8000' },
       ['/logout']: { target: 'http://localhost:8000' },

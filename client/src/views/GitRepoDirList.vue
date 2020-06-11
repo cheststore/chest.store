@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    base-header.pb-6.pb-8.pt-5.pt-md-8(type="gradient-success")
+    base-header.pb-6.pb-8.pt-8(type="gradient-success")
       //- div.row
       //-   div.col-lg-12
       //-     h2.text-white.mb-0
@@ -36,7 +36,7 @@
                 :path="pathMatch")
             //- div.card-body.p-0
             //-   git-clone-url.text-center(:repo-name="repo.repo")
-            div.table-responsive.mb-0(style="overflow: visible;")
+            div.table-responsive.mb-0
               table.table.tablesorter.align-items-center.table-flush
                 thead.thead-light
                   tr

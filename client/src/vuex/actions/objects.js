@@ -1,16 +1,17 @@
 import ApiCloudObjects from '../../factories/ApiCloudObjects'
 
 export default {
-  async getObjectsList(
+  async SOCKET_getObjectsList(
     { commit, state },
-    { bucketId = null, directoryId = null }
+    { bucketId = null, directoryId = null } = {}
   ) {
     const {
       objectInfo,
       directory,
       directories,
     } = await ApiCloudObjects.listObjects(
-      bucketId,
+      bucketId ||
+        (state.objects.currentObject && state.objects.currentObject.id),
       directoryId,
       state.objects.currentListFilters,
       state.objects.currentList.currentPage,

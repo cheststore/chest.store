@@ -67,7 +67,7 @@
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-lg-5 col-md-6">
-              <h1 class="text-white">Authentication</h1>
+              <h1 class="text-white">Login</h1>
               <!-- <p class="text-lead text-white">Use these awesome forms to login or create new account in
                                 your project for free.</p> -->
             </div>
@@ -88,7 +88,7 @@
       </div>
     </div>
     <!-- Page content -->
-    <div class="container mt--8 pb-8">
+    <div class="container mt--6 pb-8">
       <slide-y-up-transition mode="out-in" origin="center top">
         <router-view></router-view>
       </slide-y-up-transition>

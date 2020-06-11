@@ -186,5 +186,16 @@ export default function ({ log, postgres, redis }) {
 
       res.json(true)
     },
+
+    async ['directory/hierarchy'](req, res) {
+      const session = SessionHandler(req.session)
+      const dirs = CloudDirectories(postgres)
+      const allBucketIds = session.getAllBucketIds()
+      // const userId = session.getLoggedInUserId()
+      const dirId = req.query.id
+
+      const directories = await dirs.getDirectoryHeierarchy(allBucketIds, dirId)
+      res.json({ directories })
+    },
   }
 }

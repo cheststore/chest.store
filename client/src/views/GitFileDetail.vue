@@ -25,24 +25,28 @@
             div.row
               div.col.mb-4
                 div.card.shadow
-                  div.card-header.d-flex.align-items-center
-                    h4.m-0.d-flex.align-items-center
-                      bucket-repo-list-nav-tabs.mr-2
-                      git-path-breadcrumbs(
-                        :repo-id="id",
-                        :repo-name="repo.repo",
-                        :path="pathMatch")
-                    div.ml-auto.d-flex.align-items-center.nowrap
-                      base-button.d-flex.align-items-center.mr-2(
-                        type="default",
-                        size="sm",
-                        @click="$router.push(`/repos`)")
-                        | #[i.fab.fa-git-alt.mr-2] Back to all git repos
-                      base-button.w-100.d-flex.align-items-center.justify-content-center(
-                        type="info",
-                        size="sm",
-                        @click="downloadFile()")
-                        | #[i.ni.ni-cloud-download-95.mr-2] Download File
+                  div.card-header
+                    div.row.small-gutters
+                      div.col-lg-7
+                        h4.m-0.d-flex.align-items-center
+                          bucket-repo-list-nav-tabs.mr-2
+                          git-path-breadcrumbs(
+                            :repo-id="id",
+                            :repo-name="repo.repo",
+                            :path="pathMatch")
+                      div.col-lg-5
+                        div.d-flex.align-items-center.justify-content-end.nowrap
+                          base-button.d-flex.align-items-center.mr-2(
+                            type="default",
+                            size="sm",
+                            @click="$router.push(`/repos`)")
+                            | #[i.fab.fa-git-alt.mr-2] Back to all git repos
+                          file-link-icon.mr-2(entity-table="git_repos",:entity-id="id",:path="pathMatch")
+                          base-button.d-flex.align-items-center.justify-content-center(
+                            type="info",
+                            size="sm",
+                            @click="downloadFile()")
+                            | #[i.ni.ni-cloud-download-95.mr-2] Download File
                   //- div.card-body.p-0
                   //-   git-clone-url.text-center(:repo-name="repo.repo")
                   div.card-body

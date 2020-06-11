@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    base-header.pb-6.pb-8.pt-5.pt-md-8(type="gradient-success")
+    base-header.pb-6.pb-8.pt-8(type="gradient-success")
       div.row
         div.col-lg-12
           h2.text-white.mb-0
@@ -22,15 +22,16 @@
                     bucket-repo-list-nav-tabs.mr-2
                     div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
                     div git repositories
-            div.card-header.py-2.border-top
-              file-list-filters(@update="changePage(1)")
+            //- TODO: support filter info in git repos list
+            //- div.card-header.py-2.border-top
+            //-   file-list-filters(@update="changePage(1)")
             div.card-body.py-2.d-flex.justify-content-end
               base-pagination.mb-0(
                 :total="gitrepoInfo.totalCount"
                 :value="gitrepoInfo.currentPage"
                 :perPage="gitrepoInfo.perPage"
                 @input="changePage")
-            div.table-responsive.mb-0(style="overflow: visible;")
+            div.table-responsive.mb-0
               table.table.tablesorter.align-items-center.table-flush
                 thead.thead-light
                   tr

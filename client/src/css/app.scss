@@ -67,6 +67,11 @@
 
 @import 'custom/vendors';
 
+a,
+.clickable {
+  cursor: pointer;
+}
+
 .nowrap {
   white-space: nowrap;
 }
@@ -100,5 +105,11 @@
     td {
       padding-right: 1rem;
     }
+  }
+}
+
+@media (min-width: 768px) {
+  .table-responsive {
+    overflow: visible;
   }
 }

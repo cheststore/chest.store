@@ -36,11 +36,13 @@
               btn-icon="ni ni-cloud-upload-96"
               btn-variant="default"
               @added="init()")
-            base-button.mb-2.w-100.d-flex.align-items-center.justify-content-center(
-              type="info",
-              size="sm",
-              @click="downloadObject()")
-              | #[i.ni.ni-cloud-download-95.mr-2] Download Object
+            div.d-flex.align-items-center.mb-2
+              file-link-icon.mr-2(entity-table="cloud_objects",:entity-id="objectId")
+              base-button.d-flex.align-items-center.justify-content-center.w-100(
+                type="info",
+                size="sm",
+                @click="downloadObject()")
+                | #[i.ni.ni-cloud-download-95.mr-2] Download Object
     div.container.mt--7
       div.row
         loader.col-12(v-if="isLoadingLocal")
@@ -50,6 +52,10 @@
               div.card.shadow
                 div.card-header
                   h4.m-0 {{ file.name }}
+                div.card-header.py-2
+                  object-path-breadcrumbs(
+                    :current-directory-id="file.directory_id",
+                    :path="`${currentBucket.name}/${file.full_path}`")
                 div.card-body.py-2.small.d-flex.justify-content-center.bg-secondary.border
                   //- div.mb-2 Pull object and it's version history
                   pre.m-0

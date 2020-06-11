@@ -37,7 +37,7 @@ Vue.use(
     connection: CheststoreSocket,
     vuex: {
       store,
-      // actionPrefix: '',
+      actionPrefix: 'SOCKET_',
       mutationPrefix: 'SOCKET_',
     },
   })

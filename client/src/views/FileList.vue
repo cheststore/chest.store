@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    base-header.pb-6.pb-8.pt-5.pt-md-8(type="gradient-info")
+    base-header.pb-6.pb-8.pt-8(type="gradient-info")
       div.row
         div.col-lg-12
           h2.text-white.mb-0
@@ -34,9 +34,9 @@
                     :btn-text="`Add File`"
                     btn-variant="warning"
                     @added="fileUploaded")
-            div.card-header.border-top
+            div.card-header.border-top.py-2(v-if="dirOrBucket")
               object-path-breadcrumbs(
-                :current-directory-id="'123'",
+                :current-directory-id="directoryId",
                 :path="dirOrBucket")
             div.card-header.py-2
               file-list-filters(@update="changePage(1)")
@@ -46,7 +46,7 @@
                 :value="objectInfo.currentPage"
                 :perPage="objectInfo.perPage"
                 @input="changePage")
-            div.table-responsive.mb-0(style="overflow: visible;")
+            div.table-responsive.mb-0
               table.table.tablesorter.align-items-center.table-flush
                 thead.thead-light
                   tr
@@ -147,11 +147,11 @@
         directories(state) {
           return this.directoryId != null
             ? [
-                {
-                  back: true,
-                  full_path: 'up one folder',
-                  id: this.currentParentDirId || '',
-                },
+                // {
+                //   back: true,
+                //   full_path: 'up one folder',
+                //   id: this.currentParentDirId || '',
+                // },
               ].concat(state.objects.directories)
             : state.objects.directories
         },
@@ -227,7 +227,7 @@
       },
 
       async getObjectList() {
-        await this.$store.dispatch('getObjectsList', {
+        await this.$store.dispatch('SOCKET_getObjectsList', {
           bucketId: this.currentBucketId,
           directoryId: this.directoryId,
         })

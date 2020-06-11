@@ -46,8 +46,7 @@ export default function ({
       }
 
       log.debug(`socket/update/clients data sending`, bucketId, data)
-
-      io.to(`bucket_${bucketId}`).emit('SET_BUCKET_OBJECT_LIST', data)
+      io.to(`bucket_${bucketId}`).emit('getObjectsList')
       res.json(true)
     },
   }

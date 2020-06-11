@@ -6,29 +6,58 @@
 </template>
 
 <script>
+  import ApiCloudObjects from '../factories/ApiCloudObjects'
+
   export default {
     name: 'object-path-breadcrumbs',
 
     props: {
-      currentDirectoryId: { type: String, required: true },
+      currentDirectoryId: { type: String, default: null },
       path: { type: String, default: null },
+    },
+
+    watch: {
+      async currentDirectoryId() {
+        await this.getHierarchy()
+      },
+    },
+
+    data() {
+      return {
+        directories: [],
+      }
     },
 
     computed: {
       crumbs() {
         const pathAry = this.path.split('/').filter((p) => !!p)
-        return pathAry.map((part /*, ind*/) => {
+        return pathAry.map((part, ind) => {
+          const dir = this.directories.find((d) => d.cname === part)
           return {
             text: part,
-            link: '/bucket',
-            //   ind === pathAry.length - 1
-            //     ? '/bucket'
-            //     : `/directory/${this.bucketId}/${pathAry
-            //         .slice(1, ind + 1)
-            //         .join('/')}`,
+            link: ind === 0 || !dir ? '/bucket' : `/directory/${dir.cid}`,
           }
         })
       },
+    },
+
+    methods: {
+      async getHierarchy() {
+        try {
+          if (this.currentDirectoryId) {
+            const { directories } = await ApiCloudObjects.getDirectoryHierarchy(
+              this.currentDirectoryId
+            )
+            this.directories = directories.reverse()
+          }
+        } catch (err) {
+          this.$notify({ type: 'danger', message: err.message })
+        }
+      },
+    },
+
+    async created() {
+      await this.getHierarchy()
     },
   }
 </script>

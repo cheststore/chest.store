@@ -2,7 +2,7 @@
 const DatabaseModel = require('./DatabaseModel').default
 const CloudObjects = require('./CloudObjects').default
 
-export default function CloudDirectories(postgres: object) {
+export default function CloudDirectories(postgres: any) {
   const factoryToExtend: IModel = DatabaseModel(postgres, 'cloud_directories')
 
   return Object.assign(factoryToExtend, {
@@ -87,6 +87,44 @@ export default function CloudDirectories(postgres: object) {
         info.push({ type: 'directory', id: dir.record.id })
       }
       return info
+    },
+
+    async getDirectoryHeierarchy(
+      bucketId: string,
+      bottomMostDirectoryId: string
+    ) {
+      // cid: child dir id
+      // cname: child dir name
+      // pid: parent dir id
+      const { rows } = await postgres.query(
+        `
+          WITH RECURSIVE chain(cid, cname, cfull_path, pid) AS (
+            select
+              o1.id as cid,
+              o1.name as cname,
+              o1.full_path as cfull_path,
+              o1.parent_directory_id as pid
+            from cloud_directories as o1
+            where
+              o1.bucket_id = ANY($1) and
+              o1.id = $2
+
+            UNION
+
+            select
+              o2.id as cid,
+              o2.name as cname,
+              o2.full_path as cfull_path,
+              o2.parent_directory_id as pid
+            from cloud_directories as o2, chain o1
+            where o2.id = o1.pid
+          )
+          select * from chain
+          order by pid, cid;
+        `,
+        [bucketId, bottomMostDirectoryId]
+      )
+      return rows
     },
   })
 }

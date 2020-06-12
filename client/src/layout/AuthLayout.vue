@@ -4,6 +4,7 @@
     <base-nav
       class="navbar-top navbar-horizontal navbar-dark"
       containerClasses="px-4 container"
+      :show-toggle-button="false"
       expand
     >
       <router-link slot="brand" class="navbar-brand" to="/">

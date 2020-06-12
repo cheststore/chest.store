@@ -8,7 +8,7 @@ export default {
   isLoading: true,
   isLoggedIn: false,
   isInitProcessing: false,
-  mainNotification: null,
+  mainBanner: null,
   oauthBindings: null,
   pageSizes: [10, 15, 20, 25, 50, 100],
 

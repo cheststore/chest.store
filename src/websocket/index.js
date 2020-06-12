@@ -2,6 +2,7 @@ import axios from 'axios'
 import App from './App'
 import Global from './Global'
 import SessionHandler from '../libs/SessionHandler'
+import AppBanners from '../libs/models/AppBanners'
 import config from '../config'
 
 export default async function WebSocket({ io, log, postgres, redis }) {
@@ -62,6 +63,8 @@ export default async function WebSocket({ io, log, postgres, redis }) {
         ])
       )
     }
+
+    await getAndSendAnyMainBanners(postgres, socket)
 
     // await app.globalLock(true)
   })
@@ -166,4 +169,14 @@ export async function disconnectSocket(app, io, socket, retries = 0) {
   }
 
   // await app.globalLock(true)
+}
+
+async function getAndSendAnyMainBanners(postgres, socket) {
+  const [banner] = await AppBanners(postgres).getAllBy(
+    { is_active: true },
+    null,
+    `order by priority asc, created_at desc`
+  )
+
+  if (banner) socket.emit('SET_MAIN_BANNER', banner.banner_html)
 }

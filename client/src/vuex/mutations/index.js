@@ -44,7 +44,7 @@ export default {
     state.providerTypes = types
   },
 
-  SOCKET_SET_MAIN_NOTIFICATION(state, notification) {
-    state.mainNotification = notification
+  SOCKET_SET_MAIN_BANNER(state, banner) {
+    state.mainBanner = banner
   },
 }

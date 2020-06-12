@@ -1,5 +1,11 @@
 <template>
   <div id="app">
+    <base-alert
+      v-if="mainBanner"
+      class="m-0 py-2 rounded-0 text-center"
+      type="danger"
+      v-html="mainBanner"
+    ></base-alert>
     <notifications></notifications>
     <loader v-if="isLoading"></loader>
     <router-view v-else />
@@ -15,7 +21,7 @@
 
     computed: mapState({
       isLoading: (state) => state.isLoading,
-      mainNotification: (state) => state.mainNotification,
+      mainBanner: (state) => state.mainBanner,
       user: (state) => state.session.user,
     }),
 

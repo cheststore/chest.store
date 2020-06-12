@@ -8,11 +8,8 @@
             href="https://chest.store"
             class=" text-primary font-weight-bold ml-1"
             target="_blank"
-            ><img
-              style="max-width: 30px"
-              class="img-fluid"
-              src="/public/img/brand/cheststore-black-full.png"
-          /></a>
+            >chest.store</a
+          >
         </div>
       </div>
       <div class="col-lg-6">
@@ -35,8 +32,11 @@
         >
           <li class="nav-item">
             <a href="https://chest.store" class="nav-link" target="_blank"
-              >chest.store</a
-            >
+              ><img
+                style="max-width: 30px"
+                class="img-fluid"
+                src="/public/img/brand/cheststore-black-full.png"
+            /></a>
           </li>
           <li class="nav-item">
             <a

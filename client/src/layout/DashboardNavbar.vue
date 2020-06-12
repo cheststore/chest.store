@@ -1,8 +1,9 @@
 <template>
   <base-nav
+    containerClasses="px-4 container-fluid"
     class="navbar-top navbar-dark"
     id="navbar-main"
-    :show-toggle-button="false"
+    :show-toggle-button="true"
     expand
   >
     <!-- <form
@@ -16,9 +17,9 @@
                 </base-input>
             </div>
     </form> -->
-    <ul class="navbar-nav align-items-center ml-auto d-none d-md-flex">
-      <li class="nav-item dropdown">
-        <base-dropdown class="nav-link pr-0" position="right">
+    <ul class="navbar-nav align-items-center ml-auto d-block d-md-flex">
+      <li class="nav-item dropdown w-100">
+        <base-dropdown class="nav-link w-100 pr-0" position="right">
           <div class="media align-items-center" slot="title">
             <span class="avatar avatar-sm rounded-circle bg-yellow">
               <!-- <img alt="Image placeholder" src="img/theme/team-4-800x800.jpg"> -->
@@ -26,7 +27,7 @@
                 <strong>{{ userName[0] }}</strong>
               </div>
             </span>
-            <div class="media-body ml-2 d-none d-lg-block">
+            <div class="media-body ml-2 d-block">
               <span class="mb-0 text-sm  font-weight-bold">{{ userName }}</span>
             </div>
           </div>
@@ -62,6 +63,7 @@
     </ul>
   </base-nav>
 </template>
+
 <script>
   import { mapState } from 'vuex'
 

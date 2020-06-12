@@ -1,6 +1,6 @@
 <template lang="pug">
   div
-    base-header.header.pb-8.pt-5.pt-lg-8.d-flex.align-items-center
+    base-header.header.pb-8.pt-8.d-flex.align-items-center
       // Mask
       span.mask.bg-gradient-yellow.opacity-8
       // Header container
@@ -82,7 +82,7 @@
                 hr.my-4
                 // Providers
                 h6.heading-small.text-muted.mb-4 Your Buckets
-                div.row
+                div.row.pl-lg-4
                   div.col-lg-12
                     div.card.shadow
                       div.card-header.py-2.d-flex.align-items-center
@@ -115,15 +115,19 @@
                                 div.ml-auto.text-light
                                   div.ml-2 {{ getProviderType(row.type).text }}
                 hr.my-4
-                h6.heading-small.text-muted.mb-4
+                h6.heading-small.text-muted.mb-2
                   | API Key
-                div.pl-lg-4
-                  div.row
-                    div.col-lg-12.text-center #[strong {{ userApiKey }}]
-                //- .pl-lg-4
-                //-   .form-group
-                //-     base-input(alternative='', label='About Me')
-                //-       textarea.form-control.form-control-alternative(rows='4', placeholder='A few words about you ...') A beautiful Dashboard for Bootstrap 4. It is Free and Open Source.
+                .pl-lg-4
+                  div.small.mb-4
+                    | This can be configured and used in the <a href="https://github.com/cheststore/cli" target="_blank" rel="noopener noreferrer">CLI</a>
+                    | in addition to when making API requests to chest.store.
+                  div
+                    div.row
+                      div.col-lg-12.text-center #[strong {{ userApiKey }}]
+                  //- .pl-lg-4
+                  //-   .form-group
+                  //-     base-input(alternative='', label='About Me')
+                  //-       textarea.form-control.form-control-alternative(rows='4', placeholder='A few words about you ...') A beautiful Dashboard for Bootstrap 4. It is Free and Open Source.
 
     add-provider-modal(
       :show="showAddProviderModal"

@@ -158,10 +158,9 @@ describe('DatabaseModel', () => {
 
       users.setRecord({ username: 'test3@acme.com' }, true)
       const newId = await users.save()
-      const id = parseInt(newId)
 
-      assert.equal('number', typeof id)
-      assert.equal(false, isNaN(id))
+      assert.equal('string', typeof newId)
+      assert.equal(true, newId.length > 10)
       assert.equal(true, afterGotCalled)
     })
   })

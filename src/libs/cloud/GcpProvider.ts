@@ -4,7 +4,6 @@ import {
   Storage,
   StorageOptions,
   GetFilesResponse,
-  GetFileOptions,
   GetFileResponse,
 } from '@google-cloud/storage'
 import { ICloudFactoryOptions, ICloudObject, ICloudProvider } from './Providers'
@@ -39,12 +38,15 @@ export default function GcpProvider({
     async listObjectsRecursive(
       bucket: string,
       setCallback: (set: ICloudObject[]) => Promise<void>,
-      nextPageToken?: GetFileOptions | undefined
+      nextPageToken?: string,
+      prefix?: string
     ): Promise<void> {
+      // https://googleapis.dev/nodejs/storage/latest/Bucket.html#getFiles
       const bucketInst = storage.bucket(bucket)
-      const [files, nextQuery]: GetFilesResponse = await bucketInst.getFiles(
-        nextPageToken
-      )
+      const [files, nextQuery]: GetFilesResponse = await bucketInst.getFiles({
+        directory: prefix,
+        pageToken: nextPageToken,
+      })
 
       const cloudObjects: ICloudObject[] = files.map((obj: File) => {
         // const md = obj.metadata

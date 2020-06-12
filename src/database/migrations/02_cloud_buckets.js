@@ -6,6 +6,7 @@ export default [
         credential_id uuid REFERENCES cloud_credentials,
         type varchar(20), -- 'aws', 'gcp', etc.
         bucket_uid varchar(255) NOT NULL,
+        prefix varchar(255),
         name varchar(255),
         description text,
         created_at timestamptz NOT NULL DEFAULT now(),

@@ -89,7 +89,9 @@ export default function ProviderWorkers({
         } else {
           await providers.listObjectsRecursive(
             bucket.bucket_uid,
-            processObjects
+            processObjects,
+            null,
+            bucket.prefix
           )
         }
 

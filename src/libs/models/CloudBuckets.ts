@@ -8,6 +8,7 @@ export default function CloudBuckets(postgres: any) {
       'credential_id',
       'type',
       'bucket_uid',
+      'prefix',
       'name',
       'description',
     ],

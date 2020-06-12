@@ -27,8 +27,19 @@
         hr
         div.form-group
           label(for="all-gcp-buckets") Select Bucket
-          select#all-gcp-buckets.form-control(v-model="selectedBucketName",@change="selectBucket")
+          select#all-gcp-buckets.form-control(v-model="selectedBucketName")
             option(v-for="bucket in buckets",:value="bucket.id") {{ bucket.name }}
+        template(v-if="selectedBucketName")
+            div.form-group
+              label Subdirectory to filter files #[i.fa.fa-info-circle(:id="`aws-prov-prefix-${_uid}`")]
+              b-tooltip(:target="`aws-prov-prefix-${_uid}`")
+                | If you would like to sync objects from a bucket but only a particular subdirectory
+                | inside the bucket, you can enter a prefix here and we'll only sync objects in
+                | this subdirectory and all child directories.
+                | <strong>NOTE: Be careful about including leading slashes as this is treated differently than a prefix without the leading slash.</strong>
+              input.form-control(
+                placeholder="Bucket directory prefix (i.e. 'example/dir')...",
+                v-model="selectBucketPrefix")
 
 </template>
 
@@ -44,6 +55,7 @@
 
         buckets: [],
         selectedBucketName: null,
+        selectBucketPrefix: null,
         savedCred: null,
       }
     },
@@ -77,7 +89,8 @@
 
           await ApiProviders.saveBucket(
             this.selectedBucketName,
-            this.savedCred.id
+            this.savedCred.id,
+            this.selectBucketPrefix
           )
           await this.$store.dispatch('getUserSession', true)
           this.$emit('created')

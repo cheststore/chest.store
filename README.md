@@ -186,24 +186,25 @@ required to create and use the new table.
 
 ## TODOS
 
+- Test coverage
 - More provider integrations
   - MS OneDrive
   - Wasabi
   - MinIO
   - DigitalOcean
   - more?
-- Hooks
-  - webhook integration when objects are downloaded, uploaded, synced, new version, etc.
-  - custom extensions on download, upload, etc.
-- Mobile app(s)
 - Premium features
+  - Teams/orgs/enterprise(y) features
   - chest.store subscription service (would anyone pay for a cloud offering of this?)
   - Object editing in-app (google or O365 integrations?)
-  - slackbot integration
   - Collaboration tools
     - Notes/comments, scheduling?
   - Better git repo management (github-like features)
-  - Teams/enterprise(y) features
   - Blockchain integration
     - Store SHA256 bit hash of file contents in blockchain txns for tamper-proofing
     - Could be used by/for legal services or compliance auditors for proof object(s) haven't changed/been tampered with
+- Hooks
+  - webhook integration when objects are downloaded, uploaded, synced, new version, etc.
+  - custom extensions on download, upload, etc.
+- Slackbot
+- Mobile app(s)

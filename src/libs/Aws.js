@@ -89,12 +89,18 @@ export default function Aws({
         })
       },
 
-      async listFilesRecursive(bucket, setCallback, nextPageToken = null) {
+      async listFilesRecursive(
+        bucket,
+        setCallback,
+        nextPageToken = null,
+        prefix = null
+      ) {
         return await new Promise((resolve, reject) => {
           const params = {
             Bucket: bucket,
             MaxKeys: 1000,
             ContinuationToken: nextPageToken,
+            Prefix: prefix,
           }
           this._s3.listObjectsV2(params, async (err, data) => {
             try {
@@ -107,7 +113,8 @@ export default function Aws({
                 await this.listFilesRecursive(
                   bucket,
                   setCallback,
-                  data.NextContinuationToken
+                  data.NextContinuationToken,
+                  prefix
                 )
 
               resolve()

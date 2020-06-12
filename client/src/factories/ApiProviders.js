@@ -40,11 +40,11 @@ export default {
     return await handleFetchResponse(response)
   },
 
-  async saveBucket(bucketName, credentialId) {
+  async saveBucket(bucket, credentialId, prefix = null) {
     const response = await CheststoreFetch(`/api/1.0/providers/bucket/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credentialId, bucket: bucketName }),
+      body: JSON.stringify({ credentialId, bucket, prefix }),
     })
     return await handleFetchResponse(response)
   },

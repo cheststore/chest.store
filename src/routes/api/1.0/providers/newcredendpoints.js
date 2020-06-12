@@ -81,7 +81,7 @@ export default function ({ log, postgres, redis }) {
       // const credId = session.getLoggedInCredentialId()
       const user = session.getLoggedInUserId(true)
       const credId = req.body.credentialId
-      const bucket = req.body.bucket
+      const { bucket, prefix } = req.body
 
       const cred = await CloudCredentials(postgres).find(credId)
 
@@ -92,8 +92,9 @@ export default function ({ log, postgres, redis }) {
 
       await buckets.findOrCreateBy({ type: cred.type, bucket_uid: bucket })
       buckets.setRecord({
-        name: buckets.record.name || bucket,
         credential_id: credId,
+        name: buckets.record.name || bucket,
+        prefix: typeof prefix !== 'undefined' ? prefix : buckets.record.prefix,
       })
 
       await Promise.all([

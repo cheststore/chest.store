@@ -30,7 +30,8 @@ export default function AwsProvider({
     async listObjectsRecursive(
       bucket: string,
       setCallback: (set: ICloudObject[]) => Promise<void>,
-      nextPageToken?: string
+      nextPageToken?: string,
+      prefix?: string
     ): Promise<void> {
       await aws.S3.listFilesRecursive(
         bucket,
@@ -50,7 +51,8 @@ export default function AwsProvider({
           })
           await setCallback(cloudObjects)
         },
-        nextPageToken
+        nextPageToken,
+        prefix
       )
     },
 

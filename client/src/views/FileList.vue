@@ -22,6 +22,11 @@
                   div.overflow-ellipses.begin.no-hover.mr-1
                     | {{ includeAllBuckets && allBuckets.length > 0 ? "All" : dirOrBucket }} objects
                 div.col-lg-4.d-flex.align-items-center.justify-content-end.nowrap
+                  base-button#refresh-file-list(
+                    type="default",
+                    size="sm",
+                    @click="changePage()") #[i.fa.fa-refresh]
+                    b-tooltip(target="#refresh-file-list") Refresh object list
                   base-button(
                     type="secondary",
                     size="sm",
@@ -215,7 +220,7 @@
         }
       },
 
-      async changePage(newPage) {
+      async changePage(newPage = this.objectInfo.currentPage) {
         this.$store.commit('SET_BUCKET_OBJECT_LIST_PAGE', newPage)
         await this.objectListUpdate()
       },

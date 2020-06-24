@@ -1,6 +1,6 @@
 <template lang="pug">
   div.row
-    div.col-lg-7.d-flex.align-items-center.border-right(v-if="allBuckets && allBuckets.length > 0")
+    div.d-flex.align-items-center.border-right(v-if="allBuckets && allBuckets.length > 0",:class="search ? 'col-lg-7' : 'col-12'")
       select-dropdown-filter(
         v-model="currentBucketId",
         :class="currentBucketId && 'filter-active'",
@@ -17,7 +17,7 @@
       //- select#current-bucket.form-control.form-control-sm(v-model="currentBucketId")
       //-   option(v-for="bucket in allBuckets",:value="bucket.id")
       //-     | {{ bucket.name }} ({{ getProviderType(bucket.type).text || 'N/A' }})
-    div.col
+    div.col(v-if="search")
       base-input.m-0(
         v-model="searchQuery"
         label-classes="mb-0"
@@ -31,6 +31,10 @@
 
   export default {
     name: 'file-list-filters',
+
+    props: {
+      search: { type: Boolean, default: false },
+    },
 
     data() {
       return {

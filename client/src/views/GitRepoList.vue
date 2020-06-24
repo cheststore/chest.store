@@ -22,10 +22,9 @@
                     bucket-repo-list-nav-tabs.mr-2
                     div.overflow-ellipses.begin.no-hover.mr-1 {{ includeAllBuckets ? "All" : dirOrBucket }}
                     div git repositories
-            //- TODO: support filter info in git repos list
-            //- div.card-header.py-2.border-top
-            //-   file-list-filters(@update="changePage(1)")
-            div.card-body.py-2.d-flex.justify-content-end
+            div.card-header.py-2.border-top
+              file-list-filters(:search="false",@update="changePage(1)")
+            div.card-body.py-2.d-flex.justify-content-end(v-if="gitrepoInfo.numberPages > 1")
               base-pagination.mb-0(
                 :total="gitrepoInfo.totalCount"
                 :value="gitrepoInfo.currentPage"

@@ -1,4 +1,4 @@
-import axios from 'axios'
+// import axios from 'axios'
 import Providers, { ICloudObject } from '../libs/cloud/Providers'
 import CloudBuckets from '../libs/models/CloudBuckets'
 import CloudCredentials from '../libs/models/CloudCredentials'
@@ -137,23 +137,26 @@ export default function ProviderWorkers({
         })
         await objInst.save()
 
-        if (shouldSendUpdate) {
-          log.info(
-            `sending upstream socket update request to sync clients in bucket: ${bucketId}`
-          )
-          axios.post(
-            `${config.server.host}/api/1.0/admin/socket/update/clients`,
-            {
-              bucketId: bucketId,
-              type: 'objects',
-            },
-            {
-              headers: {
-                [config.apiKeyHeader]: config.app.masterKey,
-              },
-            }
-          )
-        }
+        // TODO reinstate this to sync all clients who are viewing this bucket.
+        // need to identify the best UX for this when refreshing
+        //
+        // if (shouldSendUpdate) {
+        //   log.info(
+        //     `sending upstream socket update request to sync clients in bucket: ${bucketId}`
+        //   )
+        //   axios.post(
+        //     `${config.server.host}/api/1.0/admin/socket/update/clients`,
+        //     {
+        //       bucketId: bucketId,
+        //       type: 'objects',
+        //     },
+        //     {
+        //       headers: {
+        //         [config.apiKeyHeader]: config.app.masterKey,
+        //       },
+        //     }
+        //   )
+        // }
       },
     },
   }

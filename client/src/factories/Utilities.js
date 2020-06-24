@@ -37,6 +37,8 @@ export async function checkFileAscii(fetchBlob) {
         try {
           const fileContents = theReader.result
           // if (fileContents.match(/[^\u0000-\u007f]/)) return resolve(false)
+          // https://stackoverflow.com/questions/1677644/detect-non-printable-characters-in-javascript
+          if (fileContents.match(/[\x00-\x08\x0E-\x1F]/)) return resolve(false)
           resolve(fileContents)
         } catch (err) {
           reject(err)
